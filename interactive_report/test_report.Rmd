@@ -1,5 +1,5 @@
 ---
-title: "Dig Deeper - Microbial Community Analysis"
+title: "A microbial diversity perspective within the Restoring Resilient Ecosystems project"
 author: "IBIX4"
 date: "`r Sys.Date()`"
 output: 
@@ -12,79 +12,79 @@ output:
       collapsed: true
   
 ---
+```{r title-centre, echo=FALSE, results='asis'}
+cat('
+<style>
+h1.title {
+  text-align: center;
+}
+</style>
+')
+```
 
 
 ```{r custom-header, echo=FALSE, results='asis'}
-# cat('
-# <style>
-# 
-# body, .main-container {
-#   max-width: 95%;
-#   margin: 0 auto;
-#   font-size: 1.05rem;
-# }
+cat('
+<style>
 
-# 
-# .header-bar {
-#   position: fixed;
-#   top: 0;
-#   left: 0;
-#   width: 100%;
-#   background-color: white;
-#   color: #337ab7; 
-#   display: flex;
-#   align-items: center;
-#   padding: 10px 20px;
-#   z-index: 9999;
-#   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-#   font-size: 22px;
-#   font-weight: bold;
-# }
+body, .main-container {
+  max-width: 95%;
+  margin: 0 auto;
+  font-size: 1.05rem;
+}
 
 
-# .header-bar img {
-#   height: 45px;
-#   margin-right: 15px;
-# }
+.header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  color: #337ab7; 
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  z-index: 9999;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 22px;
+  font-weight: bold;
+}
 
-# .header-text {
-#   text-align: left;
-# }
 
-#
-# body {
-#   padding-top: 70px;
-# }
+.header-bar img {
+  height: 45px;
+  margin-right: 15px;
+}
 
-# /* Responsive */
-# @media (max-width: 768px) {
-#   .header-bar {
-#     font-size: 18px;
-#     padding: 8px 10px;
-#   }
-#   .header-bar img {
-#     height: 35px;
-#     margin-right: 10px;
-#   }
-# }
-# </style>
 
-# <div class="header-bar">
-#   <img src="images/cropped-restreco_logo-1.jpg" alt="Logo" />
-#   <div class="header-text">Restoring Resilient Ecosystems</div>
-# </div>
-# ')
+.header-text {
+  text-align: left;
+}
 
-```
 
-```{r custom-page, echo=FALSE, results='asis'}
-#cat('
-#<style>
-#.container-fluid {
-#  max-width: 95% !important; 
-#}
-#</style>
-#')
+body {
+  padding-top: 70px;
+}
+
+
+@media (max-width: 768px) {
+  .header-bar {
+    font-size: 18px;
+    padding: 8px 10px;
+  }
+  .header-bar img {
+    height: 35px;
+    margin-right: 10px;
+  }
+}
+</style>
+
+<div class="header-bar">
+  <img src="images/cropped-restreco_logo-1.jpg" alt="Logo" />
+  <img src="images/Cranfield_logo.jpg" alt="Logo Cranfield" />
+  <div class="header-text">Dig Deeper - Microbial Community Analysis</div>
+</div>
+')
 ```
 
 
@@ -111,7 +111,7 @@ library(readr)
 
 ## Project Background
 
-**RestREco** is a research initiative that approaches ecological restoration with a focus on *resilience*, rather than returning ecosystems to its original state.
+**RestREco** is a research initiative that approaches ecological restoration with a focus on *resilience*, rather than returning ecosystems to their original state.
 
 The **Dig Deeper** study explored how the *age of restoration*, *establishment type*, and *site management* influence **bacterial** and **fungal** communities in soil. This was achieved by analysing both **16S** and **ITS** sequencing data collected from 66 distinct sites. The analysis focused on three main aspects:
 
@@ -823,7 +823,7 @@ cat('Here is a link to the weighted unifrac emperor plot for more flexibility on
 
 
 
-## Taxonomy
+## Taxonomy Composition
 
 ### Krona Plots
 
@@ -834,7 +834,6 @@ These plots allow users to intuitively navigate from broader taxonomic levels (s
 In this study, Krona plots provide a powerful and user-friendly way to:
 
 - Visualise which microbial groups dominate each site
-- Identify taxonomic shifts between locations or treatments
 - Explore the taxonomic diversity present in bacterial, archaeal, and fungal communities
 
 You can click on the image below to access the Krona plots for each site.
@@ -864,8 +863,15 @@ To investigate the ecological roles of fungal communities, we used **FUNGuild**,
 - **Saprotrophs**: decomposers of organic matter  
 - **Mycorrhizal fungi**: symbionts associated with plant roots  
 - **Pathogens**: organisms that cause disease in plants or animals
+- **Ectomycorrhizal**: symbionts that assist plant roots by enhancing nutrient and water uptake, especially nitrogen and phosphorus, while contributing to carbon cycling and soil nutrient mobilisation
+- **Arbuscular Mycorrhizal**: symbionts that contribute to nutrient uptake
+- **Endophyte**: microorganisms that promote the growth and development of the plants
+- **Lichenized**: fungi that form symbiotic associations with algae or cyanobacteria, creating lichens that can survive in harsh environments by combining structural support and photosynthetic ability
+- **Parasites**: fungi that live on or inside a host organism, extracting nutrients and often causing harm
+- **Symbiotrophs**: fungi that engage in mutually beneficial relationships with host organisms, typically exchanging nutrients for resources like carbon or protection
 
 This functional classification provides valuable insights into what fungi are likely *doing* in the ecosystem, beyond simply *who* they are.
+
 
 The plot below highlights the top 20 most abundant fungal guilds identified using FUNGuild. To avoid clutter, the guild names are hidden on the axis; however, users can hover over each bar to reveal the full name, enabling interactive and detailed exploration of fungal functional diversity.
 
@@ -877,9 +883,8 @@ guild_counts <- funguild %>%
   count(Guild, sort = TRUE) %>%
   slice_max(n, n = 20)
 
-# Ajout de l'esthétique text pour tooltip
 p <- ggplot(guild_counts, aes(x = reorder(Guild, n), y = n, text = Guild)) +
-  geom_col(fill = "#66c2a5") +
+  geom_col(fill = "#3780AE") +
   coord_flip() +
   labs(
     title = "Top 20 functional guilds",
@@ -898,6 +903,8 @@ ggplotly(p, tooltip = "text")
 
 Here you'll find all the content that was given throughout the report : 
 </br><a href="data/beta_diversity/s09_beta_bray_curtis_emperor_pcoa/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a></br>
-<a href="data/beta_diversity/s09_beta_weighted_unifrac_emperor_pcoa/data/index.html" target="_blank">Weighted Unifrac Emperor Plot (16S)</a>
+<a href="data/beta_diversity/s09_beta_weighted_unifrac_emperor_pcoa/data/index.html" target="_blank">Weighted Unifrac Emperor Plot (16S)</a></br>
+<a href="data/krona_by_site.html" target="_blank">Krona Plots by Site (16S)</a>
+
 
 
