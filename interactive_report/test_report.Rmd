@@ -12,6 +12,7 @@ output:
       collapsed: true
   
 ---
+
 ```{r title-centre, echo=FALSE, results='asis'}
 cat('
 <style>
@@ -40,7 +41,7 @@ body, .main-container {
   left: 0;
   width: 100%;
   background-color: white;
-  color: #337ab7; 
+  color: #3780AE; 
   display: flex;
   align-items: center;
   padding: 10px 20px;
@@ -106,24 +107,61 @@ library(stringr)
 library(tidyverse)
 library(vegan)
 library(readr)
-
+library(DT)
 ```
 
 ## Project Background
 
-**RestREco** is a research initiative that approaches ecological restoration with a focus on *resilience*, rather than returning ecosystems to their original state.
+Biodiversity loss, ecosystem degradation, and habitat destruction are increasingly linked to human-driven changes in land use, including **urbanisation**, **agriculture**, and the **exploitation of natural resources** (European Parliament, 2025; Jaureguiberry et al., 2022). In response, governments across Europe — including the EU — have introduced ambitious environmental strategies such as the **EU Biodiversity Strategy for 2030** (European Parliament, 2025) and the **30x30 target** (Markwick, 2023), which aims to protect *30% of land and sea* by the year 2030.
 
-The **Dig Deeper** study explored how the *age of restoration*, *establishment type*, and *site management* influence **bacterial** and **fungal** communities in soil. This was achieved by analysing both **16S** and **ITS** sequencing data collected from 66 distinct sites. The analysis focused on three main aspects:
+Ecological restoration plays a vital role in addressing these challenges. Rather than simply returning ecosystems to a previous state, modern approaches focus on **restoring ecological processes** and **enhancing ecosystem resilience** (Hicks, 2023).
 
-- **Alpha and beta diversity**
-- **Taxonomic composition**
+### The **RestREco** Initiative
+
+**RestREco** (*Restoring Resilient Ecosystems*) is a **NERC-funded** research project that adopts a *resilience-based* perspective on ecological restoration. The initiative brings together researchers from:
+
+- **Cranfield University**  
+- **University of Stirling**
+- **UK Centre for Ecology & Hydrology**  
+- **The National Trust**  
+- **Forest Research**
+
+Using a **natural experiment design**, RestREco studies a network of **133 ecological restoration sites** across **England and Scotland**. The project aims to identify key drivers of ecosystem development, such as:
+
+- **Time since restoration began**  
+- **Initial ecological conditions**  
+- **Proximity to existing woodland and grassland**
+
+The goal is to understand how these factors influence ecosystem **complexity**, **function**, and **resilience** to future pressures (RestREco, 2024).
+
+### The **Dig Deeper** Study
+
+As part of the RestREco initiative, the **Dig Deeper** study focused on how the *age of restoration*, *establishment type*, and *site management* affect **soil microbial communities**, specifically **bacteria** and **fungi**.
+
+To explore this, high-throughput sequencing was conducted on:
+
+- **16S rRNA gene** (for bacterial communities)  
+- **ITS region** (for fungal communities)
+
+A total of **330 soil samples** were collected for each marker. Sequencing produced an average of approximately **65,000 reads per sample**, though this varied across the dataset:
+
+- A small number of samples had **just over 30,000 reads**  
+- A few reached up to **85,000 reads**
+
+Despite this variation, sequencing depth was generally sufficient to support robust microbial analyses.
+
+The analysis focused on three main aspects:
+
+- **Alpha and beta diversity**  
+- **Taxonomic composition**  
 - **Functional diversity**
+
+These microbial assessments complement broader ecosystem-level measurements within the **RestREco project**, including **vegetation**, **invertebrates**, and ecosystem functions such as **litter decomposition**, **pollination services**, and **soil thermodynamic efficiency**.
+
 
 ---
 
-## Data Overview
-
-### Approach
+## Pipeline
 
 The sequencing data were processed using the **QIIME 2** bioinformatics platform — a widely used tool for microbiome analysis. Raw amplicon reads were **denoised** using the `DADA2` plugin, enabling accurate identification of *amplicon sequence variants (ASVs)* with single-nucleotide resolution. This method improves upon traditional OTU clustering by enhancing precision.
 
@@ -137,27 +175,55 @@ Both **16S rRNA gene** sequencing (for *bacteria and archaea*) and **ITS sequenc
 
 ---
 
-### Quality Control
+## About the Data
 
-You can explore the full **MultiQC report** by clicking the image below:
+### About the Samples 
+
+#### MutliQC on raw data
+
+You can explore the full **MultiQC report** by **clicking** the image below:
 
 ```{r QC,echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 
 cat('
 <div style="text-align: center;">
   <a href="data/multiqc_report.html" target="_blank">
-    <img src="images/number_reads_per_samples.png" style="max-width: 80%; height: auto;" alt="MutlitQc thumbnail">
+    <img src="images/sequence_quality_hist.png" style="max-width: 80%; height: auto;" alt="MutlitQc thumbnail">
   </a>
-  <p style="font-style: italic;">Figure 5. MultiQC Plot</p>
+  <p style="font-style: bold;">Figure ??. MultiQC Plot</p>
 </div>
 ')
 
+
 ```
 
-This barplot presents the number of raw sequencing reads for each individual sample prior to any quality control or filtering.  
-Most samples exhibit a relatively consistent sequencing depth. However, a few samples display notably lower read counts, which could potentially influence downstream analyses if not properly filtered or normalised.
+#### QC after denoising { .tabset}
 
----
+##### Bacteria (16S)
+
+```{r denoising-stats-table, echo=FALSE, message=FALSE, results='asis'}
+
+
+df <- read.delim("data/s04_stats_dada2/data/metadata.tsv", comment.char = "#")
+
+cat('Here is a link to the **statistics after denoising** to view it on QIIME2 (16S) : <a href="data/s04_stats_dada2/data/index.html" target="_blank">Statitics after denoising (16S)</a>')
+
+datatable(
+  df,
+  options = list(
+    pageLength = 10,
+    scrollX = TRUE,
+    autoWidth = TRUE,
+    dom = 'tip',
+    class = 'stripe hover row-border order-column'
+  )
+)
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure ??. Statitics after denoising (16S)</p>")
+
+```
+
+##### Fungi (ITS)
 
 ### About the Sites {.tabset}
 
@@ -211,11 +277,10 @@ p <- ggplot(mean.ph, aes(x=Site, y=pH, fill = Establishment, text = paste0("Site
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
-b <- ggplotly(p, tooltip = "text")
 
-# Wrap with centered div using htmltools
+htmltools::div(style = "text-align: center;", ggplotly(p, tooltip = "text"))
 HTML("<p style='text-align: center; font-weight: bold;'>Figure 2. pH Mean For Each Site</p>")
-htmltools::div(style = "text-align: center;", b)
+
 
 ```
 
@@ -277,11 +342,16 @@ gg_ec_est <- ggplot(mean.ec.est, aes(
     "Natural_regen" = "goldenrod",
     "Green_hay/bush" = "darkseagreen"
   )) +
+  
+  labs(x = "Site (ordered by EC)",
+       y = "Mean EC") +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
 cat('<div id="plot_EC_est">')
-ggplotly(gg_ec_est, tooltip = "text")
+htmltools::div(style = "text-align: center;", ggplotly(gg_ec_est, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 3. Mean EC per Site (by Establishment)</p>")
+
 cat('<p style="margin-top: 20px;">This plot shows the variation in electrical conductivity across sites, sorted by electrical conductivity.</p>')
 cat('</div>')
 
@@ -293,14 +363,16 @@ gg_ec_age <- ggplot(mean.ec.age, aes(
   text = paste0("Site: ", Site, "\nEC: ", round(EC, 2), "\nAge: ", Age_original)
 )) +
   geom_col(fill = "steelblue") +
-  labs(title = "Mean EC per Site ",
-       x = "Site (ordered by Age)",
+  labs(x = "Site (ordered by Age)",
        y = "Mean EC") +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
 cat('<div id="plot_EC_age" style="display:none;">')
-ggplotly(gg_ec_age, tooltip = "text")
+htmltools::div(style = "text-align: center;", ggplotly(gg_ec_age, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 4. Mean EC per Site (by Age)</p>")
+
+
 cat('<p style="margin-top: 20px;">This plot shows the variation in electrical conductivity across sites, sorted by increasing site age.</p>')
 cat('</div>')
 
@@ -321,7 +393,7 @@ Each coloured bar indicates the presence of one or more management strategies at
 
 *Hover over each bar in the interactive plot to see the site name.*
 
-```{r site-management, echo = FALSE, message=FALSE, warning=FALSE, fig.cap="Figure 4. Management for each site"}
+```{r site-management, echo = FALSE, message=FALSE, warning=FALSE}
 
 
 
@@ -349,10 +421,9 @@ p <- ggplot(df_unique, aes(x = Site, fill = management_type,text = Site)) +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
-c <- ggplotly(p, tooltip= "text")
+htmltools::div(style = "text-align: center;", ggplotly(p, tooltip= "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 5. Management type for each site</p>")
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 4. Management type for each site</p>")
-htmltools::div(style = "text-align: center;", c)
 
 ```
 
@@ -392,14 +463,13 @@ gg_ph <- ggplot(sample.data_long, aes(x = management_type, y = pH, fill = manage
              aes(x = management_type, y = mean_val,
                  text = paste0("Mean pH: ", round(mean_val, 2))),
              shape = 20, size = 3, color = "black", inherit.aes = FALSE) +
-  labs(title = "pH Variation Depending on Management Type",
-       x = "Management Type", y = "pH") +
+  labs(x = "Management Type", y = "pH") +
   theme_minimal()
 
+
 cat('<div id="plot_ph">')
-
-ggplotly(gg_ph, tooltip = "text")
-
+htmltools::div(style = "text-align: center;", ggplotly(gg_ph, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 6. pH Variation Depending on Management Type</p>")
 cat('</div>')
 
 summary_means_ec <- sample.data_long %>%
@@ -423,7 +493,9 @@ gg_ec <- ggplot(sample.data_long, aes(x = management_type, y = EC, fill = manage
   theme_minimal()
 
 cat('<div id="plot_ec" style="display:none;">')
-ggplotly(gg_ec, tooltip = "text")
+
+htmltools::div(style = "text-align: center;", ggplotly(gg_ec, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 7. EC Variation Depending on Management Type</p>")
 cat('</div>')
 
 cat('
@@ -442,7 +514,7 @@ function switchPlot() {
 
 ## Diversity
 
-### Alpha Diversity
+### Alpha Diversity 
 
 Alpha diversity refers to the variety of organisms within a particular sample or environment. It reflects both **richness**—the number of distinct taxa—and **evenness**—how evenly individuals are distributed among those taxa. One of the most widely used measures for assessing alpha diversity is the **Shannon index**.
 
@@ -452,18 +524,7 @@ Another important metric is **Faith’s Phylogenetic Diversity (Faith PD)**, whi
 
 In the interactive plots below, we examine how both the Shannon index and Faith PD vary across different environmental and experimental conditions, separately for the 16S (bacteria and archaea) and ITS (fungi) datasets.
 
-#### From 16S Data
-
-
-```{r type-plot-switcherBegin, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-#cat('
-#<label for="variable_selector_type"><big>Select data type:</big></label>
-#<select id="variable_selector_type" onchange="switchPlotType()">
-#  <option value="bac">16S (bacteria & archaea)</option>
-#  <option value="fun">ITS (fungi)</option>
-#</select>
-#')
-```
+#### Bacteria (16S)
 
 
 ```{r shannon-plot-switcher, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
@@ -471,8 +532,8 @@ In the interactive plots below, we examine how both the Shannon index and Faith 
 cat('
 <label for="variable_selector_Alpha16S">Select variable:</label>
 <select id="variable_selector_Alpha16S" onchange="switchPlotAlpha16S()">
-  <option value="year_est">Year-Establishment</option>
   <option value="est">Establishment</option>
+  <option value="year_est">Year-Establishment</option>
   <option value="age">Age</option>
 </select>
 ') # creates a drop-down menu
@@ -488,37 +549,12 @@ df_shannon$shannon_entropy <- as.numeric(df_shannon$shannon_entropy)
 df_faith$faith_pd <- as.numeric(df_faith$faith_pd)
 
 
-var <- "Year_est"
-p <- ggplot(df_shannon, aes_string(x = var, y = "shannon_entropy")) +
-  geom_boxplot(fill = "deepskyblue3") +
-  theme_minimal() +
-  labs(title = paste("Shannon Index by", var), x = var, y = "Shannon Index") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_y_continuous(breaks = seq(floor(min(df_shannon$shannon_entropy, na.rm = TRUE)),
-                                  ceiling(max(df_shannon$shannon_entropy, na.rm = TRUE)), 1))
-
-pp <- ggplot(df_faith, aes_string(x = var, y = "faith_pd")) +
-    geom_boxplot(fill = "deepskyblue3") +
-    theme_minimal() +
-    labs(title = paste("Faith PD by", var), x = var, y = "Faith PD") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_y_continuous(breaks = seq(floor(min(df_faith$faith_pd, na.rm = TRUE)),
-                                  ceiling(max(df_faith$faith_pd, na.rm = TRUE)), 1))
-
-
-cat('<div id="plot_year_est">')
-
-ggplotly(p, tooltip = "text")
-ggplotly(pp, tooltip = "text")
-
-cat('</div>')
-
 var2 <- "Establishment"
 
 g <- ggplot(df_shannon, aes_string(x = var2, y = "shannon_entropy")) +
   geom_boxplot(fill = "deepskyblue2") +
   theme_minimal() +
-  labs(title = paste("Shannon Index by", var2), x = var2, y = "Shannon Index") +
+  labs( x = var2, y = "Shannon Index") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(breaks = seq(floor(min(df_shannon$shannon_entropy, na.rm = TRUE)),
                                   ceiling(max(df_shannon$shannon_entropy, na.rm = TRUE)), 1))
@@ -526,24 +562,60 @@ g <- ggplot(df_shannon, aes_string(x = var2, y = "shannon_entropy")) +
 gg <- ggplot(df_faith, aes_string(x = var2, y = "faith_pd")) +
     geom_boxplot(fill = "deepskyblue2") +
     theme_minimal() +
-    labs(title = paste("Faith PD by", var2), x = var2, y = "Faith PD") +
+    labs( x = var2, y = "Faith PD") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(breaks = seq(floor(min(df_faith$faith_pd, na.rm = TRUE)),
                                   ceiling(max(df_faith$faith_pd, na.rm = TRUE)), 1))
 
 
 
-cat('<div id="plot_est" style="display:none;">')
-ggplotly(g, tooltip = "text")
-ggplotly(gg, tooltip = "text")
+cat('<div id="plot_est" >')
+
+htmltools::div(style = "text-align: center;", ggplotly(g, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 10. Shannon Index by Establishment</p>")
+htmltools::div(style = "text-align: center;", ggplotly(gg, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 11. Faith PD by Establishment</p>")
+
+
+
 cat('</div>')
+
+
+var <- "Year_est"
+p <- ggplot(df_shannon, aes_string(x = var, y = "shannon_entropy")) +
+  geom_boxplot(fill = "deepskyblue3") +
+  theme_minimal() +
+  labs(x = var, y = "Shannon Index") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(breaks = seq(floor(min(df_shannon$shannon_entropy, na.rm = TRUE)),
+                                  ceiling(max(df_shannon$shannon_entropy, na.rm = TRUE)), 1))
+
+pp <- ggplot(df_faith, aes_string(x = var, y = "faith_pd")) +
+    geom_boxplot(fill = "deepskyblue3") +
+    theme_minimal() +
+    labs(x = var, y = "Faith PD") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(breaks = seq(floor(min(df_faith$faith_pd, na.rm = TRUE)),
+                                  ceiling(max(df_faith$faith_pd, na.rm = TRUE)), 1))
+
+f <- ggplotly(p, tooltip = "text")
+h <- ggplotly(pp, tooltip = "text")
+cat('<div id="plot_year_est" style="display:none;">')
+htmltools::div(style = "text-align: center;", f)
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 8. Shannon Index by Age of Establishment</p>")
+htmltools::div(style = "text-align: center;", h)
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 9. Faith PD by Age of Establishment</p>")
+
+cat('</div>')
+
+
 
 var3 <- "Age"
 
 q <- ggplot(df_shannon, aes_string(x = var3, y = "shannon_entropy")) +
   geom_boxplot(fill = "deepskyblue") +
   theme_minimal() +
-  labs(title = paste("Shannon Index by", var3), x = var3, y = "Shannon Index") +
+  labs( x = var3, y = "Shannon Index") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(breaks = seq(floor(min(df_shannon$shannon_entropy, na.rm = TRUE)),
                                   ceiling(max(df_shannon$shannon_entropy, na.rm = TRUE)), 1))
@@ -551,7 +623,7 @@ q <- ggplot(df_shannon, aes_string(x = var3, y = "shannon_entropy")) +
 qq <- ggplot(df_faith, aes_string(x = var3, y = "faith_pd")) +
     geom_boxplot(fill = "deepskyblue") +
     theme_minimal() +
-    labs(title = paste("Faith PD by", var3), x = var3, y = "Faith PD") +
+    labs( x = var3, y = "Faith PD") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_y_continuous(breaks = seq(floor(min(df_faith$faith_pd, na.rm = TRUE)),
                                   ceiling(max(df_faith$faith_pd, na.rm = TRUE)), 1))
@@ -559,8 +631,11 @@ qq <- ggplot(df_faith, aes_string(x = var3, y = "faith_pd")) +
 
 
 cat('<div id="plot_age" style="display:none;">')
-ggplotly(q, tooltip = "text")
-ggplotly(qq, tooltip = "text")
+htmltools::div(style = "text-align: center;", ggplotly(q, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 12. Shannon Index by Age</p>")
+htmltools::div(style = "text-align: center;", ggplotly(qq, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 13. Faith PD by Age</p>")
+
 cat('</div>')
 
 
@@ -580,27 +655,22 @@ function switchPlotAlpha16S() {
 }
 </script>')
 
-#cat('</div>')
 
 
 ```
 
 
-#### From ITS Data
-
-Just as with the 16S data, we computed the **Shannon diversity index** for the ITS dataset to assess fungal alpha diversity. The resulting boxplots allow us to explore how fungal diversity varies across different environmental or experimental conditions, offering a parallel view to that of bacterial and archaeal communities.
-
-This analysis provides valuable insights into how fungal communities respond to factors such as establishment method, site age, or land management, complementing the microbial diversity picture captured by the 16S data.
+#### Fungi (ITS)
 
 ```{r funguilt-shannon, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 
-#cat('<div id="section_ITS" style="display:none;">')
 
 cat('
 <label for="variable_selector_AlphaITS">Select variable:</label>
 <select id="variable_selector_AlphaITS" onchange="switchPlotAlphaITS()">
-  <option value="year_est">Year-Establishment</option>
+  
   <option value="est">Establishment</option>
+  <option value="year_est">Year-Establishment</option>
   <option value="age">Age</option>
 </select>
 ') # creates a drop-down menu
@@ -636,45 +706,55 @@ metadata <- read_tsv("data/GP_metadata.txt")
 
 shannon_merged <- left_join(shannon_df, metadata, by = "Site")
 
+p2 <- ggplot(shannon_merged, aes(x = Establishment, y = Shannon, fill = Establishment)) +
+  geom_boxplot(fill = "dodgerblue2") +
+  theme_minimal() +
+  labs(x = "Establishment",
+       y = "Shannon Index") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+cat('<div id="plot_estITS" >')
+htmltools::div(style = "text-align: center;", ggplotly(p2, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 15. Shannon Index by Establishment</p>")
+
+
+cat('</div>')
+
 p1 <- ggplot(shannon_merged, aes(x = Year_est, y = Shannon, fill = Year_est)) +
   geom_boxplot(fill = "dodgerblue3") +
   theme_minimal() +
-  labs(title = "Shannon Index by Year of Establishment",
+  labs(
        x = "Year_est",
        y = "Shannon Index") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-cat('<div id="plot_year_estITS">')
+cat('<div id="plot_year_estITS" style="display:none;">')
+htmltools::div(style = "text-align: center;", ggplotly(p1, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 14. Shannon Index by Age of Establishment</p>")
 
-ggplotly(p1, tooltip = "text")
+
 
 cat('</div>')
 
-p2 <- ggplot(shannon_merged, aes(x = Establishment, y = Shannon, fill = Establishment)) +
-  geom_boxplot(fill = "dodgerblue2") +
-  theme_minimal() +
-  labs(title = "Shannon Index by establishment",
-       x = "Establishment",
-       y = "Shannon Index") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 
-cat('<div id="plot_estITS" style="display:none;">')
-ggplotly(p2, tooltip = "text")
-cat('</div>')
 p3 <- ggplot(shannon_merged, aes(x = Age, y = Shannon, fill = Age)) +
   geom_boxplot(fill = "dodgerblue") +
   theme_minimal() +
-  labs(title = "Shannon Index by Age",
-       x = "Age",
+  labs(x = "Age",
        y = "Shannon Index") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 
 cat('<div id="plot_ageITS" style="display:none;">')
-ggplotly(p3, tooltip = "text")
+htmltools::div(style = "text-align: center;", ggplotly(p3, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 16. Shannon Index by Age</p>")
+
+
 cat('</div>')
 
 
@@ -687,17 +767,6 @@ function switchPlotAlphaITS() {
 }
 </script>')
 
-#cat('</div>')
-```
-
-```{r type-plot-switcherEnd, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-#cat('<script>
-#function switchPlotType() {
-#  var val = document.getElementById("variable_selector_type").value;
-#  document.getElementById("section_16S").style.display = (val === "bac") ? "block" : "none";
-#  document.getElementById("section_ITS").style.display = (val === "fun") ? "block" : "none";
-#}
-#</script>')
 ```
 
 ### Beta Diversity
@@ -706,7 +775,7 @@ To explore differences in microbial communities, we often rely on dimensionality
 
 While both metrics can reveal meaningful clustering and separation in microbial data, they capture complementary aspects of community structure.
 
-#### From 16S Data
+#### Bacteria (16S)
 
 ##### Bray-Curtis Emperor Plot
 
@@ -733,15 +802,15 @@ coord_df <- as.data.frame(coords)
 colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
 coord_df$SampleID <- json$plot$decomposition$sample_ids
 
-# Extraire les métadonnées
+
 metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
 colnames(metadata) <- json$plot$metadata_headers
 
-# Joindre coordonnées + métadonnées
+
 df <- left_join(coord_df, metadata, by = "SampleID")
 
 
-plot_ly(
+b <- plot_ly(
   df,
   x = ~PC1,
   y = ~PC2,
@@ -753,6 +822,8 @@ plot_ly(
   marker = list(size = 4)
   
 )
+htmltools::div(style = "text-align: center;", b)
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 17. Bray-Curtis Emperor Plot</p>")
 
 cat('Here is a link to the bray curtis emperor plot for more flexibility on QIIME2: <a href="data/beta_diversity/s09_beta_bray_curtis_emperor_pcoa/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>')
 
@@ -768,7 +839,7 @@ cat('Here is a link to the bray curtis emperor plot for more flexibility on QIIM
 #  <a href="data/beta_diversity/s09_beta_bray_curtis_emperor_pcoa/data/index.html" target="_blank">
 #    <img src="images/bray_curtis_emperor.png" style="max-width: 80%; height: auto;" alt="Emperor thumbnail">
 #  </a>
-#  <p style="font-style: italic;">Figure 2. Beta diversity emperor plot</p>
+#  <p style="font-style: bold;">Figure 2. Beta diversity emperor plot</p>
 #</div>
 #')
 
@@ -802,7 +873,7 @@ colnames(metadata) <- json$plot$metadata_headers
 df <- left_join(coord_df, metadata, by = "SampleID")
 
 
-plot_ly(
+b <- plot_ly(
   df,
   x = ~PC1,
   y = ~PC2,
@@ -815,21 +886,29 @@ plot_ly(
   
 )
 
+htmltools::div(style = "text-align: center;", b)
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Weighted Unifrac Emperor Plot</p>")
+
+
 cat('Here is a link to the weighted unifrac emperor plot for more flexibility on QIIME2: <a href="data/beta_diversity/s09_beta_weighted_unifrac_emperor_pcoa/data/index.html" target="_blank">Weighted Unifrac Emperor Plot (16S)</a>')
 
 ```
 
-#### From ITS Data
+#### Fungi (ITS)
 
 
 
 ## Taxonomy Composition
 
-### Krona Plots
-
 To explore the composition of soil microbial communities, we used **Krona plots** — interactive, circular charts that display taxonomic abundances in a hierarchical manner.
 
 These plots allow users to intuitively navigate from broader taxonomic levels (such as *Phylum*) to more specific ones (like *Genus*), while simultaneously comparing relative abundances across taxa.
+
+### Bacteria (16S)
+
+#### Krona Plots
+
+
 
 In this study, Krona plots provide a powerful and user-friendly way to:
 
@@ -844,19 +923,24 @@ cat('
   <a href="data/krona_by_site.html" target="_blank">
     <img src="images/krona.png" style="max-width: 80%; height: auto;" alt="Krona thumbnail">
   </a>
-  <p style="font-style: italic;">Figure 2. Krona Plot for Baltic_farm_1</p>
+  <p style="font-style: bold;">Figure 19. Krona Plot for Baltic_farm_1</p>
 </div>
 ')
 ```
+
+### Fungi (ITS)
+
+#### Krona Plots
+
 
 ## Functional Diversity
 
 In microbial ecology, a *guild* refers to a group of organisms that fulfil similar ecological roles, regardless of their taxonomic identity. Understanding functional guilds allows researchers to move beyond taxonomic profiles and assess the ecological roles that microbial communities may play in an environment.
 
-### From 16S Data
+### Bacteria (16S)
 
 
-### From ITS Data
+### Fungi (ITS)
 
 To investigate the ecological roles of fungal communities, we used **FUNGuild**, a tool that assigns fungi to functional guilds based on curated databases and literature. These guilds represent ecological strategies such as:
 
@@ -886,25 +970,18 @@ guild_counts <- funguild %>%
 p <- ggplot(guild_counts, aes(x = reorder(Guild, n), y = n, text = Guild)) +
   geom_col(fill = "#3780AE") +
   coord_flip() +
-  labs(
-    title = "Top 20 functional guilds",
-    x = NULL,
+  labs(x = NULL,
     y = "Number of OTUs"
   ) +
   theme_minimal() +
   theme(axis.text.y = element_blank())
 
-ggplotly(p, tooltip = "text")
+htmltools::div(style = "text-align: center;", ggplotly(p, tooltip = "text"))
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 20. Top 20 functional guilds</p>")
+
+
+
 ```
 
-
-
-## All External Link
-
-Here you'll find all the content that was given throughout the report : 
-</br><a href="data/beta_diversity/s09_beta_bray_curtis_emperor_pcoa/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a></br>
-<a href="data/beta_diversity/s09_beta_weighted_unifrac_emperor_pcoa/data/index.html" target="_blank">Weighted Unifrac Emperor Plot (16S)</a></br>
-<a href="data/krona_by_site.html" target="_blank">Krona Plots by Site (16S)</a>
-
-
+## Appendix
 
