@@ -17,28 +17,40 @@ def extract_numeric(sample_id):
 
 # Function to match metadata sample IDs from manifest
 def match_metadata(args):
-    # Read the manifest file and extract unique sample ID
     manifest_df = pd.read_csv(args.manifest)
     sample_ids = manifest_df['sample-id'].unique()
     sample_ids_dict = {str(int(extract_numeric(sid))): sid for sid in sample_ids if extract_numeric(sid)}
-    
+
     metadata_df = pd.read_csv(args.metadata, sep="\t", dtype=str)
 
-    # Check if CU Code columne exists
     if "CU Code" not in metadata_df.columns:
         raise ValueError("'CU Code' column is missing in the metadata file.")
-    
-    # Extract CU Code number
+
     metadata_df["CU_numeric"] = metadata_df["CU Code"].str.extract(r'(\d+)$')[0].astype(int).astype(str)
-
-    # Filter metadata based on CU codes
     metadata_df = metadata_df[metadata_df["CU_numeric"].isin(sample_ids_dict.keys())]
-
-    # Replace site code with new sample IDs from the manifest
     metadata_df.insert(0, "sample-id", metadata_df["CU_numeric"].map(sample_ids_dict))
     metadata_df.drop(columns=["CU_numeric"], inplace=True)
-   
-    metadata_df.to_csv(args.output, sep="\t", index=False)
+
+    metadata_df = metadata_df.replace('/', '_', regex=True)
+
+    columns_to_modify = ['Cutting', 'Cattle', 'Sheep', 'Plough']
+    metadata_df[columns_to_modify] = metadata_df[columns_to_modify].replace({'1': 'Yes', '0': 'No', pd.NA: 'NA', '': 'NA'})
+
+    # Process pH column
+    if 'pH' in metadata_df.columns:
+        metadata_df['pH'] = pd.to_numeric(metadata_df['pH'], errors='coerce')
+        pH_median = metadata_df['pH'].median()
+        metadata_df['pH_category'] = metadata_df['pH'].apply(lambda x: 'Above_median' if x > pH_median else 'Below_median')
+
+    # Process Age column
+    if 'Age' in metadata_df.columns:
+        metadata_df['Age_numeric'] = pd.to_numeric(metadata_df['Age'].replace('>100', '101'), errors='coerce')
+        age_median = metadata_df['Age_numeric'].median()
+        metadata_df['Age_category'] = metadata_df.apply(
+            lambda row: 'Above_median' if (row['Age'] == '>100' or row['Age_numeric'] > age_median) else 'Below_median', axis=1)
+        metadata_df.drop(columns=['Age_numeric'], inplace=True)
+
+    metadata_df.to_csv(args.output, sep="\t", index=False, na_rep='NA')
     print(f"Processed metadata written to: {args.output}")
 
 def main():
