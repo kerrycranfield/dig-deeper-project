@@ -12,6 +12,7 @@ METADATA_DIR="$ITS_DIR/metadata"
 CLASSIFIER="/home/sam/UniGroup/resources/unite_ver10_dynamic_all_19.02.2025-Q2-2024.10.qza"
 RAW_METADATA="/home/sam/UniGroup/data/restreco_grassland/GP_metadata.txt"
 MANIFEST="$TRIMMED_DIR/manifest.txt"
+RESULTS_DIR="/home/sam/UniGroup/results/"
 
 # Create output directories
 mkdir -p "$DENOISE_DIR" "$METADATA_DIR"
@@ -29,6 +30,11 @@ qiime tools import \
   --input-format PairedEndFastqManifestPhred33 \
   --input-path "$MANIFEST" \
   --output-path "$DENOISE_DIR/sequence.qza"
+
+# Export sequence quality
+qiime demux summarize
+  --i-data "$DENOISE_DIR/sequence.qza"
+  --o-visualization "$RESULTS_DIR"
 
 # Denoise with DADA2
 qiime dada2 denoise-paired \
@@ -76,6 +82,9 @@ qiime diversity alpha-rarefaction \
   --p-max-depth 50000 \
   --m-metadata-file "$METADATA_DIR/agg_metadata.txt" \
   --o-visualization "$DENOISE_DIR/aggregated_rarefaction.qzv"
+
+# Copy desired results to the RESULTS directory
+cp "$DENOISE_DIR/table-dada2.qzv" "$RESULTS_DIR/"
 
 # Deactivate environment
 conda deactivate

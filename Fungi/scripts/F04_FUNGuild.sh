@@ -10,7 +10,7 @@ source /home/sam/miniconda3/bin/activate qiime2-amplicon-2024.10
 ITS_DIR="/home/sam/UniGroup/data/restreco_grassland/ITS"
 DENOISE_DIR="$ITS_DIR/denoise"
 GUILD_DIR="$ITS_DIR/funguild"
-TABLE="$DENOISE_DIR/table_aggregated.qza"
+TABLE="$DENOISE_DIR/rare_table_aggregated.qza"
 TAXONOMY="$DENOISE_DIR/taxonomy.qza"
 GUILD_INPUT="$GUILD_DIR/funguild_input.tsv"
 GUILD_OUTPUT="$GUILD_DIR/funguild_output.txt"
@@ -24,6 +24,13 @@ qiime taxa collapse \
   --i-taxonomy "$TAXONOMY" \
   --p-level 6 \
   --o-collapsed-table "$GUILD_DIR/table_collapsed_genus.qza"
+  
+# Collapse table at family level, level 5
+qiime taxa collapse \
+  --i-table "$TABLE" \
+  --i-taxonomy "$TAXONOMY" \
+  --p-level 5 \
+  --o-collapsed-table "$GUILD_DIR/table_collapsed_family.qza"
 
 # Export collapsed table to BIOM format
 qiime tools export \
