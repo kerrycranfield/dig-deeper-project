@@ -24,9 +24,6 @@ def res_tsv(args):
     df.columns = header
     df = df.rename(columns={df.columns[0]: 'Taxonomy'})
     
-    # Remove rows where 'Taxonomy' contains 'unassigned'
-    df = df[~df['Taxonomy'].str.contains('unassigned', case=False)]
-
     # Insert 'OTU ID' column
     df.insert(0, 'OTU ID', [f'OTU_{i+1}' for i in range(len(df))])
     
@@ -38,7 +35,7 @@ def res_tsv(args):
 
 def main():
     args = parse_args()
-    restructure_tsv(args)
+    res_tsv(args)
 
 if __name__ == "__main__":
     main()
