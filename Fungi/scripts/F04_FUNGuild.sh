@@ -14,9 +14,8 @@ TABLE="$DENOISE_DIR/rare_table_aggregated.qza"
 TAXONOMY="$DENOISE_DIR/taxonomy.qza"
 GUILD_INPUT="$GUILD_DIR/funguild_input.tsv"
 GUILD_OUTPUT="$GUILD_DIR/funguild_output.txt"
-
-# Create output directory
-mkdir -p "$GUILD_DIR"
+FUN_TOOL="/home/sam/UniGroup/tools/FUN_tool.py"
+FUNGUILD="/home/sam/UniGroup/resources/FUNGuild/Guilds_v1.1.py"
 
 # Collapse table at genus level, level 6
 qiime taxa collapse \
@@ -25,13 +24,6 @@ qiime taxa collapse \
   --p-level 6 \
   --o-collapsed-table "$GUILD_DIR/table_collapsed_genus.qza"
   
-# Collapse table at family level, level 5
-qiime taxa collapse \
-  --i-table "$TABLE" \
-  --i-taxonomy "$TAXONOMY" \
-  --p-level 5 \
-  --o-collapsed-table "$GUILD_DIR/table_collapsed_family.qza"
-
 # Export collapsed table to BIOM format
 qiime tools export \
   --input-path "$GUILD_DIR/table_collapsed_genus.qza" \
@@ -45,12 +37,12 @@ biom convert \
   --header-key taxonomy
 
 # Restructure TSV for FUNGuild compatibility
-python /home/sam/UniGroup/tools/FUN_tool.py \
+python "$FUN_TOOL" \
   -i "$GUILD_DIR/feature-table.tsv" \
   -o "$GUILD_INPUT"
 
 # Run FUNGuild
-python "/home/sam/UniGroup/resources/FUNGuild/Guilds_v1.1.py" \
+python "$FUNGUILD" \
   -otu "$GUILD_INPUT" \
   -db fungi \
   -m \
