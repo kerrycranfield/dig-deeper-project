@@ -19,7 +19,7 @@ df$Guild_Extracted <- str_extract(df$Guild, "\\|[^|]+\\|") %>%
 # converts NA to Unassigned
 df$Guild_Extracted[is.na(df$Guild_Extracted)] <- "Unassigned"
 
-# Set factor level so "Unassigned" appears first (bottom of bar)
+# Set factor level so "Unassigned" appears first
 df$Guild_Extracted <- factor(df$Guild_Extracted, levels = c("Unassigned", sort(unique(df$Guild_Extracted[df$Guild_Extracted != "Unassigned"]))))
 
 # Filter out rows without pipe-delimited guilds
@@ -56,7 +56,7 @@ guild_plot <- ggplot(guild_data, aes(x = Site, y = Abundance, fill = Guild_Extra
 # Restructure data for filtered guilds, excludes undefined
 guild_data_filtered <- df_filtered %>%
   pivot_longer(cols = all_of(site_cols), names_to = "Site", values_to = "Abundance") %>%
-  filter(Abundance > 0) %>%
+  filter(Abundance > 0 & Guild_Extracted != "Unassigned") %>%
   group_by(Site, Guild_Extracted) %>%
   summarise(Abundance = sum(Abundance), .groups = "drop")
 
@@ -79,7 +79,7 @@ guild_plot_filtered <- ggplot(guild_data_filtered, aes(x = Site, y = Abundance, 
 # Restructure data for pH, excludes undefined
 guild_pH_data <- df_filtered %>%
   pivot_longer(cols = all_of(site_cols), names_to = "sample-id", values_to = "Abundance") %>%
-  filter(Abundance > 0) %>%
+  filter(Abundance > 0 & Guild_Extracted != "Unassigned") %>%
   left_join(meta[, c("sample-id", "pH_category")], by = "sample-id") %>%
   group_by(pH_category, Guild_Extracted) %>%
   summarise(Abundance = sum(Abundance), .groups = "drop")
@@ -99,7 +99,7 @@ guild_pH_plot <- ggplot(guild_pH_data, aes(x = pH_category, y = Abundance, fill 
 # Restructure data for Age, excludes undefined
 guild_Age_data <- df_filtered %>%
   pivot_longer(cols = all_of(site_cols), names_to = "sample-id", values_to = "Abundance") %>%
-  filter(Abundance > 0) %>%
+  filter(Abundance > 0 & Guild_Extracted != "Unassigned") %>%
   left_join(meta[, c("sample-id", "Age_category")], by = "sample-id") %>%
   group_by(Age_category, Guild_Extracted) %>%
   summarise(Abundance = sum(Abundance), .groups = "drop")
@@ -119,7 +119,7 @@ guild_Age_plot <- ggplot(guild_Age_data, aes(x = Age_category, y = Abundance, fi
 # Restructure data for Establishment, excludes undefined
 guild_Establishment_data <- df_filtered %>%
   pivot_longer(cols = all_of(site_cols), names_to = "sample-id", values_to = "Abundance") %>%
-  filter(Abundance > 0) %>%
+  filter(Abundance > 0 & Guild_Extracted != "Unassigned") %>%
   left_join(meta[, c("sample-id", "Establishment")], by = "sample-id") %>%
   group_by(Establishment, Guild_Extracted) %>%
   summarise(Abundance = sum(Abundance), .groups = "drop")
