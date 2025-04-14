@@ -11,6 +11,7 @@ AGG_METADATA_FILE="$METADATA_DIR/agg_metadata.txt"
 METADATA_FILE="$METADATA_DIR/metadata.txt"
 COREMETRICS_DIR="$ITS_DIR/coremetrics"
 VISUAL_DIR="$COREMETRICS_DIR/visual"
+GUILD_DIR="$ITS_DIR/funguild"
 RESULTS_DIR="/home/sam/UniGroup/results"
 
 # Clean and recreate output directories (can be run multiple times)
@@ -18,6 +19,7 @@ rm -rf "$COREMETRICS_DIR"
 mkdir -p "$COREMETRICS_DIR"
 mkdir -p "$VISUAL_DIR"
 mkdir -p "$RESULTS_DIR"
+mkdir -p "$GUILD_DIR"
 
 # Run metrics non-aggregated
 qiime diversity core-metrics \
@@ -63,165 +65,25 @@ qiime diversity alpha-group-significance \
   --m-metadata-file "$METADATA_FILE" \
   --o-visualization "$VISUAL_DIR/shannon_significance.qzv"
 
-# Beta diversity significance, PERMANOVA, on aggregated table (Bray Curtis)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_bray_curtis_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Establishment \
-  --o-visualization "$VISUAL_DIR/Establishment_bray_curtis_significance.qzv" \
-  --p-pairwise
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Jaccard)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_jaccard_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Establishment \
-  --o-visualization "$VISUAL_DIR/Establishment_jaccard_significance.qzv" \
-  --p-pairwise
+categories=("Establishment" "pH_category" "Age_category" "Cutting" "Cattle" "Sheep" "Plough")
 
-# Beta diversity significance, PERMANOVA, on aggregated table (Bray Curtis)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_bray_curtis_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column pH_category \
-  --o-visualization "$VISUAL_DIR/pH_bray_curtis_significance.qzv" \
-  --p-pairwise
+for category in "${categories[@]}"; do
+  qiime diversity beta-group-significance \
+    --i-distance-matrix "$COREMETRICS_DIR/agg_bray_curtis_distance_matrix.qza" \
+    --m-metadata-file "$AGG_METADATA_FILE" \
+    --m-metadata-column "$category" \
+    --o-visualization "$VISUAL_DIR/${category}_bray_curtis_significance.qzv" \
+    --p-pairwise
   
-# Beta diversity significance, PERMANOVA, on aggregated table (Jaccard)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_jaccard_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column pH_category \
-  --o-visualization "$VISUAL_DIR/pH_jaccard_significance.qzv" \
-  --p-pairwise
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Bray Curtis)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_bray_curtis_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Age_category \
-  --o-visualization "$VISUAL_DIR/Age_bray_curtis_significance.qzv" \
-  --p-pairwise
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Jaccard)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_jaccard_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Age_category \
-  --o-visualization "$VISUAL_DIR/Age_jaccard_significance.qzv" \
-  --p-pairwise  
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Bray Curtis)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_bray_curtis_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Cutting \
-  --o-visualization "$VISUAL_DIR/Cutting_bray_curtis_significance.qzv" \
-  --p-pairwise
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Jaccard)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_jaccard_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Cutting \
-  --o-visualization "$VISUAL_DIR/Cutting_jaccard_significance.qzv" \
-  --p-pairwise   
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Bray Curtis)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_bray_curtis_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Cattle \
-  --o-visualization "$VISUAL_DIR/Cattle_bray_curtis_significance.qzv" \
-  --p-pairwise
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Jaccard)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_jaccard_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Cattle \
-  --o-visualization "$VISUAL_DIR/Cattle_jaccard_significance.qzv" \
-  --p-pairwise   
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Bray Curtis)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_bray_curtis_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Sheep \
-  --o-visualization "$VISUAL_DIR/Sheep_bray_curtis_significance.qzv" \
-  --p-pairwise
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Jaccard)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_jaccard_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Sheep \
-  --o-visualization "$VISUAL_DIR/Sheep_jaccard_significance.qzv" \
-  --p-pairwise   
-    
-# Beta diversity significance, PERMANOVA, on aggregated table (Bray Curtis)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_bray_curtis_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Plough \
-  --o-visualization "$VISUAL_DIR/Plough_bray_curtis_significance.qzv" \
-  --p-pairwise
-  
-# Beta diversity significance, PERMANOVA, on aggregated table (Jaccard)
-qiime diversity beta-group-significance \
-  --i-distance-matrix "$COREMETRICS_DIR/agg_jaccard_distance_matrix.qza" \
-  --m-metadata-file "$AGG_METADATA_FILE" \
-  --m-metadata-column Plough \
-  --o-visualization "$VISUAL_DIR/Plough_jaccard_significance.qzv" \
-  --p-pairwise   
-  
-# Perform ANCOM for differential abundance testing on rarefied_aggregated table
- qiime composition add-pseudocount \
-   --i-table "$DENOISE_DIR/rare_table_aggregated.qza" \
-   --o-composition-table "$DENOISE_DIR/composition_table.qza"
- 
- qiime composition ancom \
-   --i-table "$DENOISE_DIR/composition_table.qza" \
-   --m-metadata-file "$AGG_METADATA_FILE" \
-   --m-metadata-column Establishment \
-   --o-visualization "$VISUAL_DIR/Establishment_ancom.qzv"
-   
-  qiime composition ancom \
-   --i-table "$DENOISE_DIR/composition_table.qza" \
-   --m-metadata-file "$AGG_METADATA_FILE" \
-   --m-metadata-column pH_category \
-   --o-visualization "$VISUAL_DIR/pH_ancom.qzv"
-   
-  qiime composition ancom \
-   --i-table "$DENOISE_DIR/composition_table.qza" \
-   --m-metadata-file "$AGG_METADATA_FILE" \
-   --m-metadata-column Age_category \
-   --o-visualization "$VISUAL_DIR/Age_category_ancom.qzv"
-   
-   qiime composition ancom \
-   --i-table "$DENOISE_DIR/composition_table.qza" \
-   --m-metadata-file "$AGG_METADATA_FILE" \
-   --m-metadata-column Cutting \
-   --o-visualization "$VISUAL_DIR/Cutting_ancom.qzv"
-   
-   qiime composition ancom \
-   --i-table "$DENOISE_DIR/composition_table.qza" \
-   --m-metadata-file "$AGG_METADATA_FILE" \
-   --m-metadata-column Cattle \
-   --o-visualization "$VISUAL_DIR/Cattle_ancom.qzv"
-   
-   qiime composition ancom \
-   --i-table "$DENOISE_DIR/composition_table.qza" \
-   --m-metadata-file "$AGG_METADATA_FILE" \
-   --m-metadata-column Sheep \
-   --o-visualization "$VISUAL_DIR/Sheep_ancom.qzv"
-   
-   qiime composition ancom \
-   --i-table "$DENOISE_DIR/composition_table.qza" \
-   --m-metadata-file "$AGG_METADATA_FILE" \
-   --m-metadata-column Plough \
-   --o-visualization "$VISUAL_DIR/Plough_ancom.qzv"  
+  qiime diversity beta-group-significance \
+    --i-distance-matrix "$COREMETRICS_DIR/agg_jaccard_distance_matrix.qza" \
+    --m-metadata-file "$AGG_METADATA_FILE" \
+    --m-metadata-column "$category" \
+    --o-visualization "$VISUAL_DIR/${category}_jaccard_significance.qzv" \
+    --p-pairwise
+done
 
+  
 # Rarefy aggregated feature table
 qiime feature-table rarefy \
   --i-table "$DENOISE_DIR/table_aggregated.qza" \
@@ -234,6 +96,26 @@ qiime taxa barplot \
   --i-taxonomy "$DENOISE_DIR/taxonomy.qza" \
   --m-metadata-file "$AGG_METADATA_FILE" \
   --o-visualization "$VISUAL_DIR/taxa_barplot.qzv"
+  
+# Collapse table at genus level, level 6
+qiime taxa collapse \
+  --i-table "$DENOISE_DIR/rare_table_aggregated.qza" \
+  --i-taxonomy "$DENOISE_DIR/taxonomy.qza" \
+  --p-level 6 \
+  --o-collapsed-table "$GUILD_DIR/table_collapsed_genus.qza"   
+  
+# Perform ANCOM for differential abundance testing on rarefied_aggregated table
+ qiime composition add-pseudocount \
+   --i-table "$GUILD_DIR/table_collapsed_genus.qza" \
+   --o-composition-table "$DENOISE_DIR/composition_table.qza"
+ 
+for category in "${categories[@]}"; do
+  qiime composition ancom \
+    --i-table "$DENOISE_DIR/composition_table.qza" \
+    --m-metadata-file "$AGG_METADATA_FILE" \
+    --m-metadata-column "$category" \
+    --o-visualization "$VISUAL_DIR/${category}_ancom.qzv"
+done 
   
 # Copy .qzv outputs to results directory
 cp "$VISUAL_DIR"/*.qzv "$RESULTS_DIR/"
