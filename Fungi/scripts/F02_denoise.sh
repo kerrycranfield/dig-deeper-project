@@ -45,6 +45,11 @@ qiime dada2 denoise-paired \
   --o-table "$DENOISE_DIR/table-dada2.qza" \
   --o-denoising-stats "$DENOISE_DIR/stats-dada2.qza"
 
+#Export Denoising stats
+qiime metadata tabulate \
+  --m-input-file "$DENOISE_DIR/stats-dada2.qza" \
+  --o-visualization "$RESULTS_DIR/dada2-stats-summ.qzv"
+
 # Taxonomy classification
 qiime feature-classifier classify-sklearn \
   --i-classifier "$CLASSIFIER" \
