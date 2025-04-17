@@ -307,7 +307,7 @@ HTML("</br><p style='text-align: center; font-weight: bold;'>Figure xx. Metadata
 ### Input Files Selection
 
 Before proceeding with bioinformatic analyses, it was necessary to select consistent input files for each sample.
-For both ITS and 16S datasets, each sample was associated with multiple types of sequencing files. For example, a sample such as `GF677` had up to five different files: `GF677_1.fastq.gz`, `GF677_2.fastq.gz` (paired-end reads), `GF677.raw_1.fastq.gz`, `GF677.raw_2.fastq.gz` (raw unprocessed reads), and `GF677.extendedFrags.fastq.gz` (merged forward and reverse reads). To ensure consistency and avoid redundancy, we selected one file type per sample for downstream analysis. For the **16S dataset**, we used the **paired-end reads** (`*_1.fastq.gz` and `*_2.fastq.gz`), while for the **ITS dataset**, we selected the **raw reads** (`*.raw_1.fastq.gz` and `*.raw_2.fastq.gz`), which were best suited for our quality filtering and denoising steps.
+For both ITS and 16S datasets, each sample was associated with multiple types of sequencing files. For example, a sample such as `GF677` had up to five different files: `GF677_1.fastq.gz`, `GF677_2.fastq.gz` (paired-end reads with barcode and primer removed), `GF677.raw_1.fastq.gz`, `GF677.raw_2.fastq.gz` (raw unprocessed reads), and `GF677.extendedFrags.fastq.gz` (merged forward and reverse reads). To ensure consistency and avoid redundancy, we selected one file type per sample for downstream analysis. For the **16S dataset**, we used the **paired-end reads with barcode and primer removed** (`*_1.fastq.gz` and `*_2.fastq.gz`), while for the **ITS dataset**, we selected the **raw reads** (`*.raw_1.fastq.gz` and `*.raw_2.fastq.gz`), which were best suited for our quality filtering and denoising steps.
 
 ### Denoising and Feature Table Construction
 
@@ -402,9 +402,20 @@ datatable(
     scrollX = TRUE,
     autoWidth = TRUE,
     dom = 'tip',
-    class = 'stripe hover row-border order-column'
+    class = 'stripe hover row-border order-column',
+    initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().header()).css({'background-color': '#d9eaf7', 'font-weight': 'bold'});",
+      "}")
+  ),
+  class = "display nowrap compact",
+  rownames = FALSE
+) %>% 
+  formatStyle(
+    columns = names(df),
+    `text-align` = 'center'
   )
-)
+
 
 HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Statitics after denoising (16S)</p>")
 
@@ -426,9 +437,20 @@ datatable(
     scrollX = TRUE,
     autoWidth = TRUE,
     dom = 'tip',
-    class = 'stripe hover row-border order-column'
+    class = 'stripe hover row-border order-column',
+    initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().header()).css({'background-color': '#d9eaf7', 'font-weight': 'bold'});",
+      "}")
+  ),
+  class = "display nowrap compact",
+  rownames = FALSE
+) %>% 
+  formatStyle(
+    columns = names(df),
+    `text-align` = 'center'
   )
-)
+
 
 HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Statitics after denoising (ITS)</p>")
 
@@ -1068,9 +1090,9 @@ plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
   labs(x = "Site", y = "Relative Abundance (%)", fill = "Taxon", title = "Relative abundance of taxa across sites at phylum level (16S)") +
   theme_minimal() +
   theme(
-    axis.text.x = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
     axis.ticks.x = element_blank(),
-    legend.text = element_text(size = 5), 
+    legend.text = element_text(size = 5) 
   )
 ggplotly(plot)  %>% layout(width = 800, height = 500)
 
@@ -1142,9 +1164,9 @@ plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
   labs(x = "Site", y = "Relative Abundance (%)", fill = "Taxon", title = "Relative abundance of taxa across sites at phylum level (ITS)") +
   theme_minimal() +
   theme(
-    axis.text.x = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
     axis.ticks.x = element_blank(),
-    legend.text = element_text(size = 5), 
+    legend.text = element_text(size = 5)
   )
 ggplotly(plot)  %>% layout(width = 900, height = 500)
 
@@ -1219,13 +1241,13 @@ p <- ggplot(df, aes(x = clr, y = W, text = X)) +
   theme_minimal() +
   labs(x = "Centered Logarithmic (clr)",
        y = "W statistic",
-       title = "Volcano plot (ANCOM results) for Establishment") +
+       ) +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
 ggplotly(p, tooltip = "text")
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Volcano Plot (16S)</p></br>")
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Genus-Level Differences in Taxa Abundance by Establishment Type (ANCOM Volcano Plot) (16S)</p></br>")
 
 cat('Here is a link to the **Volcano Plots** for more flexibility on QIIME2: <a href="data/16S/Taxonomy/genus_ancom_results/genus_ancom_Establishment/data/index.html" target="_blank">Volcano Plot (16S)</a>')
 ```
@@ -1246,13 +1268,13 @@ p <- ggplot(df, aes(x = clr, y = W, text = X)) +
   theme_minimal() +
   labs(x = "Centered Logarithmic (clr)",
        y = "W statistic",
-       title = "Volcano plot (ANCOM results) for Establishment") +
+       ) +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
 ggplotly(p, tooltip = "text")
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Volcano Plot (ITS)</p></br>")
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Differences in Taxa Abundance by Establishment Type (ANCOM Volcano Plot) (ITS)</p></br>")
 
 cat('Here is a link to the **Volcano Plots** for more flexibility on QIIME2: <a href="data/ITS/Taxonomy/Taxonomic_Abundance/F03_Establishment_ancom/data/index.html" target="_blank">Volcano Plot (ITS)</a>')
 
@@ -1283,21 +1305,16 @@ p <- ggplot(df, aes(x = clr, y = W, text = X)) +
   scale_color_manual(values = c("grey", "cyan3")) +
   theme_minimal() +
   labs(x = "Centered Logarithmic (clr)",
-       y = "W statistic",
-       title = "Volcano plot (ANCOM pathways) for Establishment") +
+       y = "W statistic") +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
 ggplotly(p, tooltip = "text")
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Volcano Plot (16S)</p></br>")
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Functional Pathway Differences by Establishment (ANCOM Results) (16S)</p></br>")
 
 cat('Here is a link to the **Volcano Plots** for more flexibility on QIIME2: <a href="data/16S/Taxonomy/ancom_pathway/pathway_ancom_Establishment/data/index.html" target="_blank">Volcano Plot (16S)</a>')
 ```
-
-#### Top Predicted Functional Pathways
-
-The plot below displays the top 20 predicted KEGG pathways (or alternatively MetaCyc pathways) across all samples. These pathways reflect high-level metabolic functions such as amino acid metabolism, carbohydrate degradation, or environmental information processing.
 
 
 
