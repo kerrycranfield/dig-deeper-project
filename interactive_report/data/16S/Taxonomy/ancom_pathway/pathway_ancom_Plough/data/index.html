@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>q2_composition : ancom</title>
+    <link rel="stylesheet" href="./q2templateassets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="./q2templateassets/css/normalize.css"/>
+    <link rel="stylesheet" href="./q2templateassets/css/base-template.css"/>
+    <script src="./q2templateassets/js/jquery-3.2.0.min.js" charset="utf-8"></script>
+    <script src="./q2templateassets/js/bootstrap.min.js" charset="utf-8"></script>
+    
+  <script src="js/vega.min.js"></script>
+  <script src="js/vega-embed.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/spinkit.css">
+
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div id="q2templatesheader" class="row">
+        <div class="col-lg-12">
+          <a href="http://qiime2.org/">
+            <img src="./q2templateassets/img/qiime2-rect-200.png"
+            alt="QIIME 2">
+          </a>
+        </div>
+      </div>
+        
+
+<div class="row">
+  <div class="col-lg-8">
+    <h3>ANCOM Volcano Plot</h3>
+    <div id="toolbar"></div>
+    
+    <div id="plot">
+      <div id="loading" class="spinner">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<hr>
+
+<div class="row">
+  <div class="col-lg-6">
+    <h4>ANCOM statistical results</h4>
+    
+      <div class="table-responsive">
+        <table border="0" class="dataframe table table-striped table-hover">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>W</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>PWY-5265</th>
+      <td>396</td>
+    </tr>
+    <tr>
+      <th>PWY-1541</th>
+      <td>368</td>
+    </tr>
+    <tr>
+      <th>PWY-3661</th>
+      <td>365</td>
+    </tr>
+  </tbody>
+</table>
+      </div>
+
+      <a href="ancom.tsv" target="_blank" rel="noopener noreferrer" class="btn btn-default">
+        Download table as TSV
+      </a>
+    
+  </div>
+</div>
+
+<hr>
+
+<div class="row">
+  <div class="col-lg-12">
+    <h4>Percentile abundances of features by group</h4>
+    
+      <div class="table-responsive">
+        <table border="0" class="dataframe table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>Percentile</th>
+      <th>0.0</th>
+      <th>25.0</th>
+      <th>50.0</th>
+      <th>75.0</th>
+      <th>100.0</th>
+      <th>0.0</th>
+      <th>25.0</th>
+      <th>50.0</th>
+      <th>75.0</th>
+      <th>100.0</th>
+      <th>0.0</th>
+      <th>25.0</th>
+      <th>50.0</th>
+      <th>75.0</th>
+      <th>100.0</th>
+    </tr>
+    <tr>
+      <th>Group</th>
+      <th>no</th>
+      <th>no</th>
+      <th>no</th>
+      <th>no</th>
+      <th>no</th>
+      <th>unknown</th>
+      <th>unknown</th>
+      <th>unknown</th>
+      <th>unknown</th>
+      <th>unknown</th>
+      <th>yes</th>
+      <th>yes</th>
+      <th>yes</th>
+      <th>yes</th>
+      <th>yes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>PWY-5265</th>
+      <td>1.000000</td>
+      <td>272.631358</td>
+      <td>344.863812</td>
+      <td>557.935497</td>
+      <td>2489.110116</td>
+      <td>1.0</td>
+      <td>1.00000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>320.036542</td>
+      <td>429.052341</td>
+      <td>554.216575</td>
+      <td>1000.298639</td>
+    </tr>
+    <tr>
+      <th>PWY-1541</th>
+      <td>1.000000</td>
+      <td>246.670561</td>
+      <td>391.228749</td>
+      <td>649.587252</td>
+      <td>1157.480421</td>
+      <td>1.0</td>
+      <td>1.00000</td>
+      <td>18.694475</td>
+      <td>77.588614</td>
+      <td>100.157658</td>
+      <td>44.601280</td>
+      <td>285.179852</td>
+      <td>580.819861</td>
+      <td>772.971227</td>
+      <td>1182.096338</td>
+    </tr>
+    <tr>
+      <th>PWY-3661</th>
+      <td>365.498475</td>
+      <td>1426.076623</td>
+      <td>2002.649335</td>
+      <td>3351.063003</td>
+      <td>5403.777265</td>
+      <td>1.0</td>
+      <td>21.50788</td>
+      <td>464.066691</td>
+      <td>954.646000</td>
+      <td>1031.983526</td>
+      <td>508.043288</td>
+      <td>1254.857372</td>
+      <td>3244.532463</td>
+      <td>3967.637140</td>
+      <td>5270.192150</td>
+    </tr>
+  </tbody>
+</table>
+      </div>
+
+      <a href="percent-abundances.tsv" target="_blank" rel="noopener noreferrer" class="btn btn-default">
+        Download table as TSV
+      </a>
+    
+  </div>
+</div>
+
+    </div>
+    <script type="text/javascript">
+      if (window.frameElement) {
+          document.getElementById('q2templatesheader').remove();
+      }
+    </script>
+    
+
+
+
+
+
+<script type="text/javascript">
+  function handleErrors(errors, element, msg) {
+    console.error(errors);
+    msg = msg === undefined ? '' : msg + '<br><br>';
+    var helpMsg = '<p class="alert alert-danger"> \
+                   There was an error loading and rendering the \
+                   visualization.<br><br>' + msg + 'Please \
+                   copy-and-paste the following error messages when \
+                   reporting this error (please be aware that the content \
+                   of your analysis data and/or metadata is included in \
+                   these messages):</p>';
+    var helpMsgDiv = $('<div></div>');
+    helpMsgDiv.append(helpMsg);
+    helpMsgDiv.append('<pre><code>' + errors.join('\n\n') + '</code></pre>');
+    element.replaceWith(helpMsgDiv);
+  }
+  window.onerror = function(error) {
+    handleErrors([error], $('#loading'));
+  };
+</script>
+
+<script id="spec" type="application/json">{"$schema": "https://vega.github.io/schema/vega/v4.json", "width": 300, "height": 300, "data": [{"name": "values", "values": [{"id": "1CMET2-PWY", "clr": 12.065053710175322, "W": 31}, {"id": "3-HYDROXYPHENYLACETATE-DEGRADATION-PWY", "clr": 0.2682604805781572, "W": 15}, {"id": "AEROBACTINSYN-PWY", "clr": 7.3147095940225455, "W": 8}, {"id": "ALL-CHORISMATE-PWY", "clr": 13.15175010119988, "W": 246}, {"id": "ANAEROFRUCAT-PWY", "clr": 2.3918982814556053, "W": 49}, {"id": "ANAGLYCOLYSIS-PWY", "clr": 6.939876338877457, "W": 34}, {"id": "ARG+POLYAMINE-SYN", "clr": 2.691055719042573, "W": 18}, {"id": "ARGORNPROST-PWY", "clr": 0.8578599544104946, "W": 17}, {"id": "ARGSYN-PWY", "clr": 6.5657881832746785, "W": 30}, {"id": "ARGSYNBSUB-PWY", "clr": 5.997308838094007, "W": 25}, {"id": "ARO-PWY", "clr": 6.619146345330343, "W": 33}, {"id": "ASPASN-PWY", "clr": 0.060941981960339446, "W": 11}, {"id": "AST-PWY", "clr": 5.329711404603822, "W": 5}, {"id": "BIOTIN-BIOSYNTHESIS-PWY", "clr": 0.06938919369795955, "W": 18}, {"id": "BRANCHED-CHAIN-AA-SYN-PWY", "clr": 5.423821698722534, "W": 25}, {"id": "CALVIN-PWY", "clr": 6.4257848724138995, "W": 31}, {"id": "CATECHOL-ORTHO-CLEAVAGE-PWY", "clr": 0.10704105844991317, "W": 11}, {"id": "CENTBENZCOA-PWY", "clr": 6.222533386620153, "W": 22}, {"id": "CENTFERM-PWY", "clr": 1.6221852963554058, "W": 9}, {"id": "CHLOROPHYLL-SYN", "clr": 0.2056362870993314, "W": 1}, {"id": "COA-PWY", "clr": 5.768523344952984, "W": 23}, {"id": "COBALSYN-PWY", "clr": 6.49650015539387, "W": 24}, {"id": "CODH-PWY", "clr": 0.16243031934369392, "W": 7}, {"id": "COLANSYN-PWY", "clr": 6.491933963611874, "W": 26}, {"id": "COMPLETE-ARO-PWY", "clr": 6.638978980059014, "W": 33}, {"id": "CRNFORCAT-PWY", "clr": 12.687560190703413, "W": 310}, {"id": "DAPLYSINESYN-PWY", "clr": 5.415659827901433, "W": 26}, {"id": "DENITRIFICATION-PWY", "clr": 4.018560742115142, "W": 13}, {"id": "DENOVOPURINE2-PWY", "clr": 3.2414448970459615, "W": 12}, {"id": "DTDPRHAMSYN-PWY", "clr": 6.063433512368366, "W": 22}, {"id": "ENTBACSYN-PWY", "clr": 2.920378300009017, "W": 8}, {"id": "FAO-PWY", "clr": 1.8634405867929835, "W": 45}, {"id": "FASYN-ELONG-PWY", "clr": 9.622559786375742, "W": 33}, {"id": "FASYN-INITIAL-PWY", "clr": 0.570580964744468, "W": 20}, {"id": "FERMENTATION-PWY", "clr": 10.82931821789454, "W": 36}, {"id": "FOLSYN-PWY", "clr": 9.49267072420295, "W": 27}, {"id": "FUC-RHAMCAT-PWY", "clr": 2.756087599970142, "W": 1}, {"id": "FUCCAT-PWY", "clr": 1.037915682874881, "W": 3}, {"id": "GALACT-GLUCUROCAT-PWY", "clr": 3.347659542632353, "W": 149}, {"id": "GALACTARDEG-PWY", "clr": 5.1793140172362815, "W": 18}, {"id": "GALACTUROCAT-PWY", "clr": 4.524537477489809, "W": 16}, {"id": "GALLATE-DEGRADATION-I-PWY", "clr": 3.768620908480602, "W": 5}, {"id": "GALLATE-DEGRADATION-II-PWY", "clr": 3.3112041390324407, "W": 7}, {"id": "GLCMANNANAUT-PWY", "clr": 11.277921621694585, "W": 67}, {"id": "GLUCARDEG-PWY", "clr": 10.054763553013435, "W": 30}, {"id": "GLUCARGALACTSUPER-PWY", "clr": 5.1793140172362815, "W": 18}, {"id": "GLUCONEO-PWY", "clr": 4.911473367543076, "W": 31}, {"id": "GLUCOSE1PMETAB-PWY", "clr": 0.4469048451070962, "W": 9}, {"id": "GLUCUROCAT-PWY", "clr": 0.7337662205883743, "W": 12}, {"id": "GLUTORN-PWY", "clr": 5.222504813407206, "W": 23}, {"id": "GLYCOCAT-PWY", "clr": 9.501249421584333, "W": 36}, {"id": "GLYCOGENSYNTH-PWY", "clr": 13.860114823742194, "W": 44}, {"id": "GLYCOL-GLYOXDEG-PWY", "clr": 0.30944964898854094, "W": 1}, {"id": "GLYCOLYSIS", "clr": 6.818139415247331, "W": 29}, {"id": "GLYCOLYSIS-E-D", "clr": 2.833736204245562, "W": 43}, {"id": "GLYCOLYSIS-TCA-GLYOX-BYPASS", "clr": 4.531731694018691, "W": 27}, {"id": "GLYOXYLATE-BYPASS", "clr": 7.866746087247324, "W": 25}, {"id": "GOLPDLCAT-PWY", "clr": 4.179153113517307, "W": 8}, {"id": "HCAMHPDEG-PWY", "clr": 2.2366434393746304, "W": 13}, {"id": "HEME-BIOSYNTHESIS-II", "clr": 0.6632949471684249, "W": 31}, {"id": "HEMESYN2-PWY", "clr": 1.934290945548923, "W": 44}, {"id": "HEXITOLDEGSUPER-PWY", "clr": 1.1444812064815013, "W": 11}, {"id": "HISDEG-PWY", "clr": 0.034497942907213974, "W": 133}, {"id": "HISTSYN-PWY", "clr": 4.885950174680967, "W": 21}, {"id": "HOMOSER-METSYN-PWY", "clr": 0.23550313137444237, "W": 67}, {"id": "HSERMETANA-PWY", "clr": 2.587031436276321, "W": 25}, {"id": "ILEUSYN-PWY", "clr": 5.418464028992737, "W": 26}, {"id": "KDO-NAGLIPASYN-PWY", "clr": 0.0070688882296419545, "W": 0}, {"id": "KETOGLUCONMET-PWY", "clr": 0.18203039823345113, "W": 12}, {"id": "LEU-DEG2-PWY", "clr": 2.157055896221172, "W": 20}, {"id": "LIPASYN-PWY", "clr": 3.113622857090541, "W": 4}, {"id": "MET-SAM-PWY", "clr": 2.4940905687347303, "W": 42}, {"id": "METH-ACETATE-PWY", "clr": 2.1314737417170844, "W": 4}, {"id": "METHANOGENESIS-PWY", "clr": 1.3965359574821248, "W": 1}, {"id": "METHGLYUT-PWY", "clr": 0.3005299054673943, "W": 1}, {"id": "METHYLGALLATE-DEGRADATION-PWY", "clr": 3.8420216626064665, "W": 5}, {"id": "NAD-BIOSYNTHESIS-II", "clr": 0.4014037992006345, "W": 13}, {"id": "NADSYN-PWY", "clr": 0.077225172610326, "W": 10}, {"id": "NAGLIPASYN-PWY", "clr": 7.297044643779323, "W": 48}, {"id": "NONMEVIPP-PWY", "clr": 8.250903442472142, "W": 59}, {"id": "NONOXIPENT-PWY", "clr": 6.3969859841099295, "W": 29}, {"id": "OANTIGEN-PWY", "clr": 4.773325031019311, "W": 23}, {"id": "P101-PWY", "clr": 1.1105511557181331, "W": 11}, {"id": "P105-PWY", "clr": 5.451824268333937, "W": 28}, {"id": "P108-PWY", "clr": 3.737120594142493, "W": 22}, {"id": "P122-PWY", "clr": 6.07458534807405, "W": 23}, {"id": "P124-PWY", "clr": 2.3940495854375605, "W": 18}, {"id": "P125-PWY", "clr": 1.0435347536277262, "W": 13}, {"id": "P161-PWY", "clr": 2.2284037602818336, "W": 11}, {"id": "P162-PWY", "clr": 0.5487536451316967, "W": 1}, {"id": "P163-PWY", "clr": 1.2125266558982752, "W": 7}, {"id": "P164-PWY", "clr": 5.614247064614704, "W": 6}, {"id": "P184-PWY", "clr": 4.839529715024709, "W": 8}, {"id": "P221-PWY", "clr": 0.09114890345271599, "W": 8}, {"id": "P23-PWY", "clr": 1.6546743818417047, "W": 18}, {"id": "P241-PWY", "clr": 0.9227059857724881, "W": 3}, {"id": "P261-PWY", "clr": 2.376939724997464, "W": 6}, {"id": "P281-PWY", "clr": 1.5125561662903229, "W": 17}, {"id": "P341-PWY", "clr": 1.500804016599174, "W": 1}, {"id": "P381-PWY", "clr": 2.6759425931030885, "W": 15}, {"id": "P4-PWY", "clr": 4.295810174891756, "W": 29}, {"id": "P42-PWY", "clr": 1.3857654160748754, "W": 12}, {"id": "P441-PWY", "clr": 11.260473896092444, "W": 63}, {"id": "P461-PWY", "clr": 0.38891871951947754, "W": 6}, {"id": "P562-PWY", "clr": 0.17822450047797903, "W": 11}, {"id": "P621-PWY", "clr": 1.007931836858842, "W": 12}, {"id": "PANTO-PWY", "clr": 10.108018114335668, "W": 48}, {"id": "PANTOSYN-PWY", "clr": 8.481275575998824, "W": 52}, {"id": "PENTOSE-P-PWY", "clr": 7.486959945999824, "W": 27}, {"id": "PEPTIDOGLYCANSYN-PWY", "clr": 4.286560767845649, "W": 58}, {"id": "PHOSLIPSYN-PWY", "clr": 5.188907712925079, "W": 23}, {"id": "POLYAMINSYN3-PWY", "clr": 16.78422427975966, "W": 46}, {"id": "POLYAMSYN-PWY", "clr": 1.8928968030493123, "W": 17}, {"id": "POLYISOPRENSYN-PWY", "clr": 5.291688041131368, "W": 22}, {"id": "PPGPPMET-PWY", "clr": 0.042969872100685653, "W": 12}, {"id": "PROTOCATECHUATE-ORTHO-CLEAVAGE-PWY", "clr": 5.212728323270318, "W": 22}, {"id": "PRPP-PWY", "clr": 4.637658070090481, "W": 15}, {"id": "PWY-1269", "clr": 4.104188702747522, "W": 26}, {"id": "PWY-1361", "clr": 1.537689130594685, "W": 1}, {"id": "PWY-1501", "clr": 6.599641708446467, "W": 25}, {"id": "PWY-1541", "clr": 20.70200956151716, "W": 368}, {"id": "PWY-1622", "clr": 3.3627216495717565, "W": 111}, {"id": "PWY-181", "clr": 0.6573680465757726, "W": 22}, {"id": "PWY-1861", "clr": 3.2371775691501647, "W": 16}, {"id": "PWY-1882", "clr": 0.05952260983393317, "W": 3}, {"id": "PWY-2221", "clr": 2.0834584481106684, "W": 6}, {"id": "PWY-2941", "clr": 2.071683874850408, "W": 14}, {"id": "PWY-2942", "clr": 7.780884639873326, "W": 39}, {"id": "PWY-3001", "clr": 6.851294133201229, "W": 40}, {"id": "PWY-3661", "clr": 20.094078092784844, "W": 365}, {"id": "PWY-3781", "clr": 6.11575253220585, "W": 23}, {"id": "PWY-3801", "clr": 1.0963178134143146, "W": 0}, {"id": "PWY-3941", "clr": 9.092972794808475, "W": 24}, {"id": "PWY-4361", "clr": 1.192246117391669, "W": 8}, {"id": "PWY-4984", "clr": 1.5551058772114434, "W": 21}, {"id": "PWY-5005", "clr": 2.062120121045061, "W": 1}, {"id": "PWY-5022", "clr": 7.345388011860423, "W": 30}, {"id": "PWY-5028", "clr": 0.13157796349429113, "W": 10}, {"id": "PWY-5088", "clr": 2.4543455421338654, "W": 4}, {"id": "PWY-5097", "clr": 7.069781828207756, "W": 35}, {"id": "PWY-5100", "clr": 10.654338953852267, "W": 31}, {"id": "PWY-5101", "clr": 5.617240861807172, "W": 27}, {"id": "PWY-5103", "clr": 5.749212029724355, "W": 26}, {"id": "PWY-5104", "clr": 0.19127083702621703, "W": 16}, {"id": "PWY-5121", "clr": 8.156905170977895, "W": 39}, {"id": "PWY-5154", "clr": 3.4230610777126125, "W": 23}, {"id": "PWY-5177", "clr": 0.8709275125554058, "W": 1}, {"id": "PWY-5178", "clr": 4.825026969826182, "W": 17}, {"id": "PWY-5180", "clr": 3.5786965994382793, "W": 19}, {"id": "PWY-5181", "clr": 0.8429900061939559, "W": 12}, {"id": "PWY-5182", "clr": 3.5786965994382793, "W": 19}, {"id": "PWY-5183", "clr": 0.354129415790058, "W": 2}, {"id": "PWY-5188", "clr": 5.128163617885145, "W": 22}, {"id": "PWY-5189", "clr": 6.165835428010604, "W": 30}, {"id": "PWY-5198", "clr": 1.7073887835085166, "W": 3}, {"id": "PWY-5265", "clr": 38.17310255523126, "W": 396}, {"id": "PWY-5266", "clr": 2.578700783628977, "W": 0}, {"id": "PWY-5273", "clr": 2.578700783628977, "W": 0}, {"id": "PWY-5304", "clr": 5.6274504712772515, "W": 25}, {"id": "PWY-5345", "clr": 10.222010702193934, "W": 54}, {"id": "PWY-5347", "clr": 3.657310869640773, "W": 32}, {"id": "PWY-5384", "clr": 0.44222742023875156, "W": 9}, {"id": "PWY-5392", "clr": 0.26631524530175193, "W": 10}, {"id": "PWY-5415", "clr": 4.3565816034647975, "W": 21}, {"id": "PWY-5417", "clr": 0.03754088719871879, "W": 11}, {"id": "PWY-5419", "clr": 9.133898044771778, "W": 28}, {"id": "PWY-5420", "clr": 10.911685754106754, "W": 27}, {"id": "PWY-5430", "clr": 7.207792466723534, "W": 20}, {"id": "PWY-5431", "clr": 0.03754088719871879, "W": 11}, {"id": "PWY-5484", "clr": 6.138757550584831, "W": 25}, {"id": "PWY-5499", "clr": 10.323971228638404, "W": 288}, {"id": "PWY-5505", "clr": 14.178340405381025, "W": 42}, {"id": "PWY-5507", "clr": 0.540093623182756, "W": 1}, {"id": "PWY-5509", "clr": 1.980769964136241, "W": 18}, {"id": "PWY-5529", "clr": 0.11770609840642236, "W": 1}, {"id": "PWY-5531", "clr": 0.2804421502625123, "W": 4}, {"id": "PWY-5647", "clr": 1.412343786436972, "W": 12}, {"id": "PWY-5651", "clr": 0.06954732660951454, "W": 8}, {"id": "PWY-5654", "clr": 8.023880590770128, "W": 23}, {"id": "PWY-5655", "clr": 1.1396026555496364, "W": 11}, {"id": "PWY-5656", "clr": 1.213460833703521, "W": 6}, {"id": "PWY-5659", "clr": 3.479638100263917, "W": 21}, {"id": "PWY-5667", "clr": 5.405014793833837, "W": 23}, {"id": "PWY-5676", "clr": 12.483142675625826, "W": 59}, {"id": "PWY-5677", "clr": 1.4146273356807242, "W": 3}, {"id": "PWY-5686", "clr": 5.714529894924337, "W": 24}, {"id": "PWY-5695", "clr": 1.7560068352684137, "W": 98}, {"id": "PWY-5705", "clr": 0.9090312653150114, "W": 10}, {"id": "PWY-5741", "clr": 4.90468681258429, "W": 20}, {"id": "PWY-5747", "clr": 4.2330326191082825, "W": 35}, {"id": "PWY-5837", "clr": 0.9006569590400517, "W": 9}, {"id": "PWY-5838", "clr": 1.7593085262054062, "W": 11}, {"id": "PWY-5840", "clr": 1.6416833906258266, "W": 11}, {"id": "PWY-5845", "clr": 7.5655922250097705, "W": 192}, {"id": "PWY-5850", "clr": 7.5655922250097705, "W": 192}, {"id": "PWY-5855", "clr": 4.68963940918503, "W": 28}, {"id": "PWY-5856", "clr": 4.68963940918503, "W": 28}, {"id": "PWY-5857", "clr": 4.68963940918503, "W": 28}, {"id": "PWY-5860", "clr": 7.862559746150404, "W": 192}, {"id": "PWY-5861", "clr": 1.1497329297119856, "W": 11}, {"id": "PWY-5862", "clr": 7.862559746150404, "W": 192}, {"id": "PWY-5863", "clr": 1.021898110259037, "W": 11}, {"id": "PWY-5896", "clr": 7.5655922250097705, "W": 192}, {"id": "PWY-5897", "clr": 1.5203735389580648, "W": 11}, {"id": "PWY-5898", "clr": 1.5203735389580648, "W": 11}, {"id": "PWY-5899", "clr": 1.5203735389580648, "W": 11}, {"id": "PWY-5910", "clr": 0.7226980828149105, "W": 18}, {"id": "PWY-5913", "clr": 14.142092707774616, "W": 89}, {"id": "PWY-5918", "clr": 2.0808372710076424, "W": 39}, {"id": "PWY-5920", "clr": 1.9737790661831993, "W": 19}, {"id": "PWY-5941", "clr": 0.8647315169730534, "W": 11}, {"id": "PWY-5971", "clr": 0.12015290619663979, "W": 11}, {"id": "PWY-5973", "clr": 9.393715808807857, "W": 35}, {"id": "PWY-5989", "clr": 0.7571023148389631, "W": 24}, {"id": "PWY-6071", "clr": 8.151182813316295, "W": 222}, {"id": "PWY-6107", "clr": 1.1469295490340394, "W": 13}, {"id": "PWY-6121", "clr": 5.481378351998905, "W": 25}, {"id": "PWY-6122", "clr": 5.218223359644216, "W": 22}, {"id": "PWY-6123", "clr": 5.7480680627803995, "W": 24}, {"id": "PWY-6125", "clr": 5.696905162627888, "W": 29}, {"id": "PWY-6126", "clr": 6.538957136275896, "W": 30}, {"id": "PWY-6147", "clr": 8.602318451898798, "W": 37}, {"id": "PWY-6151", "clr": 10.48135139735521, "W": 44}, {"id": "PWY-6163", "clr": 5.967802078901465, "W": 27}, {"id": "PWY-6167", "clr": 1.6805897824350695, "W": 2}, {"id": "PWY-6174", "clr": 2.3175365844649423, "W": 0}, {"id": "PWY-6182", "clr": 0.035455868762937014, "W": 11}, {"id": "PWY-6185", "clr": 4.2148359580267085, "W": 10}, {"id": "PWY-621", "clr": 1.0096777765679137, "W": 12}, {"id": "PWY-6210", "clr": 1.295953527378943, "W": 11}, {"id": "PWY-6263", "clr": 8.799585145176835, "W": 33}, {"id": "PWY-6269", "clr": 1.9385718037216386, "W": 18}, {"id": "PWY-6277", "clr": 5.218223359644216, "W": 22}, {"id": "PWY-6282", "clr": 0.9011250657752485, "W": 24}, {"id": "PWY-6317", "clr": 2.98353043769081, "W": 18}, {"id": "PWY-6338", "clr": 9.004995439933188, "W": 253}, {"id": "PWY-6339", "clr": 3.0909401215578143, "W": 7}, {"id": "PWY-6349", "clr": 1.8457643104800594, "W": 3}, {"id": "PWY-6350", "clr": 1.800921576497454, "W": 3}, {"id": "PWY-6353", "clr": 0.7351314793413875, "W": 22}, {"id": "PWY-6383", "clr": 0.6432454936810068, "W": 10}, {"id": "PWY-6385", "clr": 5.942029263929224, "W": 27}, {"id": "PWY-6386", "clr": 5.491099850969702, "W": 27}, {"id": "PWY-6387", "clr": 3.9296893169182843, "W": 65}, {"id": "PWY-6396", "clr": 2.6282718645049417, "W": 20}, {"id": "PWY-6397", "clr": 0.7205382432690213, "W": 8}, {"id": "PWY-6404", "clr": 0.8077389717955745, "W": 8}, {"id": "PWY-6467", "clr": 3.4775655494536797, "W": 27}, {"id": "PWY-6470", "clr": 2.5383005806089582, "W": 11}, {"id": "PWY-6471", "clr": 0.5973420836793301, "W": 8}, {"id": "PWY-6478", "clr": 0.21027571714185467, "W": 14}, {"id": "PWY-6505", "clr": 1.2063260998249892, "W": 11}, {"id": "PWY-6507", "clr": 1.1082403681348698, "W": 9}, {"id": "PWY-6519", "clr": 0.3651528485734883, "W": 14}, {"id": "PWY-6545", "clr": 4.511779698709092, "W": 18}, {"id": "PWY-6562", "clr": 1.3255719279573062, "W": 6}, {"id": "PWY-6572", "clr": 5.808451820905189, "W": 7}, {"id": "PWY-6588", "clr": 7.585564066624644, "W": 25}, {"id": "PWY-6590", "clr": 1.8445896545520029, "W": 12}, {"id": "PWY-6608", "clr": 1.862304355099523, "W": 43}, {"id": "PWY-6609", "clr": 1.7499145024719323, "W": 16}, {"id": "PWY-6612", "clr": 9.688407196198456, "W": 26}, {"id": "PWY-6628", "clr": 3.571516534525102, "W": 46}, {"id": "PWY-6630", "clr": 3.5620096235141654, "W": 46}, {"id": "PWY-6641", "clr": 0.5718615331662618, "W": 7}, {"id": "PWY-6654", "clr": 1.785913718982564, "W": 3}, {"id": "PWY-6690", "clr": 2.2366434393746304, "W": 13}, {"id": "PWY-6700", "clr": 7.690423566763291, "W": 30}, {"id": "PWY-6703", "clr": 4.719117686091359, "W": 17}, {"id": "PWY-6708", "clr": 4.68963940918503, "W": 28}, {"id": "PWY-6728", "clr": 0.6712660586984566, "W": 7}, {"id": "PWY-6731", "clr": 3.1353377811335776, "W": 4}, {"id": "PWY-6737", "clr": 12.070780870691264, "W": 63}, {"id": "PWY-6749", "clr": 4.114981215036105, "W": 14}, {"id": "PWY-6876", "clr": 5.8326764653219625, "W": 23}, {"id": "PWY-6891", "clr": 1.7990607862639199, "W": 11}, {"id": "PWY-6892", "clr": 21.308047516798368, "W": 355}, {"id": "PWY-6895", "clr": 3.375331097196231, "W": 17}, {"id": "PWY-6897", "clr": 5.118031256373296, "W": 24}, {"id": "PWY-6901", "clr": 12.048204011148995, "W": 36}, {"id": "PWY-6915", "clr": 1.8765307379367657, "W": 3}, {"id": "PWY-6919", "clr": 0.8194793070339508, "W": 1}, {"id": "PWY-6944", "clr": 6.731271164587957, "W": 6}, {"id": "PWY-6948", "clr": 1.3996315996982436, "W": 8}, {"id": "PWY-6957", "clr": 0.29744637631934456, "W": 2}, {"id": "PWY-6969", "clr": 5.7133380190958425, "W": 30}, {"id": "PWY-6992", "clr": 14.522211044385111, "W": 314}, {"id": "PWY-7003", "clr": 5.224911423061871, "W": 10}, {"id": "PWY-7007", "clr": 2.5232422971704103, "W": 18}, {"id": "PWY-7013", "clr": 0.6503078213537863, "W": 2}, {"id": "PWY-7046", "clr": 19.66449347194142, "W": 320}, {"id": "PWY-7084", "clr": 5.2556650034264205, "W": 3}, {"id": "PWY-7090", "clr": 4.282964911266945, "W": 15}, {"id": "PWY-7094", "clr": 2.0214942795291337, "W": 43}, {"id": "PWY-7097", "clr": 9.004995439933197, "W": 253}, {"id": "PWY-7098", "clr": 9.103743796581117, "W": 256}, {"id": "PWY-7111", "clr": 6.946838742718551, "W": 31}, {"id": "PWY-7159", "clr": 0.2804421502625123, "W": 4}, {"id": "PWY-7184", "clr": 10.575717349749642, "W": 29}, {"id": "PWY-7187", "clr": 3.247555721009085, "W": 15}, {"id": "PWY-7196", "clr": 1.6117221171487468, "W": 18}, {"id": "PWY-7197", "clr": 6.204802700228765, "W": 26}, {"id": "PWY-7198", "clr": 0.2362911956780893, "W": 3}, {"id": "PWY-7199", "clr": 0.3792706312777776, "W": 33}, {"id": "PWY-7200", "clr": 0.7550239762954118, "W": 55}, {"id": "PWY-7208", "clr": 5.806485150572099, "W": 27}, {"id": "PWY-7209", "clr": 2.2499777109943073, "W": 1}, {"id": "PWY-7210", "clr": 0.24349281808208656, "W": 3}, {"id": "PWY-7211", "clr": 9.533316364951371, "W": 36}, {"id": "PWY-7219", "clr": 6.390304657592209, "W": 28}, {"id": "PWY-722", "clr": 7.054718247694412, "W": 33}, {"id": "PWY-7220", "clr": 6.61861567799251, "W": 31}, {"id": "PWY-7221", "clr": 5.1216509905062475, "W": 29}, {"id": "PWY-7222", "clr": 6.61861567799251, "W": 31}, {"id": "PWY-7228", "clr": 5.637353409516246, "W": 28}, {"id": "PWY-7229", "clr": 6.657701863253183, "W": 33}, {"id": "PWY-7234", "clr": 10.663764687079492, "W": 49}, {"id": "PWY-7237", "clr": 0.5635416158511757, "W": 16}, {"id": "PWY-7242", "clr": 2.366716759731735, "W": 13}, {"id": "PWY-7254", "clr": 2.418561780253386, "W": 15}, {"id": "PWY-7255", "clr": 0.632590743550804, "W": 12}, {"id": "PWY-7295", "clr": 0.6507099298064688, "W": 1}, {"id": "PWY-7315", "clr": 8.31216724482745, "W": 210}, {"id": "PWY-7323", "clr": 5.137671582886675, "W": 21}, {"id": "PWY-7328", "clr": 0.5793489283946998, "W": 18}, {"id": "PWY-7332", "clr": 0.08498121303721272, "W": 14}, {"id": "PWY-7347", "clr": 0.479628326735494, "W": 3}, {"id": "PWY-7371", "clr": 7.884333112583562, "W": 32}, {"id": "PWY-7373", "clr": 2.933523518558059, "W": 14}, {"id": "PWY-7374", "clr": 2.5029059963847216, "W": 10}, {"id": "PWY-7376", "clr": 3.3815747591888026, "W": 16}, {"id": "PWY-7377", "clr": 0.5453854307551151, "W": 1}, {"id": "PWY-7385", "clr": 0.7965296743982129, "W": 1}, {"id": "PWY-7391", "clr": 2.965827488886924, "W": 1}, {"id": "PWY-7392", "clr": 6.1851921217291554, "W": 20}, {"id": "PWY-7398", "clr": 3.6999690184673972, "W": 1}, {"id": "PWY-7400", "clr": 6.555243758593594, "W": 30}, {"id": "PWY-7401", "clr": 1.2562477826064706, "W": 3}, {"id": "PWY-7402", "clr": 2.0355873836543172, "W": 5}, {"id": "PWY-7431", "clr": 5.158159014131142, "W": 20}, {"id": "PWY-7456", "clr": 0.7641442926143738, "W": 0}, {"id": "PWY-7527", "clr": 1.2794355913772257, "W": 10}, {"id": "PWY-7539", "clr": 9.00335942821644, "W": 42}, {"id": "PWY-7560", "clr": 8.250903442472142, "W": 59}, {"id": "PWY-7616", "clr": 2.3930222873910867, "W": 22}, {"id": "PWY-7644", "clr": 0.2540814440059928, "W": 3}, {"id": "PWY-7663", "clr": 9.622559786375742, "W": 33}, {"id": "PWY-7664", "clr": 1.168572156893568, "W": 24}, {"id": "PWY-841", "clr": 5.913737324363369, "W": 29}, {"id": "PWY-922", "clr": 0.7410629238277971, "W": 18}, {"id": "PWY0-1061", "clr": 0.9771781954124628, "W": 11}, {"id": "PWY0-1241", "clr": 6.764554903757041, "W": 32}, {"id": "PWY0-1261", "clr": 6.395492859999181, "W": 27}, {"id": "PWY0-1277", "clr": 3.114571478711439, "W": 18}, {"id": "PWY0-1296", "clr": 1.0565175648995766, "W": 15}, {"id": "PWY0-1297", "clr": 1.819242843472015, "W": 15}, {"id": "PWY0-1298", "clr": 2.467799886078433, "W": 12}, {"id": "PWY0-1319", "clr": 5.40501479383384, "W": 23}, {"id": "PWY0-1338", "clr": 1.7839083082628937, "W": 3}, {"id": "PWY0-1415", "clr": 1.5796453097146146, "W": 24}, {"id": "PWY0-1479", "clr": 0.07338064544445376, "W": 14}, {"id": "PWY0-1533", "clr": 10.496851182336304, "W": 71}, {"id": "PWY0-1586", "clr": 0.8767876938260787, "W": 17}, {"id": "PWY0-162", "clr": 5.792715178091016, "W": 24}, {"id": "PWY0-166", "clr": 8.88662316826568, "W": 30}, {"id": "PWY0-321", "clr": 5.125268997719824, "W": 143}, {"id": "PWY0-41", "clr": 0.13774423996243296, "W": 7}, {"id": "PWY0-42", "clr": 4.973928807302704, "W": 66}, {"id": "PWY0-781", "clr": 4.800838212400096, "W": 30}, {"id": "PWY0-845", "clr": 1.7427979137239324, "W": 1}, {"id": "PWY0-862", "clr": 1.0393325356441268, "W": 24}, {"id": "PWY1G-0", "clr": 0.22775620082204695, "W": 8}, {"id": "PWY490-3", "clr": 10.470209011285748, "W": 56}, {"id": "PWY4FS-7", "clr": 5.325893886118049, "W": 23}, {"id": "PWY4FS-8", "clr": 5.325893886118042, "W": 23}, {"id": "PWY5F9-12", "clr": 0.4053043046425347, "W": 3}, {"id": "PWYG-321", "clr": 1.1368624025865772, "W": 24}, {"id": "PYRIDNUCSAL-PWY", "clr": 3.0059592615954247, "W": 18}, {"id": "PYRIDNUCSYN-PWY", "clr": 4.570199539526261, "W": 19}, {"id": "PYRIDOXSYN-PWY", "clr": 1.8680488563720137, "W": 4}, {"id": "REDCITCYC", "clr": 1.5143261205477554, "W": 19}, {"id": "RHAMCAT-PWY", "clr": 0.5377296527831513, "W": 14}, {"id": "RIBOSYN2-PWY", "clr": 5.848881651812411, "W": 27}, {"id": "RUMP-PWY", "clr": 3.363021899788866, "W": 16}, {"id": "SALVADEHYPOX-PWY", "clr": 2.16809154524714, "W": 59}, {"id": "SER-GLYSYN-PWY", "clr": 8.605918577918004, "W": 44}, {"id": "SO4ASSIM-PWY", "clr": 12.757436632488977, "W": 71}, {"id": "SUCSYN-PWY", "clr": 0.6427972205537117, "W": 3}, {"id": "SULFATE-CYS-PWY", "clr": 13.881580542754254, "W": 125}, {"id": "TCA", "clr": 6.001911954467363, "W": 30}, {"id": "TCA-GLYOX-BYPASS", "clr": 4.163035659728421, "W": 22}, {"id": "TEICHOICACID-PWY", "clr": 0.13720837356598084, "W": 12}, {"id": "THISYN-PWY", "clr": 17.38730366815349, "W": 337}, {"id": "THRESYN-PWY", "clr": 7.214079025414955, "W": 35}, {"id": "TRNA-CHARGING-PWY", "clr": 8.9212895500561, "W": 34}, {"id": "TRPSYN-PWY", "clr": 6.026267917374794, "W": 24}, {"id": "TYRFUMCAT-PWY", "clr": 4.076334978019917, "W": 36}, {"id": "UBISYN-PWY", "clr": 4.552283061208846, "W": 28}, {"id": "UDPNAGSYN-PWY", "clr": 3.7769092466113183, "W": 51}, {"id": "VALDEG-PWY", "clr": 7.227681882633726, "W": 18}, {"id": "VALSYN-PWY", "clr": 5.418464028992737, "W": 26}]}], "scales": [{"name": "xScale", "domain": {"data": "values", "field": "clr"}, "range": "width"}, {"name": "yScale", "domain": {"data": "values", "field": "W"}, "range": "height"}], "axes": [{"scale": "xScale", "orient": "bottom", "title": "clr"}, {"scale": "yScale", "orient": "left", "title": "W"}], "marks": [{"type": "symbol", "from": {"data": "values"}, "encode": {"hover": {"fill": {"value": "#FF0000"}, "opacity": {"value": 1}}, "enter": {"x": {"scale": "xScale", "field": "clr"}, "y": {"scale": "yScale", "field": "W"}}, "update": {"fill": {"value": "black"}, "opacity": {"value": 0.3}, "tooltip": {"signal": "{'title': datum['id'], 'clr': datum['clr'], 'W': datum['W']}"}}}}]}</script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    var spec = JSON.parse(document.getElementById('spec').innerHTML);
+
+    // Try and come up with a good initial estimate of plot dimensions,
+    // based on the browser dimensions.
+    var width = $('#plot').width() / 1.5;
+    var opts = {width: width, height: width / 2};
+
+    vegaEmbed('#plot', spec, opts).then(function(result) {
+      result.view.logLevel(vega.Warn);
+      // Stash the view object in global namespace for debugging purposes.
+      // Check out https://vega.github.io/vega/docs/api/debugging/
+      // for more details.
+      window.v = result.view;
+    }).catch(function(error) {
+      // From 'js-error-handler.html'
+      handleErrors([error], $('#plot'));
+    });
+
+    // Clean up the vega-embed toolbar
+    var toolbar = $('div .vega-actions').detach();
+    toolbar.addClass('btn-group');
+    toolbar.children('a').each(function() {
+      // NOTE: We're just skipping this bit until we get the plot working with
+      // Vega 5
+      if(this.innerHTML == "Open in Vega Editor"){
+        this.remove()
+        return true
+      }
+      $(this).addClass('btn btn-default');
+    });
+    $('<a href="data.tsv" target="_blank" rel="noopener noreferrer" class="btn btn-default">Export as TSV</a>')
+      .prependTo(toolbar);
+    toolbar.appendTo('#toolbar');
+
+    // Util to mutate elements in-place
+    function cleanupEl(el, label, form_el) {
+      var e = $(el + ' .vega-bind');
+      e.children('span').replaceWith('<label>' + label + '&nbsp;</label');
+      if (form_el !== undefined) {
+        e.children(form_el).addClass('form-control');
+      }
+    }
+  });
+</script>
+
+
+  </body>
+</html>
