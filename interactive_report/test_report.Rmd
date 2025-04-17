@@ -10,8 +10,10 @@ output:
     toc_float:
       smooth_scroll: true
       collapsed: true
+    number_sections: true
   
 ---
+
 
 ```{r title-centre, echo=FALSE, results='asis'}
 cat('
@@ -22,7 +24,6 @@ h1.title {
 </style>
 ')
 ```
-
 
 ```{r custom-header, echo=FALSE, results='asis'}
 cat('
@@ -88,8 +89,6 @@ body {
 ')
 ```
 
-
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -111,9 +110,15 @@ library(DT)
 library(FSA)
 library(slickR)
 library(glue)
+library(sf)
+#library(rnaturalearth)
+#library(rnaturalearthdata)
+library(knitr)
+library(kableExtra)
+library(forcats)
 ```
 
-## Project Background
+## Introduction
 
 Biodiversity loss, ecosystem degradation, and habitat destruction are increasingly linked to human-driven changes in land use, including **urbanisation**, **agriculture**, and the **exploitation of natural resources** (European Parliament, 2025; Jaureguiberry et al., 2022). In response, governments across Europe — including the EU — have introduced ambitious environmental strategies such as the **EU Biodiversity Strategy for 2030** (European Parliament, 2025) and the **30x30 target** (Markwick, 2023), which aims to protect *30% of land and sea* by the year 2030.
 
@@ -146,21 +151,6 @@ To explore this, high-throughput sequencing was conducted on:
 - **16S rRNA gene** (for bacterial communities)  
 - **ITS region** (for fungal communities)
 
-A total of **330 soil samples** were collected for each marker. 
-
-For the bacteria (16S), sequencing produced an average of approximately **65,000 reads per sample**, though this varied across the dataset:
-
-- A small number of samples had **just over 30,000 reads**  
-- A few reached up to **85,000 reads**
-
-For the fungi (ITS), sequencing produced an average of approximately **65,000 reads per sample**, though this varied across the dataset:
-
-- Two samples had **just over 10,000 reads** and a small number of samples had **just over 30,000 reads**  
-- A few reached up to **90,000 reads**
-
-Despite this variation, sequencing depth was generally sufficient to support robust microbial analyses.
-
-
 The analysis focused on three main aspects:
 
 - **Alpha and beta diversity**  
@@ -169,25 +159,180 @@ The analysis focused on three main aspects:
 
 These microbial assessments complement broader ecosystem-level measurements within the **RestREco project**, including **vegetation**, **invertebrates**, and ecosystem functions such as **litter decomposition**, **pollination services**, and **soil thermodynamic efficiency**.
 
+The following sections describe the sampling design, metadata structure, and the processing pipeline used to characterise microbial communities.
 
-### Pipelines
+---
 
-The sequencing data were processed using the **QIIME 2** bioinformatics platform — a widely used tool for microbiome analysis. Raw amplicon reads were **denoised** using the `DADA2` plugin, enabling accurate identification of *amplicon sequence variants (ASVs)* with single-nucleotide resolution. This method improves upon traditional OTU clustering by enhancing precision.
+## Sample Design and Metadata Overview
 
-After **quality filtering** and **feature table construction**, the pipeline proceeded to:
+### Sample Collection and Geographic Coverage
 
-- Generate **taxonomic classifications**
-- Perform **alpha and beta diversity analyses**
-- Create various **interactive visualisations** for exploring microbial community structure
 
-Both **16S rRNA gene** sequencing (for *bacteria and archaea*) and **ITS sequencing** (for *fungi*) were included, providing a broad overview of microbial diversity across samples.
+A total of **330 soil samples** were collected in 66 sites of England for each marker (5 per site). 
+
+```{r sampling-map, echo = FALSE, message=FALSE,warning=FALSE}
+# df <- read.delim("data/GP_metadata.txt")
+
+# df <- df %>%
+#   mutate(
+#     lat = as.numeric(sub(",.*", "", Lat_long)),
+#     long = as.numeric(sub(".*,", "", Lat_long))
+#   ) %>%
+#   filter(!is.na(lat), !is.na(long))
+
+
+# points_sf <- st_as_sf(df, coords = c("long", "lat"), crs = 4326)
+
+# hull <- st_convex_hull(st_union(points_sf))
+
+# uk <- ne_countries(scale = "medium", returnclass = "sf") %>% 
+#   filter(admin == "United Kingdom")
+
+# map_plot <- ggplot() +
+#   geom_sf(data = uk, fill = "gray95", color = "black") +
+#   geom_sf(data = hull, fill = "deepskyblue4", alpha = 0.4, color = "black") +
+#   theme_minimal() +
+#   coord_sf(expand = FALSE) 
+
+# ggsave("images/map_plot.png", map_plot, width = 6, height = 8, dpi = 300)
+
+```
+
+```{r table, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+sampling_summary <- data.frame(
+  Metric = c(
+    "Microbial group",
+    "Region sampled",
+    "Number of sites",
+    "Samples per site",
+    "Total samples",
+    "Average reads per sample",
+    "Read count range"
+  ),
+  `16S` = c(
+    "Bacteria",
+    "England",
+    "66",
+    "5",
+    "330",
+    "~65,000",
+    "30,000–85,000"
+  ),
+  `ITS` = c(
+    "Fungi",
+    "England",
+    "66",
+    "5",
+    "330",
+    "~65,000",
+    "10,000–90,000"
+  ),
+  check.names = FALSE
+)
+
+
+table_html <- kable(sampling_summary, "html", escape = FALSE, align = "lcc",
+      caption = "Overview of the soil sampling and sequencing strategy for each microbial marker.") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive", "bordered"),
+                full_width = FALSE, position = "center") %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#d9eaf7")
+
+```
+
+
+```{r map-table, echo=FALSE, message=FALSE, warning=FALSE}
+htmltools::HTML('
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 40px;">
+
+  <div style="flex: 1; text-align: center;">
+    <img src="images/map_plot.png" style="max-width: 100%; height: auto;">
+    <p style="font-weight: bold;">Figure 2. Sample Zone - Based on GPS coordinates</p>
+  </div>
+
+  <div style="flex: 1;text-align: center;">
+    ', table_html, '
+    <p style="font-weight: bold;">Figure 3. Sampling Summary</p>
+  </div>
+
+</div></br></br>
+')
+
+```
+
+### Metadata Overview
+
+Each sample collected was accompanied by metadata capturing key environmental and management variables. These contextual factors were essential for interpreting variation in microbial diversity.
+
+```{r metadata-info, echo=FALSE, message=FALSE, warning=FALSE}
+metadata_overview <- data.frame(
+  Variable = c(
+    "Site", "Plot number", "CU Code", "Year_est", "Age",
+    "Latitude/Longitude", "Establishment", "pH", "EC",
+    "Cutting", "Cattle", "Sheep", "Plough"
+  ),
+  Description = c(
+    "Name of the sampling site",
+    "Subdivision of each site (usually 5 plots per site)",
+    "Unique code for each sample",
+    "Year of establishment of the site",
+    "Site age (ranging from 1 year to over 100 years )",
+    "GPS coordinates of the sample",
+    "Restoration type or land management",
+    "Soil pH value at the time of sampling",
+    "Electrical conductivity of the soil",
+    "Whether the site is cut (1 = Yes, 0 = No)",
+    "Presence of cattle grazing (1 = Yes, 0 = No)",
+    "Presence of sheep grazing (1 = Yes, 0 = No)",
+    "Whether the soil has been ploughed (1 = Yes, 0 = No)"
+  )
+)
+
+kable(metadata_overview, format = "html", escape = FALSE,
+      caption = "Description of metadata variables associated with soil samples") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"),
+                full_width = FALSE, position = "center") %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#d9eaf7")
+
+HTML("</br><p style='text-align: center; font-weight: bold;'>Figure xx. Metadata Summary</p>")
+
+```
+
+
+## Analysis Pipeline
+
+### Input Files Selection
+
+Before proceeding with bioinformatic analyses, it was necessary to select consistent input files for each sample.
+For both ITS and 16S datasets, each sample was associated with multiple types of sequencing files. For example, a sample such as `GF677` had up to five different files: `GF677_1.fastq.gz`, `GF677_2.fastq.gz` (paired-end reads), `GF677.raw_1.fastq.gz`, `GF677.raw_2.fastq.gz` (raw unprocessed reads), and `GF677.extendedFrags.fastq.gz` (merged forward and reverse reads). To ensure consistency and avoid redundancy, we selected one file type per sample for downstream analysis. For the **16S dataset**, we used the **paired-end reads** (`*_1.fastq.gz` and `*_2.fastq.gz`), while for the **ITS dataset**, we selected the **raw reads** (`*.raw_1.fastq.gz` and `*.raw_2.fastq.gz`), which were best suited for our quality filtering and denoising steps.
+
+### Denoising and Feature Table Construction
+
+The sequencing data were processed using the **QIIME 2** bioinformatics platform — a widely used tool for microbiome analysis. Raw amplicon reads were **denoised** using the `DADA2` plugin, enabling accurate identification of *amplicon sequence variants (ASVs)* with single-nucleotide resolution. This step also included **chimera removal** and **read quality trimming**, ensuring high-confidence input for downstream analyses.
+
+Following denoising, a **feature table** was constructed for each dataset (16S and ITS), summarising the number of sequences associated with each ASV across samples.
+
+### Diversity Analysis and Taxonomic Assignment
+
+Following quality control and feature extraction, downstream analyses were performed to characterise microbial diversity and taxonomic composition.
+
+Alpha and beta diversity metrics were computed using the `diversity` and `emperor` plugins in QIIME 2, enabling comparison of microbial communities across restoration gradients and site conditions.
+
+Taxonomic classification of ASVs was then performed using trained classifiers against reference databases: **GreenGene2** for bacterial 16S sequences and **UNITE** for fungal ITS sequences. This allowed each ASV to be annotated with its likely taxonomic lineage (from kingdom down to genus or species when possible).
+
+**TO BE COMPLETED/CHANGED**
+
+### Summary of Pipeline
 
 ```{r 16S-pipeline, echo=FALSE, message=FALSE,warning=FALSE, results='asis'}
 
 cat('
 <div style="text-align: center;">
-  <img src="images/16S_pipeline.png" style="max-width: 80%; height: auto;" alt="16S Pipeline thumbnail">
-  <p style="font-weight: bold;">Figure 1. Pipeline (16S)</p>
+  <img src="images/16S_workflow.png" style="max-width: 50%; height: auto ;" alt="16S Pipeline thumbnail">
+  </br><p style="font-weight: bold;">Figure xx. Workflow (16S)</p>
 </div>
 ')
 
@@ -195,301 +340,11 @@ cat('
 
 ---
 
-## About the Data 
+## QC and Pre-Processing
 
-### About the Sites {.tabset}
+### MutliQC on raw data {.tabset}
 
-The dataset encompasses **66 distinct sites**, each contributing **five soil samples**. These sites span a wide age range — from **1 year** to **over 100 years** — providing a valuable gradient for ecological comparisons.
-
-Each site's five samples:
-
-- Share the same **establishment type**
-- Are subject to the same **management practices**
-
-In addition, soil **pH** and **electrical conductivity (EC)** were measured for every sample to help characterise environmental conditions.
-
-There are:
-
-- **3 establishment types**
-- **4 management types**, which can be applied **individually or in combination**  
-
-  → Some sites follow a single management approach, while others incorporate **two, three, or all four**.
-
----
-
-#### Mean Soil pH Across Sites
-
-Soil pH is a critical environmental parameter that influences microbial community structure, nutrient availability, and overall ecosystem function.  
-This section summarises the average pH values for each sampled site, grouped by establishment type.
-
-The bar chart below allows for easy comparison of mean pH across sites.  
-Each bar is coloured according to the establishment method (e.g., seed mix, natural regeneration, green hay), and by hovering over a bar, the user can view the precise pH value for each site.
-
-_Note: To improve clarity, site names have been removed from the x-axis, but full details are available via the interactive tooltip._
-
-```{r samples, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Figure 2. pH Mean For Each Site"}
-
-
-sample.data <- read.table('data/GP_metadata.txt', header = TRUE, sep = "\t")
-sample.data$Establishment <- as.factor(sample.data$Establishment)
-sample.data$Site <- as.factor(sample.data$Site)
-#mean.ph <- aggregate(sample.data, pH~Site, FUN=mean)
-mean.ph <- sample.data %>%
-  group_by(Site) %>%
-  summarise(pH = mean(pH, na.rm = TRUE),
-            Establishment = first(Establishment), .groups = "drop")  # on garde le type
-
-p <- ggplot(mean.ph, aes(x=Site, y=pH, fill = Establishment, text = paste0("Site: ", Site, "\npH: ", round(pH, 2)))) +
-  geom_col() +
-  scale_fill_manual(values = c(
-    "seed_mix" = "rosybrown",
-    "Natural_regen" = "goldenrod",
-    "Green_hay/bush" = "darkseagreen"
-  ))  +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())
-
-
-htmltools::div(style = "text-align: center;", ggplotly(p, tooltip = "text"))
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 2. pH Mean For Each Site</p>")
-
-
-```
-
-#### Mean Electrical Conductivity
-
-This section explores the **variation in electrical conductivity (EC)** across study sites.  
-Electrical conductivity is a measure of the soil’s ability to conduct electricity, often reflecting **ion concentration and soil salinity**, which can influence microbial activity and nutrient availability.
-
-The plots below allow users to examine how EC differs depending on either the **type of establishment** or the **age of the site**.
-
-*Use the drop-down menu to switch between views. Hover over the bars for detailed site-specific values.*
-
-```{r plot-switcher-ec, echo=FALSE, results='asis', warning=FALSE, message=FALSE}
-
-
-
-cat('<label for="variable_selector_ec"><big>Select variable:</big></label>
-    <select id="variable_selector_ec" onchange="switchPlotEC()">',
-    '<option value="est">Establishment</option>',
-    '<option value="age">Age</option>',
-    '</select>')
-
-
-mean.ec.est <- sample.data %>%
-  group_by(Site) %>%
-  summarise(
-    EC = mean(EC, na.rm = TRUE),
-    Establishment = dplyr::first(Establishment),
-    .groups = "drop"
-  ) %>%
-  arrange(Establishment, Site)
-
-
-sample.data <- sample.data %>%
-  mutate(
-    Age_numeric = ifelse(Age == ">100", 101, as.numeric(Age))
-  )
-
-mean.ec.age <- sample.data %>%
-  group_by(Site) %>%
-  summarise(
-    EC = mean(EC, na.rm = TRUE),
-    Age_original = first(Age),
-    Age_numeric = first(Age_numeric),
-    .groups = "drop"
-  ) %>%
-  arrange(Age_numeric)
-
-
-gg_ec_est <- ggplot(mean.ec.est, aes(
-  x = reorder(Site, EC),
-  y = EC,
-  fill = Establishment,
-  text = paste0("Site: ", Site, "\nEC: ", round(EC, 2))
-)) +
-  geom_col() +
-  scale_fill_manual(values = c(
-    "seed_mix" = "rosybrown",
-    "Natural_regen" = "goldenrod",
-    "Green_hay/bush" = "darkseagreen"
-  )) +
-  
-  labs(x = "Site (ordered by EC)",
-       y = "Mean EC") +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())
-
-cat('<div id="plot_EC_est">')
-htmltools::div(style = "text-align: center;", ggplotly(gg_ec_est, tooltip = "text"))
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 3. Mean EC per Site (by Establishment)</p>")
-
-cat('<p style="margin-top: 20px;">This plot shows the variation in electrical conductivity across sites, sorted by electrical conductivity.</p>')
-cat('</div>')
-
-
-
-gg_ec_age <- ggplot(mean.ec.age, aes(
-  x = reorder(Site, Age_numeric),
-  y = EC,
-  text = paste0("Site: ", Site, "\nEC: ", round(EC, 2), "\nAge: ", Age_original)
-)) +
-  geom_col(fill = "steelblue") +
-  labs(x = "Site (ordered by Age)",
-       y = "Mean EC") +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())
-
-cat('<div id="plot_EC_age" style="display:none;">')
-htmltools::div(style = "text-align: center;", ggplotly(gg_ec_age, tooltip = "text"))
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 4. Mean EC per Site (by Age)</p>")
-
-
-cat('<p style="margin-top: 20px;">This plot shows the variation in electrical conductivity across sites, sorted by increasing site age.</p>')
-cat('</div>')
-
-
-
-cat('<script>function switchPlotEC() {
-  var val = document.getElementById("variable_selector_ec").value;
-  document.getElementById("plot_EC_est").style.display = (val === "est") ? "block" : "none";
-  document.getElementById("plot_EC_age").style.display = (val === "age") ? "block" : "none";
-}</script>')
-```
-
-
-#### Site Management Practices
-
-This section illustrates the **types of management practices applied at each site**, including **cutting**, **cattle grazing**, **sheep grazing**, and **ploughing**.  
-Each coloured bar indicates the presence of one or more management strategies at a given site. Sites with multiple bars have undergone **combinations of practices**, highlighting the complexity and variation in land use across the study area.
-
-*Hover over each bar in the interactive plot to see the site name.*
-
-```{r site-management, echo = FALSE, message=FALSE, warning=FALSE}
-
-
-
-sample.data_long <- sample.data %>%
-  pivot_longer(cols = c(Cutting, Cattle, Sheep, Plough),
-               names_to = "management_type",
-               values_to = "used") %>%
-  filter(used == 1)
-
-df_unique <- sample.data_long %>%
-  distinct(Site, management_type)
-
-
-p <- ggplot(df_unique, aes(x = Site, fill = management_type,text = Site)) +
-  geom_bar(position = "stack") +
-  scale_fill_manual(values = c(
-    "Cutting" = "#4682B4",        # steelblue
-    "Cattle" = "#1E90FF",         # dodgerblue
-    "Sheep" = "#6CA6CD",          # skyblue3
-    "Plough" = "#104E8B"          # deepskyblue4
-  )) +
-  labs(x = "Site",
-       y = "Number of management type",
-       fill = "Management type") +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())
-
-htmltools::div(style = "text-align: center;", ggplotly(p, tooltip= "text"))
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 5. Management type for each site</p>")
-
-
-```
-
-#### Influence of Management Practices
-
-This section examines how different **management practices** — such as cutting, grazing by cattle or sheep, and ploughing — influence two key soil properties: **pH** and **electrical conductivity (EC)**.  
-These soil characteristics can affect microbial communities by altering nutrient availability, pH balance, and soil structure.
-
-The visualisations below display the overall effect of each management type **individually**. However, it is important to note that **potential interactions between management types** (e.g., cutting combined with grazing) are not accounted for here.  
-Such interactions may play a significant role in shaping soil conditions but were beyond the scope of this visual summary.
-
-Use the drop-down menu to explore how each management type affects pH or EC across all sampled sites.  
-Black dots represent the mean values for each management category.
-
-```{r plot-switcher-management, echo=FALSE, results='asis', warning= FALSE}
-cat('
-<label for="variable_selector_man">Select variable:</label>
-<select id="variable_selector_man" onchange="switchPlot()">
-  <option value="ph">pH</option>
-  <option value="ec">Electric Conductivity</option>
-</select>
-') # creates a drop-down menu
-
-
-summary_means_ph <- sample.data_long %>%
-  group_by(management_type) %>%
-  summarise(mean_val = mean(pH, na.rm = TRUE), .groups = "drop")
-
-gg_ph <- ggplot(sample.data_long, aes(x = management_type, y = pH, fill = management_type)) +
-  geom_boxplot() + scale_fill_manual(values = c(
-    "Cutting" = "steelblue3",        # steelblue
-    "Cattle" = "#1E90FF",         # dodgerblue
-    "Sheep" = "#6CA6CD",          # skyblue3
-    "Plough" = "#104E8B"          # deepskyblue4
-  )) +
-  geom_point(data = summary_means_ph,
-             aes(x = management_type, y = mean_val,
-                 text = paste0("Mean pH: ", round(mean_val, 2))),
-             shape = 20, size = 3, color = "black", inherit.aes = FALSE) +
-  labs(x = "Management Type", y = "pH") +
-  theme_minimal()
-
-
-cat('<div id="plot_ph">')
-htmltools::div(style = "text-align: center;", ggplotly(gg_ph, tooltip = "text"))
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 6. pH Variation Depending on Management Type</p>")
-cat('</div>')
-
-summary_means_ec <- sample.data_long %>%
-  group_by(management_type) %>%
-  summarise(mean_val = mean(EC, na.rm = TRUE), .groups = "drop")
-
-gg_ec <- ggplot(sample.data_long, aes(x = management_type, y = EC, fill = management_type)) +
-  geom_boxplot() +
-  scale_fill_manual(values = c(
-    "Cutting" = "#4682B4",        # steelblue
-    "Cattle" = "#1E90FF",         # dodgerblue
-    "Sheep" = "#6CA6CD",          # skyblue3
-    "Plough" = "#104E8B"          # deepskyblue4
-  ))+
-  geom_point(data = summary_means_ec,
-             aes(x = management_type, y = mean_val,
-                 text = paste0("Mean EC: ", round(mean_val, 2))),
-             shape = 20, size = 3, color = "black", inherit.aes = FALSE) +
-  labs(title = "EC Variation Depending on Management Type",
-       x = "Management Type", y = "EC") +
-  theme_minimal()
-
-cat('<div id="plot_ec" style="display:none;">')
-
-htmltools::div(style = "text-align: center;", ggplotly(gg_ec, tooltip = "text"))
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 7. EC Variation Depending on Management Type</p>")
-cat('</div>')
-
-cat('
-<script>
-function switchPlot() {
-  var val = document.getElementById("variable_selector_man").value;
-  document.getElementById("plot_ph").style.display = (val === "ph") ? "block" : "none";
-  document.getElementById("plot_ec").style.display = (val === "ec") ? "block" : "none";
-}
-</script>
-')# displays the plot corresponding to the user's choice
-```
-
-
-
----
-
-### QC and Pre-Processing
-
-#### MutliQC on raw data {.tabset}
-
-##### Bacteria (16S)
+#### Bacteria (16S) {.unnumbered}
 
 You can explore the full **MultiQC report** by **clicking** the image below:
 
@@ -500,14 +355,14 @@ cat('
   <a href="data/16S/multiqc_report_16S.html" target="_blank">
     <img src="images/sequence_quality_hist_16S.png" style="max-width: 80%; height: auto;" alt="MutlitQc thumbnail">
   </a>
-  <p style="font-style: bold;">Figure ??. MultiQC Plot (16S)</p>
+  <p style="font-style: bold;">Figure xx. MultiQC Plot (16S)</p>
 </div>
 ')
 
 
 ```
 
-##### Fungi (ITS)
+#### Fungi (ITS) {.unnumbered}
 
 
 You can explore the full **MultiQC report** by **clicking** the image below:
@@ -516,19 +371,22 @@ You can explore the full **MultiQC report** by **clicking** the image below:
 
 cat('
 <div style="text-align: center;">
-  <a href="data/ITS/multiqc_report.html" target="_blank">
+  <a href="data/ITS/F01_multiqc_report.html" target="_blank">
     <img src="images/sequence_quality_hist_ITS.png" style="max-width: 80%; height: auto;" alt="MutlitQc thumbnail">
   </a>
-  <p style="font-style: bold;">Figure ??. MultiQC Plot (ITS)</p>
+  <p style="font-style: bold;">Figure xx. MultiQC Plot (ITS)</p>
 </div>
 ')
 
 
 ```
 
-#### QC after denoising {.tabset}
+### QC after denoising
 
-##### Bacteria (16S)
+#### Statistics Table Summary {.tabset}
+
+
+##### Bacteria (16S) {.unnumbered}
 
 ```{r denoising-stats-table, echo=FALSE, message=FALSE, results='asis'}
 
@@ -548,18 +406,18 @@ datatable(
   )
 )
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure ??. Statitics after denoising (16S)</p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Statitics after denoising (16S)</p>")
 
 ```
 
-##### Fungi (ITS)
+##### Fungi (ITS) {.unnumbered}
 
 ```{r denoising-stats-table-ITS, echo=FALSE, message=FALSE, results='asis'}
 
 
-df <- read.delim("data/ITS/dada2-stats-summ/data/metadata.tsv", comment.char = "#")
+df <- read.delim("data/ITS/Pre-processing/F02_dada2-stats-summ/data/metadata.tsv", comment.char = "#")
 
-cat('Here is a link to the **statistics after denoising** to view it on QIIME2 (ITS) : <a href="data/ITS/dada2-stats-summ/data/index.html" target="_blank">Statitics after denoising (16S)</a>')
+cat('Here is a link to the **statistics after denoising** to view it on QIIME2 (ITS) : <a href="data/ITS/Pre-processing/F02_dada2-stats-summ/data/index.html" target="_blank">Statitics after denoising (16S)</a>')
 
 datatable(
   df,
@@ -572,13 +430,38 @@ datatable(
   )
 )
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure ??. Statitics after denoising (ITS)</p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Statitics after denoising (ITS)</p>")
 
 ```
 
+
+
+#### QC Plots {.tabset }
+
+##### Bacteria (16S) {.unnumbered}
+
+```{r QC-plot-16S, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+```
+
+
+##### Fungi (ITS) {.unnumbered}
+
+```{r QC-plot-ITS, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+cat('
+<div style="text-align: center;">
+  <a href="data/ITS/Pre-processing/F02_sequence/data/index.html" target="_blank">
+    <img src="images/QC_plot_ITS.png" style="max-width: 105%; height: auto;" alt="QC plot thumbnail">
+  </a>
+  <p style="font-style: bold;">Figure xx . QC plot (ITS)</p>
+</div>
+')
+
+```
+
+
 ---
-
-
 
 ## Alpha Diversity 
 
@@ -625,8 +508,8 @@ df_even    <- read_and_clean("data/16S/alpha_diversity/s08_alpha_evenness_per_gr
 
 
 # ITS data
-df_shannon_ITS <- read_and_clean("data/ITS/alpha_diversity/shannon_significance/data/metadata.tsv", "shannon_entropy")
-df_even_ITS    <- read_and_clean("data/ITS/alpha_diversity/evenness_vector/data/metadata.tsv", "pielou_evenness")
+df_shannon_ITS <- read_and_clean("data/ITS/Alpha_Diversity/F03_shannon_significance/data/metadata.tsv", "shannon_entropy")
+df_even_ITS    <- read_and_clean("data/ITS/Alpha_Diversity/F03_evenness_vector/data/metadata.tsv", "pielou_evenness")
 
 df_shannon_ITS <- df_shannon_ITS[ , ! colnames(df_shannon_ITS) %in% c("site_code", "plot_number", "OS_location", "Lat_long")]
 
@@ -678,7 +561,7 @@ vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group",
 
 The boxplot below illustrate differences in Shannon diversity across groups. This metric reflects both species richness and how balanced the community is in terms of species abundance.
 
-#### Bacteria (16S)
+#### Bacteria (16S) {.unnumbered}
 ```{r shannon-16S-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 for (var in vars) {
   var_16S <- convert_var_16S(var)
@@ -704,7 +587,7 @@ for (var in vars) {
 cat('Here is a link to the **full QIIME2 results (16S)** : <a href="data/16S/alpha_diversity/s08_alpha_shannon_per_group/data/index.html" target="_blank">Shannon Index (16S)</a>')
 ```
 
-#### Fungi (ITS)
+#### Fungi (ITS) {.unnumbered}
 ```{r shannon-ITS-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 for (var in vars) {
   var_ITS <- convert_var_ITS(var)
@@ -768,7 +651,7 @@ cat('Here is a link to the **full QIIME2 results (16S)** : <a href="data/16S/alp
 
 These boxplots display Pielou’s Evenness, highlighting how uniformly taxa are represented in each community. It allows us to isolate imbalance in dominance from richness effects.
 
-#### Bacteria (16S)
+#### Bacteria (16S) {.unnumbered}
 
 ```{r evenness-16S-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 for (var in vars) {
@@ -797,7 +680,7 @@ cat('Here is a link to the **full QIIME2 results (16S)** : <a href="data/16S/alp
 
 ```
 
-#### Fungi (ITS)
+#### Fungi (ITS) {.unnumbered}
 
 
 ```{r evenness-ITS-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
@@ -860,7 +743,7 @@ cat('}
 ### Spearman test (Bacteria - 16S) {.tabset}
 
 
-#### Summary Table
+#### Summary Table {.unnumbered}
 
 ```{r spearman-16S, echo=FALSE, message=FALSE,warning=FALSE}
 reduced_metadata <- read.delim("data/reduced_metadata.txt", row.names = 1, check.names = FALSE)
@@ -907,7 +790,7 @@ for (alpha in alpha_metrics) {
 datatable(corr_results, options = list(pageLength = 6), caption = "Spearman correlation results")
 ```
 
-#### Correlation Plots
+#### Correlation Plots {.unnumbered}
 
 ```{r correlation-slider, results='asis', echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 library(slickR)
@@ -917,15 +800,15 @@ cat('<br /><br />')
 ```
 
 
-## Beta Diversity
+## Comparative Microbial Community Composition (Beta Diversity)
 
 To explore differences in microbial communities, we often rely on dimensionality reduction techniques such as *Principal Coordinates Analysis* (PCoA), visualised through **Emperor plots**. Two commonly used distance metrics in this context are **Bray-Curtis** and **Jaccard**.
 
 While both metrics can reveal meaningful clustering and separation in microbial data, they capture complementary aspects of community structure.
 
-### Bacteria (16S) {.tabset}
+### Emperor Plots 
 
-#### Bray-Curtis Emperor Plot
+#### Bray-Curtis Emperor Plot {.tabset}
 
 The **Bray-Curtis Emperor plot** is a 3D visualisation of microbial community dissimilarities between samples, based on the Bray-Curtis distance. This distance metric quantifies how different two samples are in terms of species abundance, taking into account both presence/absence and relative abundances. It does *not* incorporate evolutionary relationships between features.
 
@@ -938,6 +821,7 @@ The Emperor plot is an **interactive 3D tool** developed for QIIME 2 that allows
 
 This type of plot is particularly useful for identifying clustering by experimental groups—such as treatment, site, or timepoint—and for detecting patterns or gradients in microbial diversity.
 
+##### Bacteria (16S) {.unnumbered}
 
 ```{r emperor-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
 
@@ -978,23 +862,48 @@ cat('Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on 
 
 ```
 
+##### Fungi (ITS) {.unnumbered}
+
+```{r emperor-plot-16S, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+json <- fromJSON("data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
 
 
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
 
-```{r emperor-plot, echo=FALSE, results='asis'}
-#cat('
-#<div style="text-align: center;">
-#  <a href="data/beta_diversity/s09_beta_bray_curtis_emperor_pcoa/data/index.html" target="_blank">
-#    <img src="images/bray_curtis_emperor.png" style="max-width: 80%; height: auto;" alt="Emperor thumbnail">
-#  </a>
-#  <p style="font-style: bold;">Figure 2. Beta diversity emperor plot</p>
-#</div>
-#')
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+htmltools::div(style = "text-align: center;", b)
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 17. Bray-Curtis Emperor Plot</p>")
+
+cat('Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (ITS)</a>')
+
 
 ```
 
-
-#### Jaccard Emperor Plot
+#### Jaccard Emperor Plot {.tabset}
 
 The **Jaccard Emperor plot** provides a 3D visualisation of microbial community dissimilarities based on the **Jaccard distance**. Unlike *Bray-Curtis*, the Jaccard metric considers **only the presence or absence** of features (e.g., microbial taxa) in each sample, ignoring their relative abundances.
 
@@ -1009,6 +918,7 @@ As with *Bray-Curtis*, the **Emperor plot** allows for *interactive exploration*
 
 The **Jaccard plot** is useful when exploring factors that influence *community membership*, such as **habitat type**, **land use**, or **environmental filtering**—especially in studies where *presence/absence patterns* are more meaningful than *relative abundances*.
 
+##### Bacteria (16S) {.unnumbered}
 
 ```{r jaccard-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
 
@@ -1049,57 +959,11 @@ cat('Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIM
 
 ```
 
-### Fungi (ITS) {.tabset}
-
-#### Bray-Curtis Emperor Plot
-
-
-```{r emperor-plot-16S, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
-
-json <- fromJSON("data/ITS/beta_diversity/s09_beta_bray_curtis_emperor_pcoa/data/emperor.json")
-
-coords <- json$plot$decomposition$coordinates
-
-coord_df <- as.data.frame(coords)
-
-colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
-coord_df$SampleID <- json$plot$decomposition$sample_ids
-
-
-metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
-colnames(metadata) <- json$plot$metadata_headers
-
-
-df <- left_join(coord_df, metadata, by = "SampleID")
-
-
-b <- plot_ly(
-  df,
-  x = ~PC1,
-  y = ~PC2,
-  z = ~PC3,
-  color = ~Establishment,
-  text = ~SampleID,
-  type = "scatter3d",
-  mode = "markers",
-  marker = list(size = 4)
-  
-)
-htmltools::div(style = "text-align: center;", b)
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 17. Bray-Curtis Emperor Plot</p>")
-
-cat('Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/beta_diversity/s09_beta_bray_curtis_emperor_pcoa/data/index.html" target="_blank">Bray-Curtis Emperor Plot (ITS)</a>')
-
-
-```
-
-
-
-#### Jaccard Emperor Plot
+##### Fungi (ITS) {.unnumbered}
 
 ```{r jaccard-plot-ITS, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
 
-json <- fromJSON("data/ITS/beta_diversity/s09_beta_jaccard_emperor_pcoa/data/emperor.json")
+json <- fromJSON("data/ITS/Beta_Diversity/F03_agg_jaccard_emperor/data/emperor.json")
 
 coords <- json$plot$decomposition$coordinates
 
@@ -1132,7 +996,7 @@ htmltools::div(style = "text-align: center;", b)
 HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Jaccard Emperor Plot</p>")
 
 
-cat('Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/beta_diversity/s09_beta_jaccard_emperor_pcoa/data/index.html" target="_blank">Jaccard Emperor Plot (ITS)</a>')
+cat('Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_jaccard_emperor/data/index.html" target="_blank">Jaccard Emperor Plot (ITS)</a>')
 
 ```
 
@@ -1140,22 +1004,171 @@ cat('Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIM
 
 ## Taxonomy Composition
 
+### Taxonomy Barplot {.tabset}
+
+#### Bacteria (16S) {.unnumbered}
+
+
+```{r barplot-16S, echo =FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+taxa_df <- read_csv("data/16S/Taxonomy/s10_taxa_barplot_by_site/data/level-2.csv")
+
+meta_cols <- c("Site", "Age", "OS_location", "pH", "Year_est", "Lat_long", "Cutting","Cattle","Sheep", "Plough", "EC", "Establishment")
+
+colnames(taxa_df)[1] <- "Site"
+
+taxa_long <- taxa_df %>%
+  pivot_longer(
+    cols = -all_of(meta_cols),
+    names_to = "Taxon",
+    values_to = "Abundance"
+  )
+
+
+taxa_rel <- taxa_long %>%
+  group_by(Site) %>%
+  mutate(Abundance = Abundance / sum(Abundance, na.rm = TRUE)) %>%
+  ungroup()
+
+
+dominant_taxon <- taxa_rel %>%
+  group_by(Taxon) %>%
+  summarise(Total = sum(Abundance), .groups = "drop") %>%
+  slice_max(Total, n = 1) %>%
+  pull(Taxon)
+
+site_order <- taxa_rel %>%
+  filter(Taxon == dominant_taxon) %>%
+  arrange(desc(Abundance)) %>%
+  pull(Site)
+
+taxon_order <- taxa_rel %>%
+  group_by(Taxon) %>%
+  summarise(Total = sum(Abundance), .groups = "drop") %>%
+  arrange(desc(Total)) %>%
+  pull(Taxon)
+
+taxa_rel <- taxa_rel %>%
+  mutate(
+    Site = factor(Site, levels = site_order),
+    Taxon = factor(Taxon, levels = taxon_order) 
+  )
+
+custom_blues <- c(
+  "#08306B",  
+  "#08519C",  
+  "#3182BD",  
+  "#6BAED6",  
+  "#C6DBEF"
+)
+
+plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
+  labs(x = "Site", y = "Relative Abundance (%)", fill = "Taxon", title = "Relative abundance of taxa across sites at phylum level (16S)") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.text = element_text(size = 5), 
+  )
+ggplotly(plot)  %>% layout(width = 800, height = 500)
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Taxonomy Barplot (16S)</p></br>")
+
+cat('Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2: <a href="data/16S/Taxonomy/s10_taxa_barplot_by_site/data/index.html" target="_blank">Taxonomy Barplot (16S)</a>')
+
+
+```
+
+
+#### Fungi (ITS) {.unnumbered}
+
+```{r barplot-ITS, echo =FALSE, message=FALSE, warning=FALSE, results='asis'}
+taxa_df <- read_csv("data/ITS/Taxonomy/Taxa_barplot/F03_taxa_barplot/data/level-2.csv")
+
+meta_cols <- c("Site", "Age", "OS_location", "pH", "Year_est","site_code", "Lat_long", "Cutting","Cattle","Sheep", "Plough", "pH_category", "Age_category", "EC", "Establishment")
+
+colnames(taxa_df)[1] <- "Site"
+
+taxa_long <- taxa_df %>%
+  pivot_longer(
+    cols = -all_of(meta_cols),
+    names_to = "Taxon",
+    values_to = "Abundance"
+  )
+
+
+taxa_rel <- taxa_long %>%
+  group_by(Site) %>%
+  mutate(Abundance = Abundance / sum(Abundance, na.rm = TRUE)) %>%
+  ungroup()
+
+
+dominant_taxon <- taxa_rel %>%
+  group_by(Taxon) %>%
+  summarise(Total = sum(Abundance), .groups = "drop") %>%
+  slice_max(Total, n = 1) %>%
+  pull(Taxon)
+
+site_order <- taxa_rel %>%
+  filter(Taxon == dominant_taxon) %>%
+  arrange(desc(Abundance)) %>%
+  pull(Site)
+
+taxon_order <- taxa_rel %>%
+  group_by(Taxon) %>%
+  summarise(Total = sum(Abundance), .groups = "drop") %>%
+  arrange(desc(Total)) %>%
+  pull(Taxon)
+
+taxa_rel <- taxa_rel %>%
+  mutate(
+    Site = factor(Site, levels = site_order),
+    Taxon = factor(Taxon, levels = taxon_order) 
+  )
+
+custom_blues <- c(
+  "#08306B",  
+  "#08519C",  
+  "#3182BD",  
+  "#6BAED6",  
+  "#C6DBEF"
+)
+
+plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
+  labs(x = "Site", y = "Relative Abundance (%)", fill = "Taxon", title = "Relative abundance of taxa across sites at phylum level (ITS)") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.text = element_text(size = 5), 
+  )
+ggplotly(plot)  %>% layout(width = 900, height = 500)
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Taxonomy Barplot (ITS)</p></br>")
+
+cat('Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2: <a href="data/ITS/Taxonomy/Taxa_barplot/F03_taxa_barplot/data/index.html" target="_blank">Taxonomy Barplot (ITS)</a>')
+
+```
+
+
+### Krona Plots {.tabset}
+
 To explore the composition of soil microbial communities, we used **Krona plots** — interactive, circular charts that display taxonomic abundances in a hierarchical manner.
 
 These plots allow users to intuitively navigate from broader taxonomic levels (such as *Phylum*) to more specific ones (like *Genus*), while simultaneously comparing relative abundances across taxa.
-
-### Bacteria (16S)
-
-#### Krona Plots
-
-
 
 In this study, Krona plots provide a powerful and user-friendly way to:
 
 - Visualise which microbial groups dominate each site
 - Explore the taxonomic diversity present in bacterial, archaeal, and fungal communities
 
-You can **click on the image** below to access the **Krona plots** for each site.
+You can **click on the images** below to access the **Krona plots** for each site.
+
+#### Bacteria (16S) {.unnumbered}
 
 ```{r krona,echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 cat('
@@ -1169,16 +1182,13 @@ cat('
 ```
 
 
-### Fungi (ITS)
+#### Fungi (ITS) {.unnumbered}
 
-#### Krona Plots
-
-You can **click on the image** below to access the **Krona plots** for each site.
 
 ```{r krona-ITS,echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 cat('
 <div style="text-align: center;">
-  <a href="data/ITS/krona_by_site_ITS.html" target="_blank">
+  <a href="data/ITS/Taxonomy/Krona/krona_by_site_ITS.html" target="_blank">
     <img src="images/krona_ITS.png" style="max-width: 80%; height: auto;" alt="Krona thumbnail">
   </a>
   <p style="font-style: bold;">Figure 19. Krona Plot for Baltic_farm_1 (ITS)</p>
@@ -1187,13 +1197,103 @@ cat('
 ```
 
 
+### Differential Abundance Analysis with ANCOM {.tabset}
+
+We used ANCOM to identify taxa whose relative abundances significantly differed across groups. This method accounts for the compositional nature of microbiome data by comparing log-ratios between taxa. The results are shown as volcano-like plots, where the W statistic reflects how many pairwise comparisons a taxon was found to differ in. Significant taxa are highlighted accordingly.
+
+#### Bacteria (16S) {.unnumbered}
+
+
+
+```{r ancom-16S-est, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+df_ancom <- read.delim("data/16S/Taxonomy/genus_ancom_results/genus_ancom_Establishment/data/ancom.tsv")
+df_data <- read.delim("data/16S/Taxonomy/genus_ancom_results/genus_ancom_Establishment/data/data.tsv")
+
+df_data$X <- df_data$id
+df_data <- df_data[, -1]
+df <- left_join(df_ancom, df_data)
+
+p <- ggplot(df, aes(x = clr, y = W, text = X)) +
+  geom_point(aes(color = `Reject.null.hypothesis`)) +
+  scale_color_manual(values = c("grey", "cyan3")) +
+  theme_minimal() +
+  labs(x = "Centered Logarithmic (clr)",
+       y = "W statistic",
+       title = "Volcano plot (ANCOM results) for Establishment") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+ggplotly(p, tooltip = "text")
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Volcano Plot (16S)</p></br>")
+
+cat('Here is a link to the **Volcano Plots** for more flexibility on QIIME2: <a href="data/16S/Taxonomy/genus_ancom_results/genus_ancom_Establishment/data/index.html" target="_blank">Volcano Plot (16S)</a>')
+```
+
+#### Fungi (ITS) {.unnumbered}
+
+```{r ancom-ITS-est, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+df_ancom <- read.delim("data/ITS/Taxonomy/Taxonomic_Abundance/F03_Establishment_ancom/data/ancom.tsv")
+df_data <- read.delim("data/ITS/Taxonomy/Taxonomic_Abundance/F03_Establishment_ancom/data/data.tsv")
+
+df_data$X <- df_data$id
+df_data <- df_data[, -1]
+df <- left_join(df_ancom, df_data)
+
+p <- ggplot(df, aes(x = clr, y = W, text = X)) +
+  geom_point(aes(color = `Reject.null.hypothesis`)) +
+  scale_color_manual(values = c("grey", "cyan3")) +
+  theme_minimal() +
+  labs(x = "Centered Logarithmic (clr)",
+       y = "W statistic",
+       title = "Volcano plot (ANCOM results) for Establishment") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+ggplotly(p, tooltip = "text")
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Volcano Plot (ITS)</p></br>")
+
+cat('Here is a link to the **Volcano Plots** for more flexibility on QIIME2: <a href="data/ITS/Taxonomy/Taxonomic_Abundance/F03_Establishment_ancom/data/index.html" target="_blank">Volcano Plot (ITS)</a>')
+
+```
+
+
+
 ---
 
 ## Functional Diversity
 
-In microbial ecology, a *guild* refers to a group of organisms that fulfil similar ecological roles, regardless of their taxonomic identity. Understanding functional guilds allows researchers to move beyond taxonomic profiles and assess the ecological roles that microbial communities may play in an environment.
+
 
 ### Bacteria (16S)
+
+#### Differentially Abundant Pathways
+
+```{r ancom-pathway-16S-est, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+df_ancom <- read.delim("data/16S/Taxonomy/ancom_pathway/pathway_ancom_Establishment/data/ancom.tsv")
+df_data <- read.delim("data//16S/Taxonomy/ancom_pathway/pathway_ancom_Establishment/data/data.tsv")
+
+df_data$X <- df_data$id
+df_data <- df_data[, -1]
+df <- left_join(df_ancom, df_data)
+
+p <- ggplot(df, aes(x = clr, y = W, text = X)) +
+  geom_point(aes(color = `Reject.null.hypothesis`)) +
+  scale_color_manual(values = c("grey", "cyan3")) +
+  theme_minimal() +
+  labs(x = "Centered Logarithmic (clr)",
+       y = "W statistic",
+       title = "Volcano plot (ANCOM pathways) for Establishment") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+ggplotly(p, tooltip = "text")
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Volcano Plot (16S)</p></br>")
+
+cat('Here is a link to the **Volcano Plots** for more flexibility on QIIME2: <a href="data/16S/Taxonomy/ancom_pathway/pathway_ancom_Establishment/data/index.html" target="_blank">Volcano Plot (16S)</a>')
+```
 
 #### Top Predicted Functional Pathways
 
@@ -1202,6 +1302,8 @@ The plot below displays the top 20 predicted KEGG pathways (or alternatively Met
 
 
 ### Fungi (ITS)
+
+In microbial ecology, a *guild* refers to a group of organisms that fulfil similar ecological roles, regardless of their taxonomic identity. Understanding functional guilds allows researchers to move beyond taxonomic profiles and assess the ecological roles that microbial communities may play in an environment.
 
 To investigate the ecological roles of fungal communities, we used **FUNGuild**, a tool that assigns fungi to functional guilds based on curated databases and literature. These guilds represent ecological strategies such as:
 
@@ -1246,48 +1348,7 @@ HTML("<p style='text-align: center; font-weight: bold;'>Figure 20. Top 20 functi
 
 #### Fungal Guild Abundance Across Sites
 
-The figure below shows the total abundance of fungal OTUs across sites, aggregated by **functional guild**. This provides an overview of how **guild-level composition** varies between locations, which may reflect differences in land use, soil conditions, or restoration histories.
+The figure below shows the total abundance of fungal ASVs across sites, aggregated by **functional guild**. This provides an overview of how **guild-level composition** varies between locations, which may reflect differences in land use, soil conditions, or restoration histories.
 
-```{r abundance_guild_ITS, echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=6}
-# Read data 
-df <- read.delim("data/ITS/funguild_input.guilds_matched.txt", check.names = FALSE)
-
-# Identify site columns
-site_cols <- names(df)[3:(which(names(df) == "Taxon") - 1)]
-
-# Extract Guild information between pipes 
-df$Guild_Extracted <- str_extract(df$Guild, "\\|[^|]+\\|") %>%
-                      str_replace_all("\\|", "") %>%
-                      trimws()
-
-# Reshape and aggregate data
-guild_data <- df %>%
-  pivot_longer(cols = all_of(site_cols), names_to = "Site", values_to = "Abundance") %>%
-  filter(Abundance > 0) %>%
-  group_by(Site, Guild_Extracted) %>%
-  summarise(Abundance = sum(Abundance), .groups = "drop")
-
-# Plot
-ggplot(guild_data, aes(x = Site, y = Abundance, fill = Guild_Extracted)) +
-  geom_bar(stat = "identity") +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-    legend.text = element_text(size = 8),
-    legend.title = element_text(size = 9)
-  ) +
-  labs(
-    title = "Fungal Guild Abundance by Site",
-    x = "Site",
-    y = "Abundance",
-    fill = "Guild"
-  )
-
-```
-
-
-
----
-
-## Appendix
+## Significance Analysis
 
