@@ -1,6 +1,6 @@
 #!/bin/bash
 # Minimal set of Crescent2 batch submission instructions 
-# Shangda.zhu March2025
+# Shangda.zhu April2025
 
 # PBS directives
 #---------------
@@ -36,22 +36,36 @@ date
 echo ""
 
 
+ 
+
+
 # set folder
 
 
 base_folder="/mnt/beegfs/home/shangda.zhu/groupproject"
 results_folder="${base_folder}/results"
-picrust2_folder="${results_folder}/picrust2"
-
+picrust2_folder="${results_folder}/rarefied_picrust2"
+mkdir -p $picrust2_folder
 qiime picrust2 full-pipeline \
-  --i-table "${results_folder}/sampleid_fix/s04_table_renamed.qza" \
+  --i-table "${results_folder}/s06b_grouped_rarefied_table.qza" \
   --i-seq "${results_folder}/s04_filtered_rep_seqs.qza" \
   --p-threads 8 \
   --o-ko-metagenome "${picrust2_folder}/ko_metagenome.qza" \
   --o-ec-metagenome "${picrust2_folder}/ec_metagenome.qza" \
   --o-pathway-abundance "${picrust2_folder}/pathway_abundance.qza" \
   --verbose 
+  
+qiime feature-table relative-frequency \
+  --i-table "${picrust2_folder}/pathway_abundance.qza" \
+  --o-relative-frequency-table "${picrust2_folder}/relfreq_pathway.qza"
 
+qiime feature-table relative-frequency \
+  --i-table "${picrust2_folder}/ko_metagenome.qza" \
+  --o-relative-frequency-table "${picrust2_folder}/relfreq_ko.qza"
+
+qiime feature-table relative-frequency \
+  --i-table "${picrust2_folder}/ec_metagenome.qza" \
+  --o-relative-frequency-table "${picrust2_folder}/relfreq_ec.qza"
 
 
 
