@@ -1,0 +1,7 @@
+"Bacteria"	"Fungi"	"r"	"padj"
+"k__Bacteria;p__Acidobacteria;c__Acidobacteria-6;o__;f__;g__"	"k__Fungi;p__Basidiomycota;c__Microbotryomycetes;o__Leucosporidiales;f__Leucosporidiaceae;g__Leucosporidium"	-0.613031318688639	0.01268127240075
+"k__Bacteria;p__Acidobacteria;c__Acidobacteria-6;o__;f__;g__"	"k__Fungi;p__Basidiomycota;c__Tremellomycetes;o__Tremellales;f__Trimorphomycetaceae;g__Saitozyma"	-0.605950652562401	0.0198861433032834
+"k__Bacteria;p__Actinobacteria;c__Acidimicrobiia;o__Acidimicrobiales;f__C111;g__Ilumatobacter"	"k__Fungi;p__Ascomycota;c__Sordariomycetes;o__Hypocreales;f__Clavicipitaceae;g__Keithomyces"	-0.592914390913997	0.044272526006637
+"k__Bacteria;p__Actinobacteria;c__Acidimicrobiia;o__Acidimicrobiales;f__C111;g__Ilumatobacter"	"k__Fungi;p__Basidiomycota;c__Microbotryomycetes;o__Leucosporidiales;f__Leucosporidiaceae;g__Leucosporidium"	-0.60032192202008	0.0282190365422008
+"k__Bacteria;p__Actinobacteria;c__Thermoleophilia;o__Solirubrobacterales;f__;g__"	"k__Fungi;p__Basidiomycota;c__Microbotryomycetes;o__Leucosporidiales;f__Leucosporidiaceae;g__Leucosporidium"	-0.594897869396262	0.0392870276074389
+"k__Bacteria;p__Proteobacteria;c__Alphaproteobacteria;o__Rhodobacterales;f__Rhodobacteraceae;__"	"k__Fungi;p__Ascomycota;c__Sordariomycetes;o__Hypocreales;f__Clavicipitaceae;g__Keithomyces"	-0.614071240763968	0.0118593381063913

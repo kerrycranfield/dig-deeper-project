@@ -1,0 +1,2 @@
+"Guild"	"Pathway"	"r"	"padj"
+"Animal Pathogen-Endophyte-Fungal Parasite-Lichen Parasite-Plant Pathogen-Wood Saprotroph"	"PWY-5913"	-0.603554741649803	0.00627345073469933
