@@ -1,0 +1,4 @@
+Group 1,Group 2,Sample size,Permutations,pseudo-F,p-value,q-value
+Green_hay_bush,Natural_regen,22,999,2.4931201627897264,0.011,0.0165
+Green_hay_bush,seed_mix,36,999,2.2489318570495045,0.008,0.0165
+Natural_regen,seed_mix,28,999,1.9130673387570027,0.019,0.019
