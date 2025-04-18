@@ -1,7 +1,6 @@
 #!/bin/bash
-# Shangda.zhu March2025
-# Aggregating feature data by site
-# Processing of metadata
+# Minimal set of Crescent2 batch submission instructions 
+# Shangda.zhu 12Dec2024
 
 # PBS directives
 #---------------
@@ -29,7 +28,7 @@ module use /apps2/modules/all
 
 # Stop at runtime errors
 set -e
-module load QIIME2/2022.8
+module load CONDA/qiime2-amplicon-2024.5
 
 # Start message
 echo "QIIME2 "
@@ -38,10 +37,10 @@ echo ""
 
 # Folders
 base_folder="/mnt/beegfs/home/shangda.zhu/groupproject"
-results_folder="${base_folder}/results-2"
+results_folder="${base_folder}/results"
+
 
 # Group by Site
-# Metadata file altered using python script to include a sampleID column as first column
 qiime feature-table group \
   --i-table "${results_folder}/s04_filtered_table_no_singletons.qza" \
   --m-metadata-file "${base_folder}/GP_metadata_fixed.txt" \
@@ -51,7 +50,6 @@ qiime feature-table group \
   --o-grouped-table "${results_folder}/s04_table_grouped_by_site.qza"
 
 # Summarize grouped table
-# Metadata file 'collapsed' to reflect grouping of data by site
 qiime feature-table summarize \
   --i-table "${results_folder}/s04_table_grouped_by_site.qza" \
   --o-visualization "${results_folder}/s04_table_grouped_by_site.qzv" \
