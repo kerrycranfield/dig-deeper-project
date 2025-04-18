@@ -828,9 +828,9 @@ To explore differences in microbial communities, we often rely on dimensionality
 
 While both metrics can reveal meaningful clustering and separation in microbial data, they capture complementary aspects of community structure.
 
-### Emperor Plots 
+### Bray-Curtis
 
-#### Bray-Curtis Emperor Plot {.tabset}
+#### Emperor Plot {.tabset}
 
 The **Bray-Curtis Emperor plot** is a 3D visualisation of microbial community dissimilarities between samples, based on the Bray-Curtis distance. This distance metric quantifies how different two samples are in terms of species abundance, taking into account both presence/absence and relative abundances. It does *not* incorporate evolutionary relationships between features.
 
@@ -925,7 +925,54 @@ cat('Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on 
 
 ```
 
-#### Jaccard Emperor Plot {.tabset}
+#### PERMANOVA {.tabset}
+
+
+#### Bacteria (16S) {.unnumbered}
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+
+#### Fungi (ITS) {.unnumbered}
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+
+```{r permanova-ITS-bray, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+
+imgs <- list.files("images/permanova/Bray_Curtis/ITS", full.names = TRUE)
+
+imgs <- c("images/permanova/Bray_Curtis/ITS/F03_Establishment_bray_curtis_significance.png", setdiff(imgs, "images/permanova/Bray_Curtis/ITS/F03_Establishment_bray_curtis_significance.png"))
+
+linked_imgs <- lapply(imgs, function(img_path) {
+
+  img_name <- tools::file_path_sans_ext(basename(img_path))
+  
+  
+  link_path <- file.path("data/ITS/Beta_Diversity", img_name, "data/index.html")
+  
+  as.tags(
+    a(
+      href = link_path, target = "_blank",
+      img(src = img_path, style = "max-height: 400px; width: auto; margin: 0 auto;")
+    )
+  )
+})
+
+
+slickR(linked_imgs, slideType = "img") + settings(arrows = TRUE, dots = TRUE, infinite = FALSE)
+
+
+
+
+```
+
+### Jaccard 
+
+
+#### Emperor Plot {.tabset}
 
 The **Jaccard Emperor plot** provides a 3D visualisation of microbial community dissimilarities based on the **Jaccard distance**. Unlike *Bray-Curtis*, the Jaccard metric considers **only the presence or absence** of features (e.g., microbial taxa) in each sample, ignoring their relative abundances.
 
@@ -1022,6 +1069,38 @@ cat('Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIM
 
 ```
 
+#### Permanova
+
+##### Bacteria (16S) {.unnumbered}
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+##### Fungi (ITS) {.unnumbered}
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+```{r permanova-ITS-jaccard, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+imgs <- list.files("images/permanova/Jaccard/ITS", full.names = TRUE)
+
+imgs <- c("images/permanova/Jaccard/ITS/F03_Establishment_jaccard_significance.png", setdiff(imgs, "images/permanova/Jaccard/ITS/F03_Establishment_jaccard_significance.png"))
+
+linked_imgs <- lapply(imgs, function(img_path) {
+
+  img_name <- tools::file_path_sans_ext(basename(img_path))
+  
+  
+  link_path <- file.path("data/ITS/Beta_Diversity", img_name, "data/index.html")
+  
+  as.tags(
+    a(
+      href = link_path, target = "_blank",
+      img(src = img_path, style = "max-height: 400px; width: auto; margin: 0 auto;")
+    )
+  )
+})
+slickR(linked_imgs, slideType = "img") + settings(arrows = TRUE, dots = TRUE, infinite = FALSE)
+```
+
 ---
 
 ## Taxonomy Composition
@@ -1032,6 +1111,13 @@ cat('Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIM
 
 
 ```{r barplot-16S, echo =FALSE, message=FALSE, warning=FALSE, results='asis'}
+custom_blues <- c(
+  "#08306B",  
+  "#08519C",  
+  "#3182BD",  
+  "#6BAED6",  
+  "#C6DBEF"
+)
 
 taxa_df <- read_csv("data/16S/Taxonomy/s10_taxa_barplot_by_site/data/level-2.csv")
 
@@ -1046,23 +1132,22 @@ taxa_long <- taxa_df %>%
     values_to = "Abundance"
   )
 
-
 taxa_rel <- taxa_long %>%
   group_by(Site) %>%
   mutate(Abundance = Abundance / sum(Abundance, na.rm = TRUE)) %>%
   ungroup()
 
+site_groups <- taxa_rel %>%
+  distinct(Site, Establishment) %>%
+  arrange(Establishment, Site)
 
-dominant_taxon <- taxa_rel %>%
-  group_by(Taxon) %>%
-  summarise(Total = sum(Abundance), .groups = "drop") %>%
-  slice_max(Total, n = 1) %>%
-  pull(Taxon)
-
-site_order <- taxa_rel %>%
-  filter(Taxon == dominant_taxon) %>%
-  arrange(desc(Abundance)) %>%
+site_order <- site_groups %>%
   pull(Site)
+
+taxa_rel <- taxa_rel %>%
+  mutate(Site = factor(Site, levels = site_order))
+
+
 
 taxon_order <- taxa_rel %>%
   group_by(Taxon) %>%
@@ -1070,31 +1155,45 @@ taxon_order <- taxa_rel %>%
   arrange(desc(Total)) %>%
   pull(Taxon)
 
-taxa_rel <- taxa_rel %>%
-  mutate(
-    Site = factor(Site, levels = site_order),
-    Taxon = factor(Taxon, levels = taxon_order) 
-  )
 
-custom_blues <- c(
-  "#08306B",  
-  "#08519C",  
-  "#3182BD",  
-  "#6BAED6",  
-  "#C6DBEF"
-)
+
+group_breaks <- site_groups %>%
+  group_by(Establishment) %>%
+  summarise(n = n()) %>%
+  mutate(position = cumsum(n) + 0.5) %>%
+  filter(row_number() < n())
+
+site_groups <- site_groups %>%
+  mutate(Site = factor(Site, levels = unique(site_order)))
+
+group_labels <- site_groups %>%
+  group_by(Establishment) %>%
+  summarise(position = median(as.numeric(Site)), .groups = "drop")
+
+
+taxa_rel <- taxa_rel %>%
+  mutate(Taxon = factor(Taxon, levels = taxon_order))
+
 
 plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
   geom_bar(stat = "identity") +
   scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
-  labs(x = "Site", y = "Relative Abundance (%)", fill = "Taxon", title = "Relative abundance of taxa across sites at phylum level (16S)") +
+  geom_vline(data = group_breaks, aes(xintercept = position), linetype = "dashed", colour = "black") +
+  geom_text(data = group_labels, aes(x = position, y = 105, label = Establishment),
+            inherit.aes = FALSE, size = 3, fontface = "bold") +
+  labs(
+    x = "Site", 
+    y = "Relative Abundance (%)", 
+    fill = "Taxon", 
+    title = "Relative abundance of taxa across sites at phylum level (16S), ordered by Establishment"
+  ) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
     axis.ticks.x = element_blank(),
-    legend.text = element_text(size = 5) 
+    legend.text = element_text(size = 5)
   )
-ggplotly(plot)  %>% layout(width = 800, height = 500)
+ggplotly(plot)  %>% layout(width = 900, height = 500)
 
 HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Taxonomy Barplot (16S)</p></br>")
 
@@ -1107,6 +1206,8 @@ cat('Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2:
 #### Fungi (ITS) {.unnumbered}
 
 ```{r barplot-ITS, echo =FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
 taxa_df <- read_csv("data/ITS/Taxonomy/Taxa_barplot/F03_taxa_barplot/data/level-2.csv")
 
 meta_cols <- c("Site", "Age", "OS_location", "pH", "Year_est","site_code", "Lat_long", "Cutting","Cattle","Sheep", "Plough", "pH_category", "Age_category", "EC", "Establishment")
@@ -1120,23 +1221,22 @@ taxa_long <- taxa_df %>%
     values_to = "Abundance"
   )
 
-
 taxa_rel <- taxa_long %>%
   group_by(Site) %>%
   mutate(Abundance = Abundance / sum(Abundance, na.rm = TRUE)) %>%
   ungroup()
 
+site_groups <- taxa_rel %>%
+  distinct(Site, Establishment) %>%
+  arrange(Establishment, Site)
 
-dominant_taxon <- taxa_rel %>%
-  group_by(Taxon) %>%
-  summarise(Total = sum(Abundance), .groups = "drop") %>%
-  slice_max(Total, n = 1) %>%
-  pull(Taxon)
-
-site_order <- taxa_rel %>%
-  filter(Taxon == dominant_taxon) %>%
-  arrange(desc(Abundance)) %>%
+site_order <- site_groups %>%
   pull(Site)
+
+taxa_rel <- taxa_rel %>%
+  mutate(Site = factor(Site, levels = site_order))
+
+
 
 taxon_order <- taxa_rel %>%
   group_by(Taxon) %>%
@@ -1144,24 +1244,38 @@ taxon_order <- taxa_rel %>%
   arrange(desc(Total)) %>%
   pull(Taxon)
 
-taxa_rel <- taxa_rel %>%
-  mutate(
-    Site = factor(Site, levels = site_order),
-    Taxon = factor(Taxon, levels = taxon_order) 
-  )
 
-custom_blues <- c(
-  "#08306B",  
-  "#08519C",  
-  "#3182BD",  
-  "#6BAED6",  
-  "#C6DBEF"
-)
+
+group_breaks <- site_groups %>%
+  group_by(Establishment) %>%
+  summarise(n = n()) %>%
+  mutate(position = cumsum(n) + 0.5) %>%
+  filter(row_number() < n())
+
+site_groups <- site_groups %>%
+  mutate(Site = factor(Site, levels = unique(site_order)))
+
+group_labels <- site_groups %>%
+  group_by(Establishment) %>%
+  summarise(position = median(as.numeric(Site)), .groups = "drop")
+
+
+taxa_rel <- taxa_rel %>%
+  mutate(Taxon = factor(Taxon, levels = taxon_order))
+
 
 plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
   geom_bar(stat = "identity") +
   scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
-  labs(x = "Site", y = "Relative Abundance (%)", fill = "Taxon", title = "Relative abundance of taxa across sites at phylum level (ITS)") +
+  geom_vline(data = group_breaks, aes(xintercept = position), linetype = "dashed", colour = "black") +
+  geom_text(data = group_labels, aes(x = position, y = 105, label = Establishment),
+            inherit.aes = FALSE, size = 3, fontface = "bold") +
+  labs(
+    x = "Site", 
+    y = "Relative Abundance (%)", 
+    fill = "Taxon", 
+    title = "Relative abundance of taxa across sites at phylum level (ITS), ordered by Establishment"
+  ) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
@@ -1173,6 +1287,7 @@ ggplotly(plot)  %>% layout(width = 900, height = 500)
 HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Taxonomy Barplot (ITS)</p></br>")
 
 cat('Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2: <a href="data/ITS/Taxonomy/Taxa_barplot/F03_taxa_barplot/data/index.html" target="_blank">Taxonomy Barplot (ITS)</a>')
+
 
 ```
 
@@ -1242,8 +1357,7 @@ p <- ggplot(df, aes(x = clr, y = W, text = X)) +
   labs(x = "Centered Logarithmic (clr)",
        y = "W statistic",
        ) +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())
+  theme()
 
 ggplotly(p, tooltip = "text")
 
@@ -1251,6 +1365,30 @@ HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Genus-Level D
 
 cat('Here is a link to the **Volcano Plots** for more flexibility on QIIME2: <a href="data/16S/Taxonomy/genus_ancom_results/genus_ancom_Establishment/data/index.html" target="_blank">Volcano Plot (16S)</a>')
 ```
+
+
+
+```{r ancom-16S-ph, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+df_ancom <- read.delim("data/16S/Taxonomy/genus_ancom_results/genus_ancom_pH_binary/data/ancom.tsv")
+df_data <- read.delim("data/16S/Taxonomy/genus_ancom_results/genus_ancom_pH_binary/data/data.tsv")
+
+df_data$X <- df_data$id
+df_data <- df_data[, -1]
+df <- left_join(df_ancom, df_data)
+
+p <- ggplot(df, aes(x = clr, y = W, text = X)) +
+  geom_point(aes(color = `Reject.null.hypothesis`)) +
+  scale_color_manual(values = c("grey", "cyan3")) +
+  theme_minimal() +
+  labs(x = "Centered Logarithmic (clr)",
+       y = "W statistic",
+       ) +
+  theme()
+
+ggplotly(p, tooltip = "text")
+
+```
+
 
 #### Fungi (ITS) {.unnumbered}
 
