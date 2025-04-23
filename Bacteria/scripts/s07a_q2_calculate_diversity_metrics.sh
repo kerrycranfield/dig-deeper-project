@@ -48,7 +48,7 @@ diversity_metrics_folder="${results_folder}/diversity_metrics_by_site"
 qiime diversity core-metrics-phylogenetic \
   --i-table "${results_folder}/s04_table_grouped_by_site.qza" \
   --i-phylogeny "${results_folder}/s05_rooted_tree.qza" \
-  --p-sampling-depth 3529 \
+  --p-sampling-depth 9473 \
   --m-metadata-file "${base_folder}/GP_site_metadata_cleaned.txt" \
   --output-dir "$diversity_metrics_folder"
 echo " 分析完成！结果保存在：$diversity_metrics_folder"
