@@ -1,5 +1,5 @@
 #!/bin/bash
-# Shangda.zhu April2025
+# Shangda.zhu 12Dec2024
 # QIIME2 - Calculate multiple diversity metrics
 
 # PBS directives
@@ -43,18 +43,20 @@ echo ""
 
 # Folders
 base_folder="/mnt/beegfs/home/shangda.zhu/groupproject"
-diversity_metrics_folder="${base_folder}/results/diversity_metrics_by_site"
+diversity_metrics_folder="${base_folder}/results/diversity_metrics_per_site"
 permanova_folder="${diversity_metrics_folder}/permanova"
-
 mkdir -p ${permanova_folder}
+
 # ‰Ω†Â∑≤ÊúâÁöÑÂèòÈáèÂàóË°®
-for var in Establishment Cutting Plough Sheep Cattle Year_group Age_group Age_binary pH_binary
+for var in Establishment Cutting Plough Sheep Cattle Age_binary pH_binary
 do
+  echo "Ì†ΩÌ≥å Running PERMANOVA for: $var"
+
   # Bray-Curtis
   qiime diversity beta-group-significance \
     --i-distance-matrix "${diversity_metrics_folder}/bray_curtis_distance_matrix.qza" \
-    --m-metadata-file "GP_site_metadata_cleaned.txt" \
-    --m-metadata-column $var \
+    --m-metadata-file "${base_folder}/GP_site_metadata_cleaned.txt" \
+    --m-metadata-column "$var" \
     --p-method permanova \
     --p-pairwise \
     --o-visualization "${permanova_folder}/bray_permanova_${var}.qzv"
@@ -62,14 +64,27 @@ do
   # Jaccard
   qiime diversity beta-group-significance \
     --i-distance-matrix "${diversity_metrics_folder}/jaccard_distance_matrix.qza" \
-    --m-metadata-file "GP_site_metadata_cleaned.txt" \
-    --m-metadata-column $var \
+    --m-metadata-file "${base_folder}/GP_site_metadata_cleaned.txt" \
+    --m-metadata-column "$var" \
     --p-method permanova \
     --p-pairwise \
     --o-visualization "${permanova_folder}/jaccard_permanova_${var}.qzv"
-done
 
-# Completion message
-echo ""
-echo "Done"
-date
+  # Weighted UniFrac
+  qiime diversity beta-group-significance \
+    --i-distance-matrix "${diversity_metrics_folder}/weighted_unifrac_distance_matrix.qza" \
+    --m-metadata-file "${base_folder}/GP_site_metadata_cleaned.txt" \
+    --m-metadata-column "$var" \
+    --p-method permanova \
+    --p-pairwise \
+    --o-visualization "${permanova_folder}/wunifrac_permanova_${var}.qzv"
+
+  # Unweighted UniFrac
+  qiime diversity beta-group-significance \
+    --i-distance-matrix "${diversity_metrics_folder}/unweighted_unifrac_distance_matrix.qza" \
+    --m-metadata-file "${base_folder}/GP_site_metadata_cleaned.txt" \
+    --m-metadata-column "$var" \
+    --p-method permanova \
+    --p-pairwise \
+    --o-visualization "${permanova_folder}/uwunifrac_permanova_${var}.qzv"
+done
