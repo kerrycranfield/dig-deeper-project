@@ -3,7 +3,9 @@ title: "A microbial diversity perspective within the Restoring Resilient Ecosyst
 author: "IBIX4"
 date: "`r Sys.Date()`"
 output: 
+  
   html_document:
+    self_contained: false
     theme: cerulean
     toc: true
     toc_depth: 5
@@ -762,7 +764,7 @@ cat('}
 
 
 
-### Spearman test (Bacteria - 16S) {.tabset}
+### Spearman test (Bacteria - 16S) 
 
 
 #### Summary Table {.unnumbered}
@@ -1310,7 +1312,7 @@ You can **click on the images** below to access the **Krona plots** for each sit
 ```{r krona,echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 cat('
 <div style="text-align: center;">
-  <a href="data/16S/krona_by_site_16S.html" target="_blank">
+  <a href="data/16S/Taxonomy/Krona/krona_by_site_16S.html" target="_blank">
     <img src="images/krona_16S.png" style="max-width: 80%; height: auto;" alt="Krona thumbnail">
   </a>
   <p style="font-style: bold;">Figure 19. Krona Plot for Baltic_farm_1 (16S)</p>
@@ -1358,8 +1360,8 @@ p <- ggplot(df, aes(x = clr, y = W, text = X)) +
        y = "W statistic",
        ) +
   theme()
+htmltools::div(style = "text-align: center;", ggplotly(p, tooltip = "text"))
 
-ggplotly(p, tooltip = "text")
 
 HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Genus-Level Differences in Taxa Abundance by Establishment Type (ANCOM Volcano Plot) (16S)</p></br>")
 
@@ -1385,38 +1387,72 @@ p <- ggplot(df, aes(x = clr, y = W, text = X)) +
        ) +
   theme()
 
-ggplotly(p, tooltip = "text")
+htmltools::div(style = "text-align: center;", ggplotly(p, tooltip = "text"))
 
 ```
 
 
 #### Fungi (ITS) {.unnumbered}
 
-```{r ancom-ITS-est, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-df_ancom <- read.delim("data/ITS/Taxonomy/Taxonomic_Abundance/F03_Establishment_ancom/data/ancom.tsv")
-df_data <- read.delim("data/ITS/Taxonomy/Taxonomic_Abundance/F03_Establishment_ancom/data/data.tsv")
 
-df_data$X <- df_data$id
-df_data <- df_data[, -1]
-df <- left_join(df_ancom, df_data)
+```{r ancom-its, echo=FALSE, message=FALSE, warning=FALSE, results='asis' }
+cat('
+<label for="variable_selector_ANCOM_ITS"><b>Select variable:</b></label>
+<select id="variable_selector_ANCOM_ITS" onchange="switchPlotANCOM_ITS()">
+  <option value="Establishment" selected>Establishment</option>
+  <option value="Cutting">Cutting</option>
+  <option value="Cattle">Cattle</option>
+  <option value="Sheep">Sheep</option>
+  <option value="Plough">Plough</option>
+  <option value="Age_category">Age category</option>
+  <option value="pH_category">pH category</option>
+</select>
 
-p <- ggplot(df, aes(x = clr, y = W, text = X)) +
-  geom_point(aes(color = `Reject.null.hypothesis`)) +
-  scale_color_manual(values = c("grey", "cyan3")) +
-  theme_minimal() +
-  labs(x = "Centered Logarithmic (clr)",
-       y = "W statistic",
-       ) +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())
+<script>
+function switchPlotANCOM_ITS() {
+  var val = document.getElementById("variable_selector_ANCOM_ITS").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category"];
+  all.forEach(function(v) {
+    document.getElementById("plot_ANCOM_" + v).style.display = (v === val) ? "block" : "none";
+  });
+}
+</script>
+')
 
-ggplotly(p, tooltip = "text")
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category")
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Differences in Taxa Abundance by Establishment Type (ANCOM Volcano Plot) (ITS)</p></br>")
 
-cat('Here is a link to the **Volcano Plots** for more flexibility on QIIME2: <a href="data/ITS/Taxonomy/Taxonomic_Abundance/F03_Establishment_ancom/data/index.html" target="_blank">Volcano Plot (ITS)</a>')
+for (v in vars) {
+  path_ancom <- paste0("data/ITS/Taxonomy/Taxonomic_Abundance/F03_", v, "_ancom/data/ancom.tsv")
+  path_data <- paste0("data/ITS/Taxonomy/Taxonomic_Abundance/F03_", v, "_ancom/data/data.tsv")
+  path_link <- paste0("data/ITS/Taxonomy/Taxonomic_Abundance/F03_", v, "_ancom/data/index.html")
 
+  if (file.exists(path_ancom) && file.exists(path_data)) {
+    df_ancom <- read.delim(path_ancom)
+    df_data <- read.delim(path_data)
+
+    df_data$X <- df_data$id
+    df_data <- df_data[, -1]
+    df <- left_join(df_ancom, df_data)
+
+    p <- ggplot(df, aes(x = X, y = W)) +
+      geom_point(aes(color = `Reject.null.hypothesis`)) +
+      scale_color_manual(values = c("gray70", "skyblue2")) +
+      labs(x = "Feature ID", y = "W statistic", title = paste("Volcano plot (ITS) for", v)) +
+      theme_minimal() +
+      theme()
+
+    div_style <- ifelse(v == "Establishment", "block", "none")
+
+   
+    cat(sprintf('<div id="plot_ANCOM_%s" style="display:%s;">', v, div_style))
+    cat(as.character(htmltools::div(style = "text-align: center;", ggplotly(p))))
+    cat(sprintf('<p style="text-align: center;"><a href="%s" target="_blank">View interactive volcano plot in QIIME2 (ITS - %s)</a></p>', path_link, v))
+    cat('</div>')
+  }
+}
 ```
+
 
 
 
@@ -1447,7 +1483,7 @@ p <- ggplot(df, aes(x = clr, y = W, text = X)) +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
-ggplotly(p, tooltip = "text")
+htmltools::div(style = "text-align: center;", ggplotly(p, tooltip = "text"))
 
 HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Functional Pathway Differences by Establishment (ANCOM Results) (16S)</p></br>")
 
