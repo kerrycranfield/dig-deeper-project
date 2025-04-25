@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: 
   
   html_document:
-    self_contained: false
+    self_contained: true
     theme: cerulean
     toc: true
     toc_depth: 5
@@ -888,7 +888,7 @@ cat('Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on 
 
 ##### Fungi (ITS) {.unnumbered}
 
-```{r emperor-plot-16S, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+```{r emperor-plot-ITS, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
 
 json <- fromJSON("data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/emperor.json")
 
@@ -1023,6 +1023,7 @@ b <- plot_ly(
 )
 
 htmltools::div(style = "text-align: center;", b)
+
 HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Jaccard Emperor Plot</p>")
 
 

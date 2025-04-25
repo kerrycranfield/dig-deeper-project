@@ -21,3 +21,4 @@ glue
 sf
 knitr
 kableExtra
+RColorBrewer
