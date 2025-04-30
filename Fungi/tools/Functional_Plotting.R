@@ -141,3 +141,70 @@ ggsave("guild_abundance_all_filtered.jpeg", plot = guild_plot_filtered, width = 
 ggsave("guild_abundance_by_Age_category.jpeg", plot = guild_Age_plot, width = 12, height = 8, dpi = 300)
 ggsave("guild_abundance_by_pH_category.jpeg", plot = guild_pH_plot, width = 12, height = 8, dpi = 300)
 ggsave("guild_abundance_by_Establishment.jpeg", plot = guild_Establishment_plot, width = 12, height = 8, dpi = 300)
+
+#############################ADDITIONAL PERCENTAGE PLOTS###########################
+
+
+# Guild Abundance by Site Percentage
+site_percentage_data <- guild_data %>%
+  group_by(Site) %>%
+  mutate(Percentage = 100 * Abundance / sum(Abundance))
+
+guild_plot_percentage <- ggplot(site_percentage_data, aes(x = Site, y = Percentage, fill = Guild_Extracted)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = guild_colors) +
+  theme_classic(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  labs(
+    title = "Fungal Guild Abundance Percentage by Site",
+    x = "Site",
+    y = "Percentage (%)",
+    fill = "Guild"
+  )
+
+# Guild Abundance by pH Percentage
+guild_pH_percentage <- guild_pH_data %>%
+  group_by(pH_category) %>%
+  mutate(Percentage = 100 * Abundance / sum(Abundance))
+
+guild_pH_plot_percentage <- ggplot(guild_pH_percentage, aes(x = pH_category, y = Percentage, fill = Guild_Extracted)) +
+  geom_bar(stat = "identity", position = "stack") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  labs(title = paste("Fungal Guild Abundance Percentage by pH Category (Median pH =", round(pH_median, 2), ")"),
+       x = "pH Category",
+       y = "Percentage (%)",
+       fill = "Guild")
+
+# Guild Abundance by Age Percentage
+guild_Age_percentage <- guild_Age_data %>%
+  group_by(Age_category) %>%
+  mutate(Percentage = 100 * Abundance / sum(Abundance))
+
+guild_Age_plot_percentage <- ggplot(guild_Age_percentage, aes(x = Age_category, y = Percentage, fill = Guild_Extracted)) +
+  geom_bar(stat = "identity", position = "stack") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  labs(title = paste("Fungal Guild Abundance Percentage by Age Category (Median Age =", round(Age_median, 2), ")"),
+       x = "Age Category",
+       y = "Percentage (%)",
+       fill = "Guild")
+
+# Guild Abundance by Establishment Percentage
+guild_Establishment_percentage <- guild_Establishment_data %>%
+  group_by(Establishment) %>%
+  mutate(Percentage = 100 * Abundance / sum(Abundance))
+
+guild_Establishment_plot_percentage <- ggplot(guild_Establishment_percentage, aes(x = Establishment, y = Percentage, fill = Guild_Extracted)) +
+  geom_bar(stat = "identity", position = "stack") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+  labs(title = "Fungal Guild Abundance Percentage by Establishment",
+       x = "Establishment",
+       y = "Percentage (%)",
+       fill = "Guild")
+
+ggsave("guild_abundance_percentage_by_site.jpeg", plot = guild_plot_percentage, width = 20, height = 10, dpi = 300)
+ggsave("guild_abundance_percentage_by_pH.jpeg", plot = guild_pH_plot_percentage, width = 12, height = 8, dpi = 300)
+ggsave("guild_abundance_percentage_by_Age.jpeg", plot = guild_Age_plot_percentage, width = 12, height = 8, dpi = 300)
+ggsave("guild_abundance_percentage_by_Establishment.jpeg", plot = guild_Establishment_plot_percentage, width = 12, height = 8, dpi = 300)
