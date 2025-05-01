@@ -1,0 +1,2818 @@
+---
+title: A microbial diversity perspective within the Restoring Resilient Ecosystems
+  project
+author: "IBIX4"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    self_contained: false
+    theme: cerulean
+    toc: true
+    toc_depth: 5
+    toc_float:
+      smooth_scroll: true
+      collapsed: true
+    number_sections: false
+  pdf_document:
+    toc: true
+    toc_depth: '4'
+---
+
+
+```{r title-centre, echo=FALSE, results='asis'}
+cat('
+<style>
+h1.title {
+  text-align: center;
+}
+iframe {
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  border: none;
+}
+
+</style>
+')
+```
+
+```{r custom-header, echo=FALSE, results='asis'}
+cat('
+<style>
+
+body, .main-container {
+  max-width: 95%;
+  margin: 0 auto;
+  font-size: 1.05rem;
+}
+
+
+.header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  color: #3780AE; 
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  z-index: 9999;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 22px;
+  font-weight: bold;
+}
+
+
+.header-bar img {
+  height: 45px;
+  margin-right: 15px;
+}
+
+
+.header-text {
+  text-align: left;
+}
+
+
+body {
+  padding-top: 70px;
+}
+
+
+@media (max-width: 768px) {
+  .header-bar {
+    font-size: 18px;
+    padding: 8px 10px;
+  }
+  .header-bar img {
+    height: 35px;
+    margin-right: 10px;
+  }
+}
+</style>
+
+<div class="header-bar">
+  <img src="images/cropped-restreco_logo-1.jpg" alt="Logo" />
+  <img src="images/Cranfield_logo.jpg" alt="Logo Cranfield" />
+  <div class="header-text">Dig Deeper - Microbial Community Analysis</div>
+</div>
+')
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(plotly.use.cdn = TRUE)
+knitr::opts_chunk$set(echo = FALSE, cache = FALSE, fig.width = 6, fig.height = 4, dpi = 100, warning = FALSE, message = FALSE)
+```
+
+
+```{r dependencies, echo=FALSE, message=FALSE, warning=FALSE}
+#loading the dependencies :
+library(ggplot2)
+library(plotly)
+library(htmltools)
+library(tidyverse)
+library(dplyr)
+library(jsonlite)
+library(stringr)
+library(tidyverse)
+library(vegan)
+library(readr)
+library(DT)
+library(FSA)
+library(slickR)
+library(glue)
+library(sf)
+library(RColorBrewer)
+#library(rnaturalearth)
+#library(rnaturalearthdata)
+library(knitr)
+library(kableExtra)
+library(forcats)
+```
+
+
+
+## Introduction
+
+Biodiversity loss, ecosystem degradation, and habitat destruction are increasingly linked to human-driven changes in land use, including **urbanisation**, **agriculture**, and the **exploitation of natural resources** (European Parliament, 2025; Jaureguiberry et al., 2022). In response, governments across Europe — including the EU — have introduced ambitious environmental strategies such as the **EU Biodiversity Strategy for 2030** (European Parliament, 2025) and the **30x30 target** (Markwick, 2023), which aims to protect *30% of land and sea* by the year 2030.
+
+Ecological restoration plays a vital role in addressing these challenges. Rather than simply returning ecosystems to a previous state, modern approaches focus on **restoring ecological processes** and **enhancing ecosystem resilience** (Hicks, 2023).
+
+### The **RestREco** Initiative
+
+**RestREco** (*Restoring Resilient Ecosystems*) is a **NERC-funded** research project that adopts a *resilience-based* perspective on ecological restoration. The initiative brings together researchers from:
+
+- **Cranfield University**  
+- **University of Stirling**
+- **UK Centre for Ecology & Hydrology**  
+- **The National Trust**  
+- **Forest Research**
+
+Using a **natural experiment design**, RestREco studies a network of **133 ecological restoration sites** across **England and Scotland**. The project aims to identify key drivers of ecosystem development, such as:
+
+- **Time since restoration began**  
+- **Initial ecological conditions**  
+- **Proximity to existing woodland and grassland**
+
+The goal is to understand how these factors influence ecosystem **complexity**, **function**, and **resilience** to future pressures (RestREco, 2024).
+
+### The **Dig Deeper** Study
+
+As part of the RestREco initiative, the **Dig Deeper** study focused on how the *age of restoration*, *establishment type*, and *site management* affect **soil microbial communities**, specifically **bacteria** and **fungi**.
+
+To explore this, high-throughput sequencing was conducted on:
+
+- **16S rRNA gene** (for bacterial communities)  
+- **ITS region** (for fungal communities)
+
+The analysis focused on three main aspects:
+
+- **Alpha and beta diversity**  
+- **Taxonomic composition**  
+- **Functional diversity**
+
+These microbial assessments complement broader ecosystem-level measurements within the **RestREco project**, including **vegetation**, **invertebrates**, and ecosystem functions such as **litter decomposition**, **pollination services**, and **soil thermodynamic efficiency**.
+
+The following sections describe the sampling design, metadata structure, and the processing pipeline used to characterise microbial communities.
+
+---
+
+
+## Sample Design and Metadata Overview
+
+### Sample Collection and Geographic Coverage
+
+
+A total of **330 soil samples** were collected in 66 sites of England for each marker (5 per site). 
+
+
+```{r table, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+sampling_summary <- data.frame(
+  Metric = c(
+    "Microbial group",
+    "Region sampled",
+    "Number of sites",
+    "Samples per site",
+    "Total samples",
+    "Average reads per sample",
+    "Read count range"
+  ),
+  `16S` = c(
+    "Bacteria",
+    "England",
+    "66",
+    "5",
+    "330",
+    "~65,000",
+    "30,000–85,000"
+  ),
+  `ITS` = c(
+    "Fungi",
+    "England",
+    "66",
+    "5",
+    "330",
+    "~65,000",
+    "10,000–90,000"
+  ),
+  check.names = FALSE
+)
+
+
+table_html <- kable(sampling_summary, "html", escape = FALSE, align = "lcc",
+      caption = "Overview of the soil sampling and sequencing strategy for each microbial marker.") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive", "bordered"),
+                full_width = FALSE, position = "center") %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#d9eaf7")
+
+```
+
+
+```{r map-table, echo=FALSE, message=FALSE, warning=FALSE}
+htmltools::HTML('
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 40px;">
+
+  <div style="flex: 1; text-align: center;">
+    <img src="images/map_plot.png" style="max-width: 100%; height: auto;">
+    <p style="font-weight: bold;">Figure 2. Sample Zone - Based on GPS coordinates</p>
+  </div>
+
+  <div style="flex: 1;text-align: center;">
+    ', table_html, '
+    <p style="font-weight: bold;">Figure 3. Sampling Summary</p>
+  </div>
+
+</div></br></br>
+')
+
+```
+
+### Metadata Overview
+
+Each sample collected was accompanied by metadata capturing key environmental and management variables. These contextual factors were essential for interpreting variation in microbial diversity.
+
+```{r metadata-info, echo=FALSE, message=FALSE, warning=FALSE}
+metadata_overview <- data.frame(
+  Variable = c(
+    "Site", "Plot number", "CU Code", "Year_est", "Age",
+    "Latitude/Longitude", "Establishment", "pH", "EC",
+    "Cutting", "Cattle", "Sheep", "Plough"
+  ),
+  Description = c(
+    "Name of the sampling site",
+    "Subdivision of each site (usually 5 plots per site)",
+    "Unique code for each sample",
+    "Year of establishment of the site",
+    "Site age (ranging from 1 year to over 100 years )",
+    "GPS coordinates of the sample",
+    "Restoration type or land management",
+    "Soil pH value at the time of sampling",
+    "Electrical conductivity of the soil",
+    "Whether the site is cut (1 = Yes, 0 = No)",
+    "Presence of cattle grazing (1 = Yes, 0 = No)",
+    "Presence of sheep grazing (1 = Yes, 0 = No)",
+    "Whether the soil has been ploughed (1 = Yes, 0 = No)"
+  )
+)
+
+kable(metadata_overview, format = "html", escape = FALSE,
+      caption = "Description of metadata variables associated with soil samples") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "bordered"),
+                full_width = FALSE, position = "center") %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#d9eaf7")
+
+HTML("</br><p style='text-align: center; font-weight: bold;'>Figure xx. Metadata Summary</p>")
+
+```
+
+---
+
+## Analysis Pipeline
+
+### Input Files Selection
+
+Before proceeding with bioinformatic analyses, it was necessary to select consistent input files for each sample.
+For both ITS and 16S datasets, each sample was associated with multiple types of sequencing files. For example, a sample such as `GF677` had up to five different files: `GF677_1.fastq.gz`, `GF677_2.fastq.gz` (paired-end reads with barcode and primer removed), `GF677.raw_1.fastq.gz`, `GF677.raw_2.fastq.gz` (raw unprocessed reads), and `GF677.extendedFrags.fastq.gz` (merged forward and reverse reads). To ensure consistency and avoid redundancy, we selected one file type per sample for downstream analysis. For the **16S dataset**, we used the **paired-end reads with barcode and primer removed** (`*_1.fastq.gz` and `*_2.fastq.gz`), while for the **ITS dataset**, we selected the **raw reads** (`*.raw_1.fastq.gz` and `*.raw_2.fastq.gz`), which were best suited for our quality filtering and denoising steps.
+
+### Denoising and Feature Table Construction
+
+The sequencing data were processed using the **QIIME 2** bioinformatics platform — a widely used tool for microbiome analysis. Raw amplicon reads were **denoised** using the `DADA2` plugin, enabling accurate identification of *amplicon sequence variants (ASVs)* with single-nucleotide resolution. This step also included **chimera removal** and **read quality trimming**, ensuring high-confidence input for downstream analyses.
+
+Following denoising, a **feature table** was constructed for each dataset (16S and ITS), summarising the number of sequences associated with each ASV across samples.
+
+### Diversity Analysis and Taxonomic Assignment
+
+Following quality control and feature extraction, downstream analyses were performed to characterise microbial diversity and taxonomic composition.
+
+Alpha and beta diversity metrics were computed using the `diversity` and `emperor` plugins in QIIME 2, enabling comparison of microbial communities across restoration gradients and site conditions.
+
+Taxonomic classification of ASVs was then performed using trained classifiers against reference databases: **GreenGene2** for bacterial 16S sequences and **UNITE** for fungal ITS sequences. This allowed each ASV to be annotated with its likely taxonomic lineage (from kingdom down to genus or species when possible).
+
+**TO BE COMPLETED/CHANGED**
+
+### Summary of Pipeline
+
+```{r 16S-pipeline, echo=FALSE, message=FALSE,warning=FALSE, results='asis'}
+
+cat('
+<div style="text-align: center;">
+  <img src="images/16S_workflow.png" style="max-width: 50%; height: auto ;" alt="16S Pipeline thumbnail">
+  </br><p style="font-weight: bold;">Figure xx. Workflow (16S)</p>
+</div>
+')
+
+```
+
+---
+
+## Data Pre-Processing
+
+### MutliQC on raw data {.tabset}
+
+#### Bacteria (16S) {.unnumbered}
+
+You can explore the full **MultiQC report** by **clicking** the image below:
+
+```{r QC,echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+cat('
+<div style="text-align: center;">
+  <a href="data/16S/Pre_processing/multiqc_report_16S.html" target="_blank">
+    <img src="images/sequence_quality_hist_16S.png" style="max-width: 80%; height: auto;" alt="MutlitQc thumbnail">
+  </a>
+  <p style="font-style: bold;">Figure xx. MultiQC Plot (16S)</p>
+</div>
+')
+
+
+```
+
+
+#### Fungi (ITS) {.unnumbered}
+
+
+You can explore the full **MultiQC report** by **clicking** the image below:
+
+```{r QC-ITS,echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+cat('
+<div style="text-align: center;">
+  <a href="data/ITS/Pre-processing/F01_multiqc_report.html" target="_blank">
+    <img src="images/sequence_quality_hist_ITS.png" style="max-width: 80%; height: auto;" alt="MutlitQc thumbnail">
+  </a>
+  <p style="font-style: bold;">Figure xx. MultiQC Plot (ITS)</p>
+</div>
+')
+
+
+```
+
+### QC after denoising
+
+#### Statistics Table Summary {.tabset}
+
+##### Bacteria (16S) {.unnumbered}
+
+```{r denoising-stats-table, echo=FALSE, message=FALSE, results='asis'}
+
+
+df <- read.delim("data/16S/Pre_processing/s04_stats_dada2/data/metadata.tsv", comment.char = "#")
+
+cat('Here is a link to the **statistics after denoising** to view it on QIIME2 (16S) : <a href="data/16S/s04_stats_dada2/data/index.html" target="_blank">Statitics after denoising (16S)</a>')
+
+datatable(
+  df,
+  options = list(
+    pageLength = 10,
+    scrollX = TRUE,
+    autoWidth = TRUE,
+    dom = 'tip',
+    class = 'stripe hover row-border order-column',
+    initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().header()).css({'background-color': '#d9eaf7', 'font-weight': 'bold'});",
+      "}")
+  ),
+  class = "display nowrap compact",
+  rownames = FALSE
+) %>% 
+  formatStyle(
+    columns = names(df),
+    `text-align` = 'center'
+  )
+
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Statitics after denoising (16S)</p>")
+
+```
+
+##### Fungi (ITS) {.unnumbered}
+
+```{r denoising-stats-table-ITS, echo=FALSE, message=FALSE, results='asis'}
+
+
+df <- read.delim("data/ITS/Pre-processing/F02_dada2-stats-summ/data/metadata.tsv", comment.char = "#")
+
+cat('Here is a link to the **statistics after denoising** to view it on QIIME2 (ITS) : <a href="data/ITS/Pre-processing/F02_dada2-stats-summ/data/index.html" target="_blank">Statitics after denoising (16S)</a>')
+
+datatable(
+  df,
+  options = list(
+    pageLength = 10,
+    scrollX = TRUE,
+    autoWidth = TRUE,
+    dom = 'tip',
+    class = 'stripe hover row-border order-column',
+    initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().header()).css({'background-color': '#d9eaf7', 'font-weight': 'bold'});",
+      "}")
+  ),
+  class = "display nowrap compact",
+  rownames = FALSE
+) %>% 
+  formatStyle(
+    columns = names(df),
+    `text-align` = 'center'
+  )
+
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Statitics after denoising (ITS)</p>")
+
+```
+
+
+
+#### QC Plots {.tabset }
+
+These **Quality Control (QC) plots** were generated **after trimming** the sequencing reads. They provide a visual summary of the **base quality scores**, **read length distributions**, and other metrics, helping to assess whether the trimming step successfully removed low-quality regions and adapter contamination. Consistently high-quality reads across samples are essential for reliable downstream analysis.
+
+##### Bacteria (16S) {.unnumbered}
+
+
+<div style="text-align: center;">
+  <a href="data/16S/Pre_processing/s03_pe_dmx_trim/data/index.html" target="_blank">
+    <img src="images/QC_plot_16S.png" style="max-width: 105%; height: auto;" alt="QC plot 16S thumbnail">
+  </a>
+  <p style="font-style: bold;">Figure xx . QC plot (16S)</p>
+</div>
+
+
+
+##### Fungi (ITS) {.unnumbered}
+
+```{r QC-plot-ITS, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+cat('
+<div style="text-align: center;">
+  <a href="data/ITS/Pre-processing/F02_sequence/data/index.html" target="_blank">
+    <img src="images/QC_plot_ITS.png" style="max-width: 105%; height: auto;" alt="QC plot thumbnail">
+  </a>
+  <p style="font-style: bold;">Figure xx . QC plot (ITS)</p>
+</div>
+')
+
+```
+
+#### Rarefication Curves {.tabset}
+
+##### Bacteria (16S) 
+
+Here is a link to the **Rarefiction plots** for more flexibility on QIIME2: <a href="data/16S/alpha_rarefaction/data/index.html" target="_blank">Rarefiction plots (16S)</a>
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_rarefaction_16S"><b>Select variable:</b></label>
+  <select id="variable_selector_rarefaction_16S" onchange="switchPlotRarefaction_16S()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Age">Age</option>
+    <option value="Year_est">Year of Establishment</option>
+    <option value="OS_location">Os Location</option>
+    <option value="Plough">Plough</option>
+    <option value="Lat_long">Lat/long</option>
+  </select>
+</div>
+
+```{r rarefication_est_16S, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+vars <- c("Establishment", "Age", "Year_est", "OS_location", "Lat_long", "Plough")
+
+rare_df <- read_csv("data/16S/Pre_processing/alpha_rarefaction/data/observed_features.csv")
+measure_cols <- grep("^depth-", names(rare_df), value = TRUE)
+meta_cols <- setdiff(names(rare_df), c("sample-id", measure_cols))
+
+rare_long <- rare_df %>%
+  pivot_longer(cols = all_of(measure_cols), names_to = "depth_iter", values_to = "observed") %>%
+  mutate(
+    depth = as.integer(str_extract(depth_iter, "(?<=depth-)\\d+")),
+    iter = as.integer(str_extract(depth_iter, "(?<=iter-)\\d+"))
+  ) %>%
+  left_join(rare_df[, c("sample-id", meta_cols)], by = "sample-id")
+
+
+
+plotlist_rarefaction_16S <- list()
+
+for (v in vars){
+  var_col <- if (paste0(v, ".y") %in% names(rare_long)) paste0(v, ".y") else v
+  
+  rare_avg <- rare_long %>%
+    group_by(.data[[var_col]], depth) %>%
+    summarise(mean_obs = mean(observed, na.rm = TRUE), .groups = "drop") %>%
+    rename(group_var = 1) 
+
+  #visible <- ifelse(v == "Establishment", "block", "none")
+  
+  plot_rare <- plot_ly(
+  data = rare_avg,
+  x = ~depth,
+  y = ~mean_obs,
+  color = ~group_var,  
+  type = 'scatter',
+  mode = 'lines+markers',
+  marker = list(size = 5, symbol = 'square-open'),
+  line = list(width = 0.5)
+) %>%
+  layout(
+    title = paste0("Rarefaction Curves by ", v, " (Mean per Depth)"),
+    xaxis = list(title = "Sequencing Depth"),
+    yaxis = list(title = "Mean Observed Features"),
+    template = "plotly_white"
+  )
+  
+  plotlist_rarefaction_16S[[v]] <- tags$div(
+      id = paste0("plot_rarefaction_16S_", v),
+      style = ifelse(v == "Establishment", "display:block;", "display:none; text-align:center;"),
+      plot_rare,
+      tags$br(),
+      tags$p(
+        style = "text-align: center; font-weight: bold;",
+        sprintf("Figure xx. Rarefaction Curves of Observed Features by '%s' (16S)", v)
+      )
+    )
+  
+ 
+}
+
+
+tagList(plotlist_rarefaction_16S)
+
+```
+
+
+<script>
+function switchPlotRarefaction_16S() {
+  var val = document.getElementById("variable_selector_rarefaction_16S").value;
+  var all = ["Establishment", "Age", "Year_est", "OS_location", "Plough", "Lat_long"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_rarefaction_16S_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+---
+
+##### Fungi (ITS)
+
+Here is a link to the **Rarefiction plots** for more flexibility on QIIME2: <a href="data/ITS/Pre-processing/F02_aggregated_rarefaction/data/index.html" target="_blank">Rarefiction plots (ITS)</a>
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_rarefaction_ITS"><b>Select variable:</b></label>
+  <select id="variable_selector_rarefaction_ITS" onchange="switchPlotRarefaction_ITS()">
+    <option value="Establishment">Establishment</option>
+    <option value="plot_number" selected>Plot Number</option>
+    <option value="Age">Age</option>
+    <option value="Year_est">Year of Establishment</option>
+    <option value="OS_location">Os Location</option>
+    <option value="CU Code">CU Code</option>
+    <option value="Lat_long">Lat/long</option>
+    
+  </select>
+</div>
+
+```{r rarefication_est_itS, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+vars <- c("Establishment", "Age", "Year_est", "OS_location", "CU Code","plot_number", "Lat_long")
+
+rare_df <- read_csv("data/ITS/Pre-processing/F02_aggregated_rarefaction/data/observed_features.csv")
+measure_cols <- grep("^depth-", names(rare_df), value = TRUE)
+meta_cols <- setdiff(names(rare_df), c("sample-id", measure_cols))
+
+rare_long <- rare_df %>%
+  pivot_longer(cols = all_of(measure_cols), names_to = "depth_iter", values_to = "observed") %>%
+  mutate(
+    depth = as.integer(str_extract(depth_iter, "(?<=depth-)\\d+")),
+    iter = as.integer(str_extract(depth_iter, "(?<=iter-)\\d+"))
+  ) %>%
+  left_join(rare_df[, c("sample-id", meta_cols)], by = "sample-id")
+
+
+
+plotlist_rarefaction_ITS <- list()
+
+for (v in vars){
+  var_col <- if (paste0(v, ".y") %in% names(rare_long)) paste0(v, ".y") else v
+  
+  rare_avg <- rare_long %>%
+    group_by(.data[[var_col]], depth) %>%
+    summarise(mean_obs = mean(observed, na.rm = TRUE), .groups = "drop") %>%
+    rename(group_var = 1) 
+
+  
+  plot_rare <- plot_ly(
+  data = rare_avg,
+  x = ~depth,
+  y = ~mean_obs,
+  color = ~group_var,  
+  type = 'scatter',
+  mode = 'lines+markers',
+  marker = list(size = 5, symbol = 'square-open'),
+  line = list(width = 0.5)
+) %>%
+  layout(
+    title = paste0("Rarefaction Curves by ", v, " (Mean per Depth)"),
+    xaxis = list(title = "Sequencing Depth"),
+    yaxis = list(title = "Mean Observed Features"),
+    template = "plotly_white"
+  )
+  
+  plotlist_rarefaction_ITS[[v]] <- tags$div(
+      id = paste0("plot_rarefaction_ITS_", v),
+      style = ifelse(v == "plot_number", "display:block;", "display:none; text-align:center;"),
+      plot_rare,
+      tags$br(),
+      tags$p(
+        style = "text-align: center; font-weight: bold;",
+        sprintf("Figure xx. Rarefaction Curves of Observed Features by '%s' (ITS)", v)
+      )
+    )
+  
+ 
+}
+
+
+tagList(plotlist_rarefaction_ITS)
+
+```
+
+
+<script>
+function switchPlotRarefaction_ITS() {
+  var val = document.getElementById("variable_selector_rarefaction_ITS").value;
+  var all = ["Establishment", "Age", "Year_est", "OS_location", "CU Code","plot_number", "Lat_long"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_rarefaction_ITS_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+
+---
+
+## **Taxonomic Diversity** (Bacteria & Fungi)
+
+### Alpha Diversity {.tabset}
+
+Alpha diversity refers to the variety of organisms within a particular sample or environment. It reflects both **richness**—the number of distinct taxa—and **evenness**—how evenly individuals are distributed among those taxa. One of the most widely used measures for assessing alpha diversity is the **Shannon index**.
+
+The Shannon index takes into account not only the number of species present, but also how evenly their abundances are distributed. A higher Shannon value generally indicates a more diverse and ecologically balanced community.
+
+Another important metric is **Faith’s Phylogenetic Diversity (Faith PD)**, which measures the total branch length of the phylogenetic tree that spans the species in a sample. Unlike the Shannon index, Faith PD incorporates evolutionary relationships, providing a phylogenetic perspective on diversity.
+
+We also include **Pielou’s Evenness index**, which specifically quantifies how equally individual organisms are distributed across taxa. While Shannon integrates both richness and evenness, this metric isolates the evenness component, providing a complementary view of diversity patterns.
+
+
+To allow interactive exploration of alpha diversity metrics across different environmental variables, we implemented a drop-down menu that dynamically displays the corresponding plots. Some variables, such as `pH category`, are only present in the ITS dataset, while others, like `Year group`, are specific to the 16S dataset. Internally, variables are mapped to their dataset-specific equivalents where needed (e.g. `Age group` in 16S becomes `Age category` in ITS). It is important to note, however, that these variables are not always directly comparable: for instance, `Age group` (16S) divides sites into multiple discrete intervals based on restoration age, while `Age category` (ITS) is a binary classification based on whether a site is above or below the median age. Despite these differences, the interface ensures that only available and relevant plots are shown for each selection.
+
+
+
+
+
+```{r alpha-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+read_and_clean <- function(path, column) {
+  df <- read_tsv(path, col_types = cols())[-1, ]
+  df[[column]] <- as.numeric(df[[column]])
+  return(df)
+}
+
+# 16S data
+df_shannon <- read_and_clean("data/16S/alpha_diversity/s08_alpha_shannon_per_group/data/metadata.tsv", "shannon_entropy")
+df_faith   <- read_and_clean("data/16S/alpha_diversity/s08_alpha_faith_pd_per_group/data/metadata.tsv", "faith_pd")
+df_even    <- read_and_clean("data/16S/alpha_diversity/s08_alpha_evenness_per_group/data/metadata.tsv", "pielou_evenness")
+
+df_shannon <- df_shannon %>% filter(Plough != "unknown")
+df_faith <- df_faith %>% filter(Plough != "unknown")
+df_even <- df_even %>% filter(Plough != "unknown")
+
+# ITS data
+df_shannon_ITS <- read_and_clean("data/ITS/Alpha_Diversity/F03_shannon_significance/data/metadata.tsv", "shannon_entropy")
+df_even_ITS    <- read_and_clean("data/ITS/Alpha_Diversity/F03_evenness_vector/data/metadata.tsv", "pielou_evenness")
+
+df_shannon_ITS <- df_shannon_ITS %>% filter(!is.na(Plough))
+df_even_ITS <- df_even_ITS %>% filter(!is.na(Plough))
+
+df_shannon_ITS <- df_shannon_ITS[ , ! colnames(df_shannon_ITS) %in% c("site_code", "plot_number", "OS_location", "Lat_long")]
+
+get_mode <- function(x) {
+  ux <- na.omit(unique(x))
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+df_shannon_ITS <- df_shannon_ITS %>%
+  group_by(Site) %>%
+  summarise(
+    shannon_entropy = mean(shannon_entropy, na.rm = TRUE),
+    pH_category = get_mode(pH_category),
+    across(c(Establishment, Age_category, Cutting, Plough, Sheep, Cattle, Year_est), ~ first(.x)),
+    .groups = "drop"
+  )
+
+df_even_ITS <- df_even_ITS[ , ! colnames(df_even_ITS) %in% c("site_code", "plot_number", "OS_location", "Lat_long")]
+df_even_ITS <- df_even_ITS %>%
+  group_by(Site) %>%
+  summarise(
+    pielou_evenness = mean(pielou_evenness, na.rm = TRUE),
+    pH_category = get_mode(pH_category),
+    across(c(Establishment, Age_category, Cutting, Plough, Sheep, Cattle, Year_est), ~ first(.x)),
+    .groups = "drop"
+  )
+
+
+
+vars16S <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "Age_group")
+varsITS <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category")
+
+
+```
+
+
+#### Bacteria (16S) {.tabset}
+
+In the plots below, we examine how the Shannon index, Faith PD and Evenness vary across different environmental and experimental conditions for the 16S (bacteria).
+
+<label for="variable_selector_Alpha16S">Select variable:</label>
+<select id="variable_selector_Alpha16S" onchange="switchPlotAlpha16S()">
+  <option value="Establishment" selected>Establishment</option>
+  <option value="Cutting">Cutting</option>
+  <option value="Cattle">Cattle</option>
+  <option value="Sheep">Sheep</option>
+  <option value="Plough">Plough</option>
+  <option value="Year_group">Year group</option>
+  <option value="Age_group">Age group</option>
+</select>
+
+
+##### Shannon Index Boxplot 
+
+The boxplot below illustrate differences in Shannon diversity across groups. This metric reflects both species richness and how balanced the community is in terms of species abundance.
+
+
+```{r shannon-16S-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+cat('Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
+<a href="data/16S/alpha_diversity/s08_alpha_shannon_per_group/data/index.html" target="_blank">Shannon Index (16S)</a>')
+
+for (var in vars16S) {
+
+  display_style <- ifelse(var == "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_shannon" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_shannon, aes_string(x = var, y = "shannon_entropy")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Shannon Index (16S)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_shannon$shannon_entropy ~ df_shannon[[var]])
+  cat("<div style='text-align: center;'>") 
+  print(p1)
+  cat('</div>')
+  cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+}
+
+```
+
+##### Faith PD Boxplot 
+
+The following plots show Faith’s Phylogenetic Diversity, which integrates evolutionary relationships to capture how phylogenetically broad each microbial community is.
+
+```{r faith-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+cat('Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
+<a href="data/16S/alpha_diversity/s08_alpha_faith_pd_per_group/data/index.html" target="_blank">Faith PD (16S)</a>')
+
+for (var in vars16S) {
+  
+  
+  display_style <- ifelse(var == "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_faith" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_faith, aes_string(x = var, y = "faith_pd")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Faith PD (16S)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_faith$faith_pd ~ df_faith[[var]])
+  cat("<div style='text-align: center;'>")  
+  print(p1)
+  cat("</div>")
+    cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+  
+  
+  
+}
+
+```
+
+##### Evenness Boxplot
+
+These boxplots display Pielou’s Evenness, highlighting how uniformly taxa are represented in each community. It allows us to isolate imbalance in dominance from richness effects.
+
+```{r evenness-16S-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+cat('Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
+<a href="data/16S/alpha_diversity/s08_alpha_evenness_per_group/data/index.html" target="_blank">Pielou Evenness (16S)</a>')
+
+for (var in vars16S) {
+
+  display_style <- ifelse(var== "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_even" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_even, aes_string(x = var, y = "pielou_evenness")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Evenness Significance (16S)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_even$pielou_evenness ~ df_even[[var]])
+  cat("<div style='text-align: center;'>")  
+  print(p1)
+  cat("</div>")
+    cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+}
+```
+
+
+<script>
+function switchPlotAlpha16S() {
+  var val = document.getElementById("variable_selector_Alpha16S").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "Age_group"];
+  
+  all.forEach(function(v) {
+    var el_shannon = document.getElementById("plot_" + v + "_shannon");
+    var el_faith = document.getElementById("plot_" + v + "_faith");
+    var el_even = document.getElementById("plot_" + v + "_even");
+    
+    if (el_shannon) el_shannon.style.display = (v === val) ? "block" : "none";
+    if (el_faith) el_faith.style.display = (v === val) ? "block" : "none";
+    if (el_even) el_even.style.display = (v === val) ? "block" : "none";
+    
+  });
+}
+</script>
+
+---
+
+#### Fungi (ITS) {.tabset}
+
+For the ITS dataset, the alpha diversity was done per sample. In order to align it with the 16S analysis—where samples were already grouped by site—we aggregated the alpha diversity values by computing the **mean per site**. Categorical metadata was simplified using the most common (modal) value per site. This ensures consistency across datasets in the visual outputs. However, users interested in the original, unaggregated sample-level data can explore the **full QIIME 2 results** via the links provided under each section.
+
+<label for="variable_selector_AlphaITS">Select variable:</label>
+<select id="variable_selector_AlphaITS" onchange="switchPlotAlphaITS()">
+  <option value="Establishment" selected>Establishment</option>
+  <option value="Cutting">Cutting</option>
+  <option value="Cattle">Cattle</option>
+  <option value="Sheep">Sheep</option>
+  <option value="Plough">Plough</option>
+  <option value="Age_category">Age category</option>
+  <option value="pH_category">pH category</option>
+</select>
+
+##### Shannon Index Boxplot 
+
+The boxplot below illustrate differences in Shannon diversity across groups. This metric reflects both species richness and how balanced the community is in terms of species abundance.
+
+
+```{r shannon-ITS-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+cat('Here is a link to the <strong>full QIIME2 results (ITS)</strong> : 
+<a href="data/ITS/alpha_diversity/shannon_significance/data/index.html" target="_blank">Shannon Index (ITS)</a>')
+
+for (var in varsITS) {
+  
+  display_style <- ifelse(var == "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_shannon_ITS" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_shannon_ITS, aes_string(x = var, y = "shannon_entropy")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Shannon Index (16S)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_shannon_ITS$shannon_entropy ~ df_shannon_ITS[[var]])
+  cat("<div style='text-align: center;'>")  
+  print(p1)
+  cat("</div>")
+    cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+}
+```
+
+##### Evenness Boxplot
+
+These boxplots display Pielou’s Evenness, highlighting how uniformly taxa are represented in each community. It allows us to isolate imbalance in dominance from richness effects.
+
+
+```{r evenness-ITS-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+cat('Here is a link to the <strong>full QIIME2 results (ITS)</strong> : 
+<a href="data/ITS/alpha_diversity/evenness_vector/data/index.html" target="_blank">Pielou Evenness (ITS)</a>')
+
+for (var in varsITS) {
+
+  display_style <- ifelse(var == "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_even_ITS" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_even_ITS, aes_string(x = var, y = "pielou_evenness")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Evenness Significance (ITS)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_even_ITS$pielou_evenness ~ df_even_ITS[[var]])
+  cat("<div style='text-align: center;'>")  
+  print(p1)
+  cat("</div>")
+    cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+  
+}
+```
+
+
+
+<script>
+function switchPlotAlphaITS() {
+  var val = document.getElementById("variable_selector_AlphaITS").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category"];
+  
+  all.forEach(function(v) {
+    var el_shannon = document.getElementById("plot_" + v + "_shannon_ITS");
+    var el_even = document.getElementById("plot_" + v + "_even_ITS");
+    if (el_shannon) el_shannon.style.display = (v === val) ? "block" : "none";
+    if (el_even) el_even.style.display = (v === val) ? "block" : "none";
+  });
+}
+</script>
+
+
+---
+
+### Comparative Microbial Community Composition (Beta Diversity)
+
+To explore differences in microbial communities, we often rely on dimensionality reduction techniques such as *Principal Coordinates Analysis* (PCoA), visualised through **Emperor plots**. Two commonly used distance metrics in this context are **Bray-Curtis** and **Jaccard**.
+
+While both metrics can reveal meaningful clustering and separation in microbial data, they capture complementary aspects of community structure.
+
+#### Bray-Curtis
+
+##### Emperor Plot {.tabset}
+
+The **Bray-Curtis Emperor plot** is a 3D visualisation of microbial community dissimilarities between samples, based on the Bray-Curtis distance. This distance metric quantifies how different two samples are in terms of species abundance, taking into account both presence/absence and relative abundances. It does *not* incorporate evolutionary relationships between features.
+
+Using **Principal Coordinates Analysis (PCoA)**, the high-dimensional Bray-Curtis distance matrix is projected into a lower-dimensional space—typically three axes—to capture the main patterns of variation across samples.
+
+The Emperor plot is an **interactive 3D tool** developed for QIIME 2 that allows users to explore these PCoA results. Samples are represented as points in space, and their spatial proximity reflects ecological similarity:
+
+- Samples that are closer together have more similar microbial communities.
+- Samples that are further apart differ more strongly in community composition.
+
+This type of plot is particularly useful for identifying clustering by experimental or environmental factors—such as establishment type, land management practices, or age group—and for detecting gradients or patterns in microbial community composition.
+
+###### Bacteria (16S) {.unnumbered}
+
+Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
+
+```{r emperor-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+
+json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/bray_curtis_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 17. Bray-Curtis Emperor Plot</p>")
+
+
+
+
+```
+
+
+
+###### Fungi (ITS) {.unnumbered}
+
+Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (ITS)</a>
+
+```{r emperor-plot-16S, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+
+
+json <- fromJSON("data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 17. Bray-Curtis Emperor Plot (ITS) </p>")
+
+
+
+```
+
+##### Permanova using Bray-Curtis distance – Taxonomic Level {.tabset}
+
+The **Bray–Curtis** distance takes into account the **relative abundance** of taxonomic features, making it suitable for detecting **quantitative differences** in microbial communities across groups. When used in a **PERMANOVA**, this metric tests whether the overall **structure and abundance** of taxa vary significantly according to explanatory variables such as **establishment type, age of the grassland, year of establishment, or management practices including cutting, ploughing, and the presence of grazing animals.**. This approach highlights shifts in dominant or highly represented taxa.
+
+###### Bacteria (16S) 
+
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_16S_bray"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_16S_bray" onchange="switchPlotPermanova_16S_bray()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Year_group">Year_group</option>
+  </select>
+</div>
+
+
+```{r permanova_16S_bray, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Bray_Curtis/16S/bray_permanova_", v, ".png")
+  link_path <- paste0("data/16S/Beta_Diversity/bray_permanova_", v, "/data/index.html")
+  display_style <- ifelse(v == "Establishment", "block", "none")
+
+  cat(sprintf('<div id="plot_permanova_bray_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Bray–Curtis – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Bray–Curtis for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+}
+
+```
+
+<script>
+function switchPlotPermanova_16S_bray() {
+  var val = document.getElementById("variable_selector_Permanova_16S_bray").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group"];
+
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_bray_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+
+###### Fungi (ITS) 
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_ITS_bray"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_ITS_bray" onchange="switchPlotPermanova_ITS_bray()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="pH_category">pH category</option>
+    <option value="Age_category">Age category</option>
+  </select>
+</div>
+
+```{r permanova_ITS_bray, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "pH_category", "Age_category")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Bray_Curtis/ITS/F03_",v,"_bray_curtis_significance.png")
+  link_path <- paste0("data/ITS/Beta_Diversity/F03_",v,"_bray_curtis_significance/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  cat(sprintf('<div id="plot_permanova_ITS_bray_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Bray–Curtis – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Bray–Curtis for "%s" (ITS)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+}
+
+```
+
+<script>
+function switchPlotPermanova_ITS_bray() {
+  var val = document.getElementById("variable_selector_Permanova_ITS_bray").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "pH_category", "Age_category"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_ITS_bray_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+#### Jaccard 
+
+
+##### Emperor Plot {.tabset}
+
+The **Jaccard Emperor plot** provides a 3D visualisation of microbial community dissimilarities based on the **Jaccard distance**. Unlike *Bray-Curtis*, the Jaccard metric considers **only the presence or absence** of features (e.g., microbial taxa) in each sample, ignoring their relative abundances.
+
+This makes the Jaccard distance particularly suited for assessing *community membership* rather than *abundance structure*—focusing on **which species are present**, regardless of how abundant they are.
+
+Using **Principal Coordinates Analysis (PCoA)**, the high-dimensional **Jaccard distance matrix** is projected into a lower-dimensional space—usually three principal axes—to reveal major patterns in sample composition.
+
+As with *Bray-Curtis*, the **Emperor plot** allows for *interactive exploration* of these ordinations:
+
+- Samples **positioned closely** together share *more taxa in common* (i.e., similar membership).
+- Samples **far apart** have *fewer shared taxa*, reflecting *greater differences* in species presence.
+
+The **Jaccard plot** is useful when exploring factors that influence *community membership*, such as **habitat type**, **land use**, or **environmental filtering**—especially in studies where *presence/absence patterns* are more meaningful than *relative abundances*.
+
+##### Bacteria (16S) {.unnumbered}
+
+Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/jaccard_emperor/data/index.html" target="_blank">Jaccard Emperor Plot (16S)</a>
+
+```{r jaccard-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+
+
+json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/jaccard_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Jaccard Emperor Plot (16S) </p>")
+
+
+
+
+```
+
+###### Fungi (ITS) {.unnumbered}
+
+Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_jaccard_emperor/data/index.html" target="_blank">Jaccard Emperor Plot (ITS)</a>
+
+```{r jaccard-plot-ITS, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+
+json <- fromJSON("data/ITS/Beta_Diversity/F03_agg_jaccard_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+
+cat("<p style='text-align: center; font-weight: bold;'>Figure xx. Jaccard Emperor Plot (ITS)</p>")
+
+
+
+
+```
+
+##### Permanova using Jaccard distance – Taxonomic Level {.tabset}
+
+The **Jaccard** distance considers only the **presence or absence** of features, offering a more **qualitative perspective** on microbial community differences. In this **PERMANOVA**, the focus is on whether the **composition** of taxa — regardless of their abundance — differs significantly between groups. This metric is particularly useful for identifying patterns in **taxon occurrence**, including rare or transient species that may not strongly influence abundance-based distances.
+
+###### Bacteria (16S) {.unnumbered}
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_16S_jacc"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_16S_jacc" onchange="switchPlotPermanova_16S_jacc()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Year_group">Year_group</option>
+  </select>
+</div>
+
+
+```{r permanova_16S_jacc, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Jaccard/16S/jaccard_permanova_", v, ".png")
+  link_path <- paste0("data/16S/Beta_Diversity/jaccard_permanova_", v, "/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  
+  cat(sprintf('<div id="plot_permanova_jacc_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Jaccard – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Jaccard for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+}
+
+```
+
+<script>
+function switchPlotPermanova_16S_jacc() {
+  var val = document.getElementById("variable_selector_Permanova_16S_jacc").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_jacc_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+---
+
+###### Fungi (ITS) {.unnumbered}
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_ITS_jacc"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_ITS_jacc" onchange="switchPlotPermanova_ITS_jacc()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="pH_category">pH category</option>
+    <option value="Age_category">Age category</option>
+  </select>
+</div>
+
+```{r permanova_ITS_jacc, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "pH_category", "Age_category")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Jaccard/ITS/F03_",v,"_jaccard_significance.png")
+  link_path <- paste0("data/ITS/Beta_Diversity/F03_",v,"_jaccard_significance/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  
+  cat(sprintf('<div id="plot_permanova_ITS_jacc_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Jaccard – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Jaccard for "%s" (ITS)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+}
+
+```
+
+<script>
+function switchPlotPermanova_ITS_jacc() {
+  var val = document.getElementById("variable_selector_Permanova_ITS_jacc").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "pH_category", "Age_category"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_ITS_jacc_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+---
+
+### Taxonomy Composition
+
+#### Taxonomy Barplot {.tabset}
+
+##### Bacteria (16S) 
+
+Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2: <a href="data/16S/Taxonomy/s10_taxa_barplot_by_site/data/index.html" target="_blank">Taxonomy Barplot (16S)</a>
+
+```{r barplot-16S, echo =FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+
+custom_blues <- c(
+  "#08306B",  
+  "#08519C",  
+  "#3182BD",  
+  "#6BAED6",  
+  "#C6DBEF"
+)
+
+taxa_df <- read_csv("data/16S/Taxonomy/s10_taxa_barplot_by_site/data/level-2.csv")
+
+meta_cols <- c("Site", "Age", "OS_location", "pH", "Year_est", "Lat_long", "Cutting","Cattle","Sheep", "Plough", "EC", "Establishment")
+
+colnames(taxa_df)[1] <- "Site"
+
+taxa_long <- taxa_df %>%
+  pivot_longer(
+    cols = -all_of(meta_cols),
+    names_to = "Taxon",
+    values_to = "Abundance"
+  )
+
+taxa_rel <- taxa_long %>%
+  group_by(Site) %>%
+  mutate(Abundance = Abundance / sum(Abundance, na.rm = TRUE)) %>%
+  ungroup()
+
+site_groups <- taxa_rel %>%
+  distinct(Site, Establishment) %>%
+  arrange(Establishment, Site)
+
+site_order <- site_groups %>%
+  pull(Site)
+
+taxa_rel <- taxa_rel %>%
+  mutate(Site = factor(Site, levels = site_order))
+
+
+
+taxon_order <- taxa_rel %>%
+  group_by(Taxon) %>%
+  summarise(Total = sum(Abundance), .groups = "drop") %>%
+  arrange(desc(Total)) %>%
+  pull(Taxon)
+
+
+
+group_breaks <- site_groups %>%
+  group_by(Establishment) %>%
+  summarise(n = n()) %>%
+  mutate(position = cumsum(n) + 0.5) %>%
+  filter(row_number() < n())
+
+site_groups <- site_groups %>%
+  mutate(Site = factor(Site, levels = unique(site_order)))
+
+group_labels <- site_groups %>%
+  group_by(Establishment) %>%
+  summarise(position = median(as.numeric(Site)), .groups = "drop")
+
+
+taxa_rel <- taxa_rel %>%
+  mutate(Taxon = factor(Taxon, levels = taxon_order))
+
+
+plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
+  geom_vline(data = group_breaks, aes(xintercept = position), linetype = "dashed", colour = "black") +
+  geom_text(data = group_labels, aes(x = position, y = 105, label = Establishment),
+            inherit.aes = FALSE, size = 3, fontface = "bold") +
+  labs(
+    x = "Site", 
+    y = "Relative Abundance (%)", 
+    fill = "Taxon", 
+    title = "Relative abundance of taxa across sites at phylum level (16S), ordered by Establishment"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
+    axis.ticks.x = element_blank(),
+    legend.text = element_text(size = 5)
+  )
+
+htmltools::tagList(
+  ggplotly(plot) %>% layout(width = 900, height = 500),
+  tags$br(),
+  tags$p(
+    style = "text-align: center; font-weight: bold;",
+    "Figure 18. Taxonomy Barplot (16S)"
+  ),
+  tags$div(style = "height: 40px;") 
+)
+
+
+
+```
+
+
+
+##### Fungi (ITS) 
+
+Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2: <a href="data/ITS/Taxonomy/Taxa_barplot/F03_taxa_barplot/data/index.html" target="_blank">Taxonomy Barplot (ITS)</a>
+
+```{r barplot-ITS, echo =FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+taxa_df <- read_csv("data/ITS/Taxonomy/Taxa_barplot/F03_taxa_barplot/data/level-2.csv")
+
+meta_cols <- c("Site", "Age", "OS_location", "pH", "Year_est","site_code", "Lat_long", "Cutting","Cattle","Sheep", "Plough", "pH_category", "Age_category", "EC", "Establishment")
+
+colnames(taxa_df)[1] <- "Site"
+
+taxa_long <- taxa_df %>%
+  pivot_longer(
+    cols = -all_of(meta_cols),
+    names_to = "Taxon",
+    values_to = "Abundance"
+  )
+
+taxa_rel <- taxa_long %>%
+  group_by(Site) %>%
+  mutate(Abundance = Abundance / sum(Abundance, na.rm = TRUE)) %>%
+  ungroup()
+
+site_groups <- taxa_rel %>%
+  distinct(Site, Establishment) %>%
+  arrange(Establishment, Site)
+
+site_order <- site_groups %>%
+  pull(Site)
+
+taxa_rel <- taxa_rel %>%
+  mutate(Site = factor(Site, levels = site_order))
+
+
+
+taxon_order <- taxa_rel %>%
+  group_by(Taxon) %>%
+  summarise(Total = sum(Abundance), .groups = "drop") %>%
+  arrange(desc(Total)) %>%
+  pull(Taxon)
+
+
+
+group_breaks <- site_groups %>%
+  group_by(Establishment) %>%
+  summarise(n = n()) %>%
+  mutate(position = cumsum(n) + 0.5) %>%
+  filter(row_number() < n())
+
+site_groups <- site_groups %>%
+  mutate(Site = factor(Site, levels = unique(site_order)))
+
+group_labels <- site_groups %>%
+  group_by(Establishment) %>%
+  summarise(position = median(as.numeric(Site)), .groups = "drop")
+
+
+taxa_rel <- taxa_rel %>%
+  mutate(Taxon = factor(Taxon, levels = taxon_order))
+
+
+plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
+  geom_vline(data = group_breaks, aes(xintercept = position), linetype = "dashed", colour = "black") +
+  geom_text(data = group_labels, aes(x = position, y = 105, label = Establishment),
+            inherit.aes = FALSE, size = 3, fontface = "bold") +
+  labs(
+    x = "Site", 
+    y = "Relative Abundance (%)", 
+    fill = "Taxon", 
+    title = "Relative abundance of taxa across sites at phylum level (ITS), ordered by Establishment"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
+    axis.ticks.x = element_blank(),
+    legend.text = element_text(size = 5)
+  )
+ggplotly(plot)  %>% layout(width = 900, height = 500)
+
+cat("<p style='text-align: center; font-weight: bold;'>Figure 18. Taxonomy Barplot (ITS)</p></br>")
+
+
+
+
+```
+</br>
+</br>
+
+#### Krona Plots {.tabset}
+
+To explore the composition of soil microbial communities, we used **Krona plots** — interactive, circular charts that display taxonomic abundances in a hierarchical manner.
+
+These plots allow users to intuitively navigate from broader taxonomic levels (such as *Phylum*) to more specific ones (like *Genus*), while simultaneously comparing relative abundances across taxa.
+
+In this study, Krona plots provide a powerful and user-friendly way to:
+
+- Visualise which microbial groups dominate each site
+- Explore the taxonomic diversity present in bacterial, archaeal, and fungal communities
+
+You can **click on the images** below to access the **Krona plots** for each site.
+
+##### Bacteria (16S) {.unnumbered}
+
+<div style="text-align: center;">
+  <a href="data/16S/Taxonomy/Krona/krona_by_site_16S.html" target="_blank">
+    <img src="images/krona_16S.png" style="max-width: 80%; height: auto;" alt="Krona thumbnail">
+  </a>
+  <p style="font-style: bold;">Figure 19. Krona Plot for Baltic_farm_1 (16S)</p>
+</div>
+
+
+##### Fungi (ITS) {.unnumbered}
+
+<div style="text-align: center;">
+  <a href="data/ITS/Taxonomy/Krona/krona_by_site_ITS.html" target="_blank">
+    <img src="images/krona_ITS.png" style="max-width: 80%; height: auto;" alt="Krona thumbnail">
+  </a>
+  <p style="font-style: bold;">Figure 19. Krona Plot for Baltic_farm_1 (ITS)</p>
+</div>
+
+
+
+#### Differential Abundance Analysis with ANCOM {.tabset}
+
+We used ANCOM to identify taxa whose relative abundances significantly differed across groups. This method accounts for the compositional nature of microbiome data by comparing log-ratios between taxa. The results are shown as volcano-like plots, where the W statistic reflects how many pairwise comparisons a taxon was found to differ in. Significant taxa are highlighted accordingly.
+
+##### Bacteria (16S) 
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_ANCOM_16S"><b>Select variable:</b></label>
+  <select id="variable_selector_ANCOM_16S" onchange="switchPlotANCOM_16S()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Age_group">Age_group</option>
+    <option value="pH_binary">pH_binary</option>
+    <option value="Year_group">Year_group</option>
+    <option value="Age_binary">Age_binary</option>
+  </select>
+</div>
+
+
+```{r ancom-16s, echo=FALSE, message=FALSE, warning=FALSE, results='asis' }
+
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_group", "pH_binary", "Year_group", "Age_binary")
+
+plotlist_ANCOM_16S <- list()
+
+for (v in vars) {
+  
+  path_ancom <- paste0("data/16S/Taxonomy/genus_ancom_results/genus_ancom_", v, "/data/ancom.tsv")
+  path_data <- paste0("data/16S/Taxonomy/genus_ancom_results/genus_ancom_", v, "/data/data.tsv")
+  path_link <- paste0("data/16S/Taxonomy/genus_ancom_results/genus_ancom_", v, "/data/index.html")
+  
+  if (file.exists(path_ancom) && file.exists(path_data)) {
+    
+    df_ancom <- read.delim(path_ancom)
+    df_data <- read.delim(path_data)
+    
+    df_data$X <- df_data$id
+    df_data <- df_data[, -1]
+    
+    df <- dplyr::left_join(df_ancom, df_data)
+    
+    p <- ggplot(df, aes(x = clr, y = W, color = `Reject.null.hypothesis`, text = X)) +
+      geom_point() +
+      scale_color_manual(values = c("grey", "cyan3")) +
+      theme_minimal() +
+      labs(
+        title = paste("ANCOM Volcano-like plot (16S) for", v),
+        x = "Centered Logarithmic (clr)",
+        y = "W statistic"
+      ) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "bottom"
+      )
+    
+    plotlist_ANCOM_16S[[v]] <- tags$div(
+      id = paste0("plot_ANCOM_16S_", v),
+      style = ifelse(v == "Establishment", "display:block;", "display:none; text-align:center;"),
+      tags$p(
+        style = "text-align: center;",
+        tags$a(href = path_link, target = "_blank",
+               paste("View interactive volcano-like plot in QIIME2 (16S -", v, ")"))
+      ),
+      ggplotly(p) %>%
+        layout(
+          legend = list(
+            orientation = "h",        
+            x = 0.5, xanchor = "center",
+            y = -0.2, yanchor = "top" 
+          )
+        ),
+      tags$br(),
+      tags$p(
+        style = "text-align: center; font-weight: bold;",
+        sprintf("Figure xx. Differences in Taxa Abundance Associated with '%s' (ANCOM Results) (16S)", v)
+      )
+    )
+  }
+}
+
+tagList(plotlist_ANCOM_16S)
+
+```
+
+<script>
+function switchPlotANCOM_16S() {
+  var val = document.getElementById("variable_selector_ANCOM_16S").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_group", "pH_binary", "Year_group", "Age_binary"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_ANCOM_16S_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+##### Fungi (ITS) 
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_ANCOM_ITS"><b>Select variable:</b></label>
+  <select id="variable_selector_ANCOM_ITS" onchange="switchPlotANCOM_ITS()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Age_category">Age_category</option>
+    <option value="pH_category">pH_category</option>
+  </select>
+</div>
+
+
+```{r ancom-its, results='asis' }
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category")
+
+plotlist_ITS <- list()
+
+for (v in vars) {
+  
+  path_ancom <- paste0("data/ITS/Taxonomy/Taxonomic_Abundance/F03_", v, "_ancom/data/ancom.tsv")
+  path_data <- paste0("data/ITS/Taxonomy/Taxonomic_Abundance/F03_", v, "_ancom/data/data.tsv")
+  path_link <- paste0("data/ITS/Taxonomy/Taxonomic_Abundance/F03_", v, "_ancom/data/index.html")
+
+  if (file.exists(path_ancom) && file.exists(path_data)) {
+    
+    df_ancom <- read.delim(path_ancom)
+    df_data <- read.delim(path_data)
+    
+    df_data$X <- df_data$id
+    df_data <- df_data[, -1]
+    
+    df <- dplyr::left_join(df_ancom, df_data)
+    
+    p <- ggplot(df, aes(x = clr, y = W, color = `Reject.null.hypothesis`, text = X)) +
+      geom_point() +
+      scale_color_manual(values = c("grey", "cyan3")) +
+      theme_minimal() +
+      labs(
+        title = paste("ANCOM Volcano-like plot (ITS) for", v),
+        x = "Centered Logarithmic (clr)",
+        y = "W statistic"
+      ) +
+      theme(
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "bottom"
+      )
+    
+    plotlist_ITS[[v]] <- tags$div(
+      id = paste0("plot_ANCOM_ITS_", v),
+      style = ifelse(v == "Establishment", "display:block;", "display:none; text-align:center;"),
+      tags$p(
+        style = "text-align: center;",
+        tags$a(href = path_link, target = "_blank",
+               paste("View interactive volcano-like plot in QIIME2 (ITS -", v, ")"))
+      ),
+      ggplotly(p)  %>%
+        layout(
+          legend = list(
+            orientation = "h",        
+            x = 0.5, xanchor = "center",
+            y = -0.2, yanchor = "top" 
+          )
+        ),
+      tags$br(),
+      tags$p(
+        style = "text-align: center; font-weight: bold;",
+        sprintf("Figure xx. Differences in Taxa Abundance Associated with '%s' (ANCOM Results) (ITS)", v)
+      )
+    )
+  }
+}
+
+# Print all plots
+tagList(plotlist_ITS)
+
+```
+
+
+<script>
+function switchPlotANCOM_ITS() {
+  var val = document.getElementById("variable_selector_ANCOM_ITS").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_ANCOM_ITS_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+---
+
+## **Functional Diversity** (Bacteria & Fungi) {.tabset}
+
+
+Functional diversity refers to the variety of biological functions present in microbial communities. Unlike taxonomic analysis, which identifies *who is there*, functional analysis explores *what they can do*. This section includes two parallel analyses:
+
+- **Bacteria (16S)**: Functional profiles were inferred using **PICRUSt2**, predicting gene family and pathway abundance.
+- **Fungi (ITS)**: Functional roles were explored using **FUNGuild**, which assigns taxa to ecological guilds based on literature.
+
+Alpha and beta diversity were analysed, along with differentially abundant functions or pathways.
+
+
+### Bacteria (16S)
+
+#### Functional Alpha Diversity {.tabset}
+
+The following metrics are based on **PICRUSt2-inferred pathways.**
+
+We examined three complementary metrics: **Shannon diversity** (richness and evenness), **Observed Features** (richness only), and **Evenness** (dominance balance). You can use the menu below to explore how each metric varies according to different experimental variables.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_SignAlpha_16S"><b>Select variable:</b></label>
+  <select id="variable_selector_SignAlpha_16S" onchange="switchPlotSignAlpha_16S()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Age_group">Age_group</option>
+    <option value="pH_binary">pH_binary</option>
+    <option value="Age_binary">Age_binary</option>
+  </select>
+</div>
+
+##### Shannon Index Boxplots
+
+
+```{r shannon-significance-16S, results='asis'}
+
+read_and_clean <- function(path, column) {
+  df <- read_tsv(path, col_types = cols())[-1, ]
+  df[[column]] <- as.numeric(df[[column]])
+  return(df)
+}
+# 16S data
+df_shannon <- read_and_clean("data/16S/Functional_analysis/Functional_alpha/pathway_shannon_significance/data/metadata.tsv", "shannon_entropy")
+df_obs_features   <- read_and_clean("data/16S/Functional_analysis/Functional_alpha/pathway_observed_features_significance/data/metadata.tsv", "observed_features")
+df_even <- read_and_clean("data/16S/Functional_analysis/Functional_alpha/pathway_pielou_e_significance/data/metadata.tsv", "pielou_evenness")
+
+df_shannon <- df_shannon %>% filter(Plough != "unknown")
+df_obs_features <- df_obs_features %>% filter(Plough != "unknown")
+df_even <- df_even %>% filter(Plough != "unknown")
+
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_group", "pH_binary", "Age_binary")
+
+for (var in vars){
+  display_style <- ifelse(var == "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_shannon_sig" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_shannon, aes_string(x = var, y = "shannon_entropy")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Shannon Significance (16S)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_shannon$shannon_entropy ~ df_even[[var]])
+  cat("<div style='text-align: center;'>") 
+  print(p1)
+  cat('</div>')
+  cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+}
+
+
+
+```
+
+##### Observed Features Boxplots
+
+```{r obs-features, results='asis'}
+for (var in vars){
+  
+  display_style <- ifelse(var == "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_obs_features_sig" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_obs_features, aes_string(x = var, y = "observed_features")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Obeserved Features Significance (16S)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_obs_features$observed_features ~ df_even[[var]])
+  cat("<div style='text-align: center;'>") 
+  print(p1)
+  cat('</div>')
+  cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+}
+```
+
+##### Evenness Significance Boxplots
+
+```{r evenness-sig, results='asis'}
+
+for (var in vars){
+  display_style <- ifelse(var == "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_even_sig" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_even, aes_string(x = var, y = "pielou_evenness")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Evenness Significance (16S)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_even$pielou_evenness ~ df_even[[var]])
+  cat("<div style='text-align: center;'>")  
+  print(p1)
+  cat("</div>")
+    cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+}
+
+```
+
+<script>
+function switchPlotSignAlpha_16S() {
+  var val = document.getElementById("variable_selector_SignAlpha_16S").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_group", "pH_binary", "Age_binary"];
+  
+  all.forEach(function(v) {
+
+    var el_shannon = document.getElementById("plot_" + v + "_shannon_sig");
+    if (el_shannon) {
+      el_shannon.style.display = (v === val) ? "block" : "none";
+    }
+    
+    var el_obs = document.getElementById("plot_" + v + "_obs_features_sig");
+    if (el_obs) {
+      el_obs.style.display = (v === val) ? "block" : "none";
+    }
+
+    var el_even = document.getElementById("plot_" + v + "_even_sig");
+    if (el_even) {
+      el_even.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+#### Functional Beta Diversity {.tabset}
+
+##### Emperor Plot – Bray-Curtis Distance
+
+*Based on predicted pathway abundance from PICRUSt2.*
+
+
+Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Functional_analysis/Functional_beta/pathway_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
+
+```{r emperor-bray-func-16s}
+
+
+json <- fromJSON("data/16S/Functional_analysis/Functional_beta/pathway_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Bray-Curtis Emperor Plot (Functional)</p>")
+
+
+
+```
+
+
+##### PERMANOVA – Bray-Curtis
+
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_16S_bray_func"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_16S_bray_func" onchange="switchPlotPermanova_16S_bray_func()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Year_group">Year group</option>
+    <option value="Age_group">Age group</option>
+    <option value="Age_binary">Age Binary </option>
+    <option value="pH_binary">pH Binary </option>
+  </select>
+</div>
+
+
+```{r permanova_16S_bray_func, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","Age_group", "Age_binary","pH_binary")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Functional/Bray_Curtis/16S/pathway_permanova_", v, ".png")
+  link_path <- paste0("data/16S/Functional_analysis/Functional_beta/pathway_permanova_", v, "/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  cat(sprintf('<div id="plot_permanova_bray_func_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Bray–Curtis – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Bray-Curtis for "%s" (ITS)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+
+}
+
+```
+
+<script>
+function switchPlotPermanova_16S_bray_func() {
+  var val = document.getElementById("variable_selector_Permanova_16S_bray_func").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","Age_group", "Age_binary","pH_binary"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_bray_func_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+#### Differentially Abundant Pathways
+
+*To identify pathways with significantly different abundances between groups, ANCOM was applied to PICRUSt2 pathway predictions.*
+
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_FunctDiv_16S"><b>Select variable:</b></label>
+  <select id="variable_selector_FunctDiv_16S" onchange="switchPlotFunctDiv_16S()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Age_group">Age_group</option>
+    <option value="pH_binary">pH_binary</option>
+    <option value="Age_binary">Age_binary</option>
+  </select>
+</div>
+
+```{r for-loop-ancom}
+
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_group", "pH_binary", "Age_binary")
+
+plotlist <- list()
+
+for (v in vars) {
+  
+  ancom_path <- paste0("data/16S/Functional_analysis/ancom_pathway/pathway_ancom_", v, "/data/ancom.tsv")
+  data_path <- paste0("data/16S/Functional_analysis/ancom_pathway/pathway_ancom_", v, "/data/data.tsv")
+  
+  df_ancom <- read.delim(ancom_path)
+  df_data <- read.delim(data_path)
+  
+  df_data$X <- df_data$id
+  df_data <- df_data[, -1]
+  
+  df <- dplyr::left_join(df_ancom, df_data)
+  
+  p <- ggplot(df, aes(x = clr, y = W, color = `Reject.null.hypothesis`, text = X)) +
+    geom_point() +
+    scale_color_manual(values = c("grey", "cyan3")) +
+    theme_minimal() +
+    labs(
+      title = paste("ANCOM Volcano Plot for", v),
+      x = "Centered Log Ratio (clr)",
+      y = "W statistic"
+    ) +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      legend.position = "bottom"
+    )
+  
+  plotlist[[v]] <- tags$div(
+    id = paste0("plot_fun16S_", v),
+    style = ifelse(v == "Establishment", "display:block;", "display:none;"),
+    ggplotly(p) %>%
+        layout(
+          legend = list(
+            orientation = "h",        
+            x = 0.5, xanchor = "center",
+            y = -0.2, yanchor = "top" 
+          )
+        ),
+    tags$br(),
+      tags$p(
+        style = "text-align: center; font-weight: bold;",
+        sprintf("Figure xx. Differences in Pathway Abundance Associated with '%s' (ANCOM Results) (ITS)", v)
+      )
+  )
+}
+tagList(plotlist)
+
+```
+
+
+
+<script>
+function switchPlotFunctDiv_16S() {
+  var val = document.getElementById("variable_selector_FunctDiv_16S").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_group", "pH_binary", "Age_binary"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_fun16S_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+#### Heatmaps
+
+These **heatmaps** display the **relative abundance** of predicted functional pathways across different samples, based on **PICRUSt2-inferred** metagenomic profiles from 16S rRNA gene data. Generated using QIIME2, each **row** represents a **metabolic pathway** (from MetaCyc), and each **column** corresponds to a **sample group**. The **colour intensity** indicates the **predicted abundance** of each functional pathway in the respective group.
+
+You can **click on each image** to view a **larger** version in a new tab.
+
+```{r heatmaps}
+imgs <- list.files("images/Heatmaps", full.names = TRUE)
+
+imgs <- c("images/Heatmaps/feature-table-heatmap_Establishment.png", setdiff(imgs, "images/Heatmaps/feature-table-heatmap_Establishment.png"))
+
+img_labels <- gsub("feature-table-heatmap_(.*).png", "\\1", basename(imgs))
+
+
+slides <- mapply(function(img, label) {
+  tags$div(
+    tags$p(style = "text-align:center; font-size:16px; font-weight:bold;", 
+       paste0("Feature Table Heatmap for ", label)),
+    tags$a(
+      href = img, target = "_blank",  
+      tags$img(src = img, style = "display:block; margin:auto; max-width:70%; height:auto;")
+    )
+  )
+}, imgs, img_labels, SIMPLIFY = FALSE)
+slickR(obj = slides, slideType = 'html', height = 500) + 
+  settings(arrows = TRUE, dots = TRUE, infinite = FALSE)
+
+```
+
+---
+
+### Fungi (ITS)
+
+#### Functional Alpha Diversity {.tabset}
+
+For fungal communities (ITS), functional diversity was assessed using metrics derived from predicted ecological functions (e.g., trophic modes, symbiosis potential).
+
+The metrics below—**Shannon diversity** and **Evenness**—summarise the variability of ecological roles across different experimental conditions. Use the dropdown menu to explore patterns by variable.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_SignAlpha_ITS"><b>Select variable:</b></label>
+  <select id="variable_selector_SignAlpha_ITS" onchange="switchPlotSignAlpha_ITS()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Age_category">Age category</option>
+    <option value="pH_category">pH category</option>
+    <option value="Age">Age</option>
+  </select>
+</div>
+
+
+##### Shannon Index Boxplots
+
+
+```{r shannon-significance-ITS, results='asis'}
+
+
+# ITS data
+df_shannon <- read_and_clean("data/ITS/Functional_analysis/Functional_alpha/alpha_shannon_ITS/data/metadata.tsv", "shannon_entropy")
+df_even <- read_and_clean("data/ITS/Functional_analysis/Functional_alpha/alpha_evenness_ITS/data/metadata.tsv", "pielou_evenness")
+
+df_shannon <- df_shannon %>% filter(Plough != "nan")
+df_even <- df_even %>% filter(Plough != "nan")
+
+get_mode <- function(x) {
+  ux <- na.omit(unique(x))
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age", "pH_category", "Age_category")
+
+for (var in vars){
+  display_style <- ifelse(var == "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_shannon_sig_ITS" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_shannon, aes_string(x = var, y = "shannon_entropy")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Shannon Significance (16S)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_shannon$shannon_entropy ~ df_shannon[[var]])
+  cat("<div style='text-align: center;'>") 
+  print(p1)
+  cat('</div>')
+  cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+}
+
+
+
+```
+
+##### Evenness Significance Boxplots
+
+
+
+```{r evenness-sig-ITS, results='asis'}
+
+for (var in vars){
+  display_style <- ifelse(var == "Establishment", "block", "none")
+  cat(paste0('<div id="plot_', var, '_even_sig_ITS" style="display:', display_style, ';">'))
+  p1 <- ggplot(df_even, aes_string(x = var, y = "pielou_evenness")) +
+      geom_boxplot(fill = "deepskyblue3") +
+      theme_minimal() +
+      labs(x = var, y = "Evenness Significance (16S)") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  kw <- kruskal.test(df_even$pielou_evenness ~ df_even[[var]])
+  cat("<div style='text-align: center;'>")  
+  print(p1)
+  cat("</div>")
+    cat(paste0("<p style='text-align: center;'>Kruskal-Wallis p-value: ", signif(kw$p.value, 3), "</p>"))
+  cat('</div>')
+}
+
+```
+
+<script>
+function switchPlotSignAlpha_ITS() {
+  var val = document.getElementById("variable_selector_SignAlpha_ITS").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category", "Age"];
+  
+  all.forEach(function(v) {
+
+    var el_shannon = document.getElementById("plot_" + v + "_shannon_sig_ITS");
+    if (el_shannon) {
+      el_shannon.style.display = (v === val) ? "block" : "none";
+    }
+
+    var el_even = document.getElementById("plot_" + v + "_even_sig_ITS");
+    if (el_even) {
+      el_even.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+#### Functional Beta Diversity {.tabset}
+
+##### Emperor Plot – Bray-Curtis Distance
+
+
+Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Functional_analysis/Functional_beta/Emperor_Plot/bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
+
+```{r emperor-bray-func-its}
+
+
+json <- fromJSON("data/ITS/Functional_analysis/Functional_beta/Emperor_Plot/bray_curtis_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Bray-Curtis Emperor Plot (Fungi - ITS, Functional)</p>")
+
+
+
+```
+
+
+##### PERMANOVA – Bray-Curtis
+
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_ITS_bray_func"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_ITS_bray_func" onchange="switchPlotPermanova_ITS_bray_func()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="pH">pH category</option>
+    <option value="Age">Age category</option>
+  </select>
+</div>
+
+```{r permanova_ITS_bray_func, results='asis'}
+vars <- c("Establishment", "pH", "Age")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Functional/Bray_Curtis/ITS/bray_curtis_significance_",v,"_ITS.png")
+  link_path <- paste0("data/ITS/Functional_analysis/Functional_beta/bray_curtis_significance_",v,"_ITS/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  cat(sprintf('<div id="plot_permanova_ITS_bray_func_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Bray–Curtis – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Bray-Curtis for "%s" (ITS)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+  
+  
+}
+
+```
+
+<script>
+function switchPlotPermanova_ITS_bray_func() {
+  var val = document.getElementById("variable_selector_Permanova_ITS_bray_func").value;
+  var all = ["Establishment", pH", "Age"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_ITS_bray_func_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+##### Emperor Plot – Jaccard Distance
+
+Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Functional_analysis/Functional_beta/Emperor_Plot/jaccard_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
+
+```{r emperor-jaccard-func-its}
+
+
+json <- fromJSON("data/ITS/Functional_analysis/Functional_beta/Emperor_Plot/jaccard_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Jaccard Emperor Plot (Fungi - ITS, Functional)</p>")
+
+
+
+```
+
+
+##### PERMANOVA – Jaccard Distance
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_ITS_jacc_func"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_ITS_jacc_func" onchange="switchPlotPermanova_ITS_jacc_func()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="pH">pH category</option>
+    <option value="Age">Age category</option>
+  </select>
+</div>
+
+```{r permanova_ITS_jacc_func, results='asis'}
+vars <- c("Establishment", "pH", "Age")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Functional/Jaccard/ITS/jaccard_significance_",v,"_ITS.png")
+  link_path <- paste0("data/ITS/Functional_analysis/Functional_beta/jaccard_significance_",v,"_ITS/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  cat(sprintf('<div id="plot_permanova_ITS_jacc_func_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Jaccard – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Jaccard for "%s" (ITS)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+  
+}
+
+```
+
+<script>
+function switchPlotPermanova_ITS_jacc_func() {
+  var val = document.getElementById("variable_selector_Permanova_ITS_jacc_func").value;
+  var all = ["Establishment", pH", "Age"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_ITS_jacc_func_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+#### Fungal Functional Guilds (FUNGuild)
+
+In microbial ecology, a *guild* refers to a group of organisms that fulfil similar ecological roles, regardless of their taxonomic identity. Understanding functional guilds allows researchers to move beyond taxonomic profiles and assess the ecological roles that microbial communities may play in an environment.
+
+To investigate the ecological roles of fungal communities, we used **FUNGuild**, a tool that assigns fungi to functional guilds based on curated databases and literature. These guilds represent ecological strategies such as:
+
+- **Saprotrophs**: decomposers of organic matter  
+- **Mycorrhizal fungi**: symbionts associated with plant roots  
+- **Pathogens**: organisms that cause disease in plants or animals
+- **Ectomycorrhizal**: symbionts that assist plant roots by enhancing nutrient and water uptake, especially nitrogen and phosphorus, while contributing to carbon cycling and soil nutrient mobilisation
+- **Arbuscular Mycorrhizal**: symbionts that contribute to nutrient uptake
+- **Endophyte**: microorganisms that promote the growth and development of the plants
+- **Lichenized**: fungi that form symbiotic associations with algae or cyanobacteria, creating lichens that can survive in harsh environments by combining structural support and photosynthetic ability
+- **Parasites**: fungi that live on or inside a host organism, extracting nutrients and often causing harm
+- **Symbiotrophs**: fungi that engage in mutually beneficial relationships with host organisms, typically exchanging nutrients for resources like carbon or protection
+
+This functional classification provides valuable insights into what fungi are likely *doing* in the ecosystem, beyond simply *who* they are.
+
+
+This section explores the functional roles of fungi within each site, based on guild-level annotations provided by **FUNGuild**. Fungal guilds reflect ecological functions such as **saprotrophy**, **symbiosis** (e.g., mycorrhizal fungi), or **pathogenicity**. This approach provides insight into how fungal communities may contribute to ecosystem processes, complementing traditional taxonomic analyses.
+
+
+##### Top 20 Most Abundant Guilds
+
+
+The plot below highlights the top 20 most abundant fungal guilds identified using **FUNGuild**. To avoid clutter, the guild names are hidden on the y-axis; however, users can **hover over each bar to reveal the full name**, enabling interactive and detailed exploration of fungal functional diversity.
+
+```{r its-fun-div, echo = FALSE, message=FALSE, warning=FALSE, results='asis'}
+df <- read.delim("data/ITS/Functional_analysis/F04_Results/F04_funguild_input.guilds.txt", check.names = FALSE)
+
+# Identify site columns
+site_cols <- names(df)[3:(which(names(df) == "Taxon") - 1)]
+
+# Extract Guild information between pipes (|...|)
+df$Guild_Extracted <- str_extract(df$Guild, "\\|[^|]+\\|") %>%
+  str_replace_all("\\|", "") %>%
+  trimws()
+
+# converts NA to Unassigned
+df$Guild_Extracted[is.na(df$Guild_Extracted)] <- "Unassigned"
+
+# Set factor level so "Unassigned" appears first
+df$Guild_Extracted <- factor(df$Guild_Extracted, levels = c("Unassigned", sort(unique(df$Guild_Extracted[df$Guild_Extracted != "Unassigned"]))))
+
+# Filter out rows without pipe-delimited guilds
+df_filtered <- df %>% filter(!is.na(Guild_Extracted))
+
+
+guild_counts <- df_filtered %>%
+  filter(!is.na(Guild), `Confidence Ranking` %in% c("Probable", "Highly Probable")) %>%
+  count(Guild, sort = TRUE) %>%
+  slice_max(n, n = 20)
+
+cat('<div style="text-align: center;">')
+ggplot(guild_counts, aes(x = reorder(Guild, n), y = n, text = Guild)) +
+  geom_col(fill = "#3780AE") +
+  
+  labs(x = NULL,
+       y = "Number of ASVs") +
+  theme_minimal() +
+theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 5),
+    axis.ticks.x = element_blank(),
+    legend.text = element_text(size = 5)
+  )
+
+HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Top 20 functional guilds</p>")
+
+cat('</div>')
+```
+
+
+
+##### Guild Abundance Across Sites
+
+The figure below shows the total abundance of fungal ASVs across sites, aggregated by **functional guild**. This provides an overview of how **guild-level composition** varies between locations, which may reflect differences in land use, soil conditions, or restoration histories.
+
+
+```{r fun-ab-total, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+meta <- read.delim("data/agg_metadata.txt", check.names = FALSE)
+
+df <- read.delim("data/ITS/Functional_analysis/F04_Results/F04_funguild_input.guilds.txt", check.names = FALSE)
+
+# Identify site columns
+site_cols <- names(df)[3:(which(names(df) == "Taxon") - 1)]
+
+# Extract Guild information between pipes (|...|)
+df$Guild_Extracted <- str_extract(df$Guild, "\\|[^|]+\\|") %>%
+  str_replace_all("\\|", "") %>%
+  trimws()
+
+# converts NA to Unassigned
+df$Guild_Extracted[is.na(df$Guild_Extracted)] <- "Unassigned"
+
+# Set factor level so "Unassigned" appears first
+df$Guild_Extracted <- factor(df$Guild_Extracted, levels = c("Unassigned", sort(unique(df$Guild_Extracted[df$Guild_Extracted != "Unassigned"]))))
+
+# Filter out rows without pipe-delimited guilds
+df_filtered <- df %>% filter(!is.na(Guild_Extracted))
+
+
+df_filtered <- df %>% filter(!is.na(Guild_Extracted))
+meta$Site <- meta$`sample-id`
+
+# Joining metadata to abundances
+df_filtered_meta <- df_filtered %>%
+  pivot_longer(cols = all_of(site_cols), names_to = "Site", values_to = "Abundance") %>%
+  left_join(meta, by = "Site")
+
+# Relative abundances by site and guild
+guild_data_per <- df_filtered_meta %>%
+  filter(Abundance > 0) %>%
+  group_by(Site, Guild_Extracted) %>%
+  summarise(Abundance = sum(Abundance), .groups = "drop") %>%
+  group_by(Site) %>%
+  mutate(Abundance_percent = Abundance / sum(Abundance) * 100) %>%
+  ungroup()
+
+# Order Sites by Establishment
+site_groups <- guild_data_per %>%
+  distinct(Site) %>%
+  left_join(meta[, c("Site", "Establishment")], by = "Site") %>%
+  arrange(Establishment, Site)
+
+site_order <- site_groups %>% pull(Site)
+
+
+guild_data_per <- guild_data_per %>%
+  mutate(Site = factor(Site, levels = site_order))
+
+group_breaks <- site_groups %>%
+  group_by(Establishment) %>%
+  summarise(n = n()) %>%
+  mutate(position = cumsum(n) + 0.5) %>%
+  filter(row_number() < n())
+
+group_labels <- site_groups %>%
+  mutate(Site_num = as.numeric(factor(Site, levels = site_order))) %>%
+  group_by(Establishment) %>%
+  summarise(position = median(Site_num), .groups = "drop")
+
+# Alternating the colors to have a better seperation
+guild_names <- levels(factor(df$Guild_Extracted))
+guild_main <- setdiff(guild_names, "Unassigned")
+
+blues18 <- colorRampPalette(brewer.pal(9, "Blues"))(18)
+light_blues <- blues18[1:9]
+dark_blues <- blues18[10:18]
+alternance <- as.vector(rbind(light_blues, dark_blues))[seq_along(guild_main)]
+
+guild_colors <- setNames(rep(NA, length(guild_names)), guild_names)
+guild_colors["Unassigned"] <- "gray70"
+guild_colors[guild_main] <- alternance
+
+p <- ggplot(guild_data_per, aes(x = Site, y = Abundance_percent, fill = Guild_Extracted)) +
+  geom_bar(stat = "identity") +
+  geom_vline(data = group_breaks, aes(xintercept = position), color = "black", linetype = "dashed") +
+  geom_text(data = group_labels, aes(x = position, y = max(guild_data_per$Abundance_percent) + 5, label = Establishment), inherit.aes = FALSE, size = 3, fontface = "bold") +
+  scale_fill_manual(values = guild_colors) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
+    axis.ticks.x = element_blank(),
+    legend.text = element_text(size = 5)
+  ) +
+  labs(
+    title = "Fungal Guild Abundance by Site",
+    x = "Site",
+    y = "Abundance (%)",
+    fill = "Guild"
+  )
+
+htmltools::div(
+  style = "display: block; margin-left: auto; margin-right: auto; width: 80%;",
+  ggplotly(p, tooltip = "text")
+)
+cat("<p style='text-align: center; font-weight: bold;'>Figure xx. Fungal Guild Abundance by Site</p>")
+
+
+```
+
+
+##### Guild Abundance by Variable
+
+```{r fun-abundance-est-ph-age, echo=FALSE, results='asis'}
+vars <- c("pH_category", "Age_category", "Establishment")
+cat('
+<label for="variable_selector_funAbundance"><b>Select variable:</b></label>
+<select id="variable_selector_funAbundance" onchange="switchPlotfunAbundance()">
+  <option value="Establishment" selected>Establishment</option>
+  <option value="Age_category">Age</option>
+  <option value="pH_category">pH</option>
+</select>
+
+
+<script>
+function switchPlotfunAbundance() {
+  var val = document.getElementById("variable_selector_funAbundance").value;
+  var all = ["Establishment", "Age_category", "pH_category"];
+  all.forEach(function(v) {
+    var el = document.getElementById("guild_" + v +"_plot_percent");
+    el.style.display = (v === val) ? "block" : "none";
+  });
+}
+</script>
+
+')
+
+#Calculate medians from the original pH and Age columns
+
+pH_median <- median(as.numeric(meta$pH), na.rm = TRUE)
+Age_median <- median(as.numeric(meta$Age), na.rm = TRUE)
+
+
+
+for (v in vars) {
+    div_style <- ifelse(v == "Establishment", "block", "none")
+    if (v == "pH_category") {
+    ttl <- paste0("Fungal Guild Relative Abundance by pH category (Median pH = ", round(pH_median, 2), ")")
+  } else if (v == "Age_category") {
+    ttl <- paste0("Fungal Guild Relative Abundance by Age category (Median Age = ", round(Age_median, 2), ")")
+  } else {
+    ttl <- "Fungal Guild Relative Abundance by Establishment"
+  }
+
+    guild_data_per <- df_filtered %>%
+      pivot_longer(cols = all_of(site_cols), names_to = "sample-id", values_to = "Abundance") %>%
+      filter(Abundance > 0 & Guild_Extracted != "Unassigned") %>%
+      left_join(meta[, c("sample-id", v)], by = "sample-id") %>%
+      group_by(.data[[v]], Guild_Extracted) %>%
+      summarise(Abundance = sum(Abundance), .groups = "drop") %>%
+      group_by(.data[[v]]) %>%
+      mutate(Abundance_percent = Abundance / sum(Abundance) * 100) %>%
+      ungroup()
+    
+    p <- ggplot(guild_data_per, aes_string(x = v, y = "Abundance_percent", fill = "Guild_Extracted")) +
+      geom_bar(stat = "identity", position = "stack") +
+      theme_minimal() +
+      scale_fill_manual(values = guild_colors) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
+      labs(
+        title = ttl,
+        x = v,
+        y = "Relative Abundance (%)",
+        fill = "Guild"
+      )
+    
+    cat(sprintf('<div id="guild_%s_plot_percent" style="display:%s;">\n', v, div_style))
+    cat(as.character(htmltools::div(style = "text-align: center;", ggplotly(p))))
+    cat(sprintf("<p style='text-align: center; font-weight: bold;'>Figure xx. Fungal Guild Relative Abundance by %s </p>", v))
+    
+    cat('</div>')
+}
+
+```
+
+---
+
+## **Correlation between Bacteria and Fungi**
+
+### Taxonomic level
+
+
+```{r corr_taxa}
+
+df_corr <- read.delim("data/bac_fun/taxa_corr_abundant.txt")
+df_corr <- df_corr %>%
+  arrange(desc(r)) %>%
+  mutate(
+    label = paste(Bacteria, Fungi, sep = ": "),
+    correlation_sign = factor(r > 0, levels = c(TRUE, FALSE), labels = c("Positive", "Negative"))
+  )
+
+g <- ggplot(df_corr, aes(
+  x = label, 
+  y = r, 
+  fill = correlation_sign,
+  text = paste("Bacteria:Fungi =", label, "<br>r =", round(r, 3))
+)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Positive" = "skyblue", "Negative" = "darkblue")) +
+  theme_minimal() +
+  theme(axis.text.y = element_blank()) +
+  labs(
+    title = "Correlation between Bacteria and Fungi",
+    x = "Bacteria:Fungi",
+    y = "Correlation Coefficient (r)",
+    fill = "Correlation"
+  )
+
+htmltools::div(
+  style = "display: block; margin-left: auto; margin-right: auto; width: 80%;",
+  ggplotly(g, tooltip = "text")
+)
+```
+
+
+
+### Functional level
+
+
+```{r corr_func}
+df_corr_fun <- read.delim("data/bac_fun/func_corr.txt")
+df_corr_fun <- df_corr_fun %>%
+  arrange(desc(r)) %>%
+  mutate(
+    label = paste(Guild, Pathway, sep = ": "),
+    correlation_sign = factor(r > 0, levels = c(TRUE, FALSE), labels = c("Positive", "Negative"))
+  )
+
+g <- ggplot(df_corr_fun, aes(
+  x = label, 
+  y = r, 
+  fill = correlation_sign,
+  text = paste("Guild:Pathway =", label, "<br>r =", round(r, 3))
+)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Positive" = "skyblue", "Negative" = "darkblue")) +
+  theme_minimal() +
+  theme(axis.text.y = element_blank()) +
+  labs(
+    title = "Correlation between Guilds and Pathways",
+    x = "Guild:Pathway",
+    y = "Correlation Coefficient (r)",
+    fill = "Correlation"
+  )
+
+htmltools::div(
+  style = "display: block; margin-left: auto; margin-right: auto; width: 80%;",
+  ggplotly(g, tooltip = "text")
+)
+```
+
+
