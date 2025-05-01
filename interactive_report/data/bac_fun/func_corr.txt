@@ -1,0 +1,43 @@
+"Guild"	"Pathway"	"r"	"padj"
+"|Algal Parasite|-Plant Pathogen-Plant Saprotroph-Protist Parasite-Undefined Saprotroph"	"P164-PWY"	-0.750433042736553	3.12935826705321e-08
+"|Algal Parasite|-Plant Pathogen-Plant Saprotroph-Protist Parasite-Undefined Saprotroph"	"PWY-6486"	0.765320190266623	5.62730626834324e-09
+"|Animal Parasite|-Animal Pathogen-Undefined Saprotroph"	"CENTBENZCOA-PWY"	0.803493216092606	3.63382067691305e-11
+"|Animal Parasite|-Animal Pathogen-Undefined Saprotroph"	"LACTOSECAT-PWY"	0.708105354738385	2.27151887062904e-06
+"|Endophyte|"	"PWY-6581"	0.70223458882109	3.87784431906476e-06
+"|Fungal Parasite|-Lichen Parasite"	"PWY-1422"	0.757927538262999	1.33970607373942e-08
+"|Fungal Parasite|-Plant Saprotroph-Undefined Saprotroph"	"PWY-6906"	0.789082159220978	2.75359975734962e-10
+"|Plant Pathogen|-Plant Saprotroph-Wood Saprotroph"	"PWY-7446"	0.956042998022642	6.38451090752934e-31
+"|Plant Pathogen|-Undefined Saprotroph"	"CENTBENZCOA-PWY"	0.741850878094698	7.97537792235853e-08
+"|Plant Pathogen|-Undefined Saprotroph"	"LACTOSECAT-PWY"	0.826437641666934	9.97431647183924e-13
+"Algal Parasite-Plant Pathogen-|Pollen Saprotroph|"	"PWY-5679"	0.814444496608996	6.94980586643316e-12
+"Algal Parasite-Plant Pathogen-|Pollen Saprotroph|"	"PWY-6148"	0.814444496608996	6.94980586643316e-12
+"Animal Parasite-Dung Saprotroph-Endophyte-Fungal Parasite-Plant Pathogen-|Undefined Saprotroph|-Wood Saprotroph"	"PWY-7316"	0.715295490497301	1.15866276969337e-06
+"Animal Pathogen-|Plant Saprotroph|-Undefined Saprotroph"	"PWY-6581"	0.70223458882109	3.87784431906476e-06
+"Animal Pathogen-Dung Saprotroph-Endophyte-Epiphyte-Plant Saprotroph-Wood Saprotroph"	"GLUCOSE1PMETAB-PWY"	0.795849879484401	1.08543389710571e-10
+"Animal Pathogen-Dung Saprotroph-Endophyte-Epiphyte-Plant Saprotroph-Wood Saprotroph"	"METHGLYUT-PWY"	0.936520370526155	6.05028172514614e-26
+"Animal Pathogen-Dung Saprotroph-Endophyte-Epiphyte-Plant Saprotroph-Wood Saprotroph"	"PWY-5384"	0.778410963162842	1.11762346431896e-09
+"Animal Pathogen-Dung Saprotroph-Endophyte-Epiphyte-Plant Saprotroph-Wood Saprotroph"	"PWY-5651"	0.718864077529086	8.23214624301859e-07
+"Animal Pathogen-Dung Saprotroph-Endophyte-Epiphyte-Plant Saprotroph-Wood Saprotroph"	"PWY-5747"	0.713382887575217	1.38861650624372e-06
+"Animal Pathogen-Dung Saprotroph-Endophyte-Epiphyte-Plant Saprotroph-Wood Saprotroph"	"PWY-7295"	0.849401408297095	1.5446504454383e-14
+"Animal Pathogen-Endophyte-Plant Pathogen-Undefined Saprotroph"	"PWY-6906"	0.713506411853812	1.37254981828381e-06
+"Dung Saprotroph-Ectomycorrhizal-Litter Saprotroph-Undefined Saprotroph"	"P164-PWY"	-0.706764884625935	2.56948494041956e-06
+"Dung Saprotroph-Ectomycorrhizal-Soil Saprotroph-Wood Saprotroph"	"PWY-6906"	0.753675543721104	2.1759938425688e-08
+"Ectomycorrhizal-Endomycorrhizal-Orchid Mycorrhizal-|Plant Pathogen|-Plant Saprotroph-Undefined Saprotroph"	"PWY-1422"	0.858314546635285	2.53190927616471e-15
+"Ectomycorrhizal-Fungal Parasite-Plant Pathogen-Wood Saprotroph"	"PWY-6906"	0.779758724272825	9.40433318796412e-10
+"Endophyte-Epiphyte-Fungal Parasite-Insect Parasite"	"P621-PWY"	0.705253101339881	2.95026722747508e-06
+"Endophyte-Epiphyte-Fungal Parasite-Insect Parasite"	"PWY490-3"	0.746480674225754	4.8370231161194e-08
+"Endophyte-Ericoid Mycorrhizal-|Undefined Saprotroph|"	"GLCMANNANAUT-PWY"	0.741228668273657	8.5227971297684e-08
+"Endophyte-Ericoid Mycorrhizal-|Undefined Saprotroph|"	"P441-PWY"	0.707339285281624	2.43750562647769e-06
+"Endophyte-Ericoid Mycorrhizal-|Undefined Saprotroph|"	"PWY-7316"	0.84084031058608	7.88769225271062e-14
+"Endophyte-Insect Pathogen"	"METHGLYUT-PWY"	0.817202163756257	4.50392738195737e-12
+"Endophyte-Insect Pathogen"	"PWY-7295"	0.701025033546124	4.32259718839155e-06
+"Endophyte-Soil Saprotroph-Undefined Saprotroph"	"PWY-1422"	0.738386825446754	1.15145664809599e-07
+"Epiphyte-|Undefined Saprotroph|"	"PWY-7316"	0.834500514462016	2.48303426257296e-13
+"Lichen Parasite-|Plant Pathogen|"	"PWY-1422"	0.983519016016954	2.25756420717925e-44
+"Plant Pathogen-|Pollen Saprotroph|"	"PWY-7316"	0.954095021500433	2.48168551244432e-30
+"Plant Pathogen-Plant Saprotroph-Undefined Saprotroph-|Wood Saprotroph|"	"CENTBENZCOA-PWY"	0.912931967564181	1.03114217344177e-21
+"Plant Pathogen-Plant Saprotroph-Undefined Saprotroph-|Wood Saprotroph|"	"LACTOSECAT-PWY"	0.852102902214723	9.0414561124798e-15
+"Plant Pathogen-Plant Saprotroph-Undefined Saprotroph-|Wood Saprotroph|"	"P162-PWY"	0.713851764662511	1.32853585575225e-06
+"Plant Pathogen-Plant Saprotroph-Undefined Saprotroph-|Wood Saprotroph|"	"PWY-5177"	0.718753593375566	8.32027576572896e-07
+"Plant Pathogen"	"PWY-6906"	0.789082159220978	2.75359975734962e-10
+"Wood Saprotroph"	"PWY-1422"	0.706359705942977	2.66664601317016e-06

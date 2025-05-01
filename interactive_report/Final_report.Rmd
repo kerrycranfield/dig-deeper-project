@@ -1199,7 +1199,7 @@ As with *Bray-Curtis*, the **Emperor plot** allows for *interactive exploration*
 
 The **Jaccard plot** is useful when exploring factors that influence *community membership*, such as **habitat type**, **land use**, or **environmental filtering**—especially in studies where *presence/absence patterns* are more meaningful than *relative abundances*.
 
-##### Bacteria (16S) {.unnumbered}
+###### Bacteria (16S) {.unnumbered}
 
 Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/jaccard_emperor/data/index.html" target="_blank">Jaccard Emperor Plot (16S)</a>
 
@@ -2654,7 +2654,7 @@ p <- ggplot(guild_data_per, aes(x = Site, y = Abundance_percent, fill = Guild_Ex
 
 htmltools::div(
   style = "display: block; margin-left: auto; margin-right: auto; width: 80%;",
-  ggplotly(p, tooltip = "text")
+  ggplotly(p)
 )
 cat("<p style='text-align: center; font-weight: bold;'>Figure xx. Fungal Guild Abundance by Site</p>")
 
