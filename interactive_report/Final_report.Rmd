@@ -376,6 +376,8 @@ cat('
 
 #### Statistics Table Summary {.tabset}
 
+After denoising, quality control (QC) metrics provide essential insights into the effectiveness of the data processing steps and the overall quality of the resulting feature table. This summary table presents key statistics for each sample, including the number of input reads, filtered reads, and final feature counts after denoising. These metrics help assess sequencing success, identify potential outliers, and ensure that sufficient data remain for robust downstream analyses. Samples with unusually low read counts or feature richness may need to be excluded or interpreted with caution.
+
 ##### Bacteria (16S) {.unnumbered}
 
 ```{r denoising-stats-table, echo=FALSE, message=FALSE, results='asis'}
@@ -466,20 +468,22 @@ These **Quality Control (QC) plots** were generated **after trimming** the seque
 
 ##### Fungi (ITS) {.unnumbered}
 
-```{r QC-plot-ITS, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 
-cat('
 <div style="text-align: center;">
   <a href="data/ITS/Pre-processing/F02_sequence/data/index.html" target="_blank">
     <img src="images/QC_plot_ITS.png" style="max-width: 105%; height: auto;" alt="QC plot thumbnail">
   </a>
   <p style="font-style: bold;">Figure xx . QC plot (ITS)</p>
 </div>
-')
 
-```
 
 #### Rarefication Curves {.tabset}
+
+**Rarefaction** curves provide a visual tool to assess sequencing depth and compare species richness between samples. In this study, rarefaction curves were generated separately for bacterial (16S rRNA gene) and fungal (ITS) communities, using the number of observed features—i.e., unique ASVs—as a proxy for richness.
+
+For both bacteria and fungi, the shape of each curve indicates whether sequencing depth was sufficient to capture most of the diversity in a given sample. Curves that level off suggest that a representative portion of the community has been sampled, whereas rising curves indicate that additional sequencing could reveal further diversity.
+
+This step is crucial to ensure that downstream diversity analyses are not biased by unequal sampling effort.
 
 ##### Bacteria (16S) 
 
@@ -587,10 +591,6 @@ Here is a link to the **Rarefiction plots** for more flexibility on QIIME2: <a h
 <div style="margin-bottom: 20px;">
   <label for="variable_selector_rarefaction_ITS"><b>Select variable:</b></label>
   <select id="variable_selector_rarefaction_ITS" onchange="switchPlotRarefaction_ITS()">
-    <option value="Establishment">Establishment</option>
-    <option value="plot_number" selected>Plot Number</option>
-    <option value="Age">Age</option>
-    <option value="Year_est">Year of Establishment</option>
     <option value="OS_location">Os Location</option>
     <option value="CU Code">CU Code</option>
     <option value="Lat_long">Lat/long</option>
@@ -599,7 +599,7 @@ Here is a link to the **Rarefiction plots** for more flexibility on QIIME2: <a h
 </div>
 
 ```{r rarefication_est_itS, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-vars <- c("Establishment", "Age", "Year_est", "OS_location", "CU Code","plot_number", "Lat_long")
+vars <- c( "OS_location", "CU Code", "Lat_long")
 
 rare_df <- read_csv("data/ITS/Pre-processing/F02_aggregated_rarefaction/data/observed_features.csv")
 measure_cols <- grep("^depth-", names(rare_df), value = TRUE)
@@ -666,7 +666,7 @@ tagList(plotlist_rarefaction_ITS)
 <script>
 function switchPlotRarefaction_ITS() {
   var val = document.getElementById("variable_selector_rarefaction_ITS").value;
-  var all = ["Establishment", "Age", "Year_est", "OS_location", "CU Code","plot_number", "Lat_long"];
+  var all = ["OS_location", "CU Code", "Lat_long"];
   
   all.forEach(function(v) {
     var el = document.getElementById("plot_rarefaction_ITS_" + v);
@@ -778,21 +778,49 @@ In the plots below, we examine how the Shannon index, Faith PD and Evenness vary
 
 The boxplot below illustrate differences in Shannon diversity across groups. This metric reflects both species richness and how balanced the community is in terms of species abundance.
 
+Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
+<a href="data/16S/alpha_diversity/s08_alpha_shannon_per_group/data/index.html" target="_blank">Shannon Index (16S)</a>
+
+Shannon entropy revealed significant overall differences (p = 0.001), with green hay/bush sites showing higher diversity than both natural regeneration (q = 0.0019) and seed mix sites (q = 0.036). Seed mix sites also had higher Shannon diversity than natural regeneration (q = 0.0199).
 
 ```{r shannon-16S-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-cat('Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
-<a href="data/16S/alpha_diversity/s08_alpha_shannon_per_group/data/index.html" target="_blank">Shannon Index (16S)</a>')
+
+
 
 for (var in vars16S) {
+  summary_stats <- df_shannon %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(shannon_entropy, na.rm = TRUE), 2),
+      median = round(median(shannon_entropy, na.rm = TRUE), 2),
+      Q1 = round(quantile(shannon_entropy, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(shannon_entropy, 0.75, na.rm = TRUE), 2)
+    )
 
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_shannon" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_shannon, aes_string(x = var, y = "shannon_entropy")) +
-      geom_boxplot(fill = "deepskyblue3") +
-      theme_minimal() +
-      labs(x = var, y = "Shannon Index (16S)") +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+  p1 <- ggplot(df_shannon, aes(x = .data[[var]], y = shannon_entropy)) +
+    geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    theme_minimal() +
+    labs(x = var, y = "Shannon Index (16S)") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
   kw <- kruskal.test(df_shannon$shannon_entropy ~ df_shannon[[var]])
+
   cat("<div style='text-align: center;'>") 
   print(p1)
   cat('</div>')
@@ -802,21 +830,46 @@ for (var in vars16S) {
 
 ```
 
+
+
 ##### Faith PD Boxplot 
 
 The following plots show Faith’s Phylogenetic Diversity, which integrates evolutionary relationships to capture how phylogenetically broad each microbial community is.
 
+Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
+<a href="data/16S/alpha_diversity/s08_alpha_faith_pd_per_group/data/index.html" target="_blank">Faith PD (16S)</a>
+
+Pielou’s evenness differed significantly across establishment methods (p = 0.0148), with green hay/bush sites being significantly more even than natural regeneration (q = 0.0148). The difference between seed mix and natural regeneration approached significance (q = 0.0597), while no significant difference was found between green hay/bush and seed mix.
+
 ```{r faith-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-cat('Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
-<a href="data/16S/alpha_diversity/s08_alpha_faith_pd_per_group/data/index.html" target="_blank">Faith PD (16S)</a>')
 
 for (var in vars16S) {
-  
+  summary_stats <- df_faith %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(faith_pd, na.rm = TRUE), 2),
+      median = round(median(faith_pd, na.rm = TRUE), 2),
+      Q1 = round(quantile(faith_pd, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(faith_pd, 0.75, na.rm = TRUE), 2)
+    )
   
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_faith" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_faith, aes_string(x = var, y = "faith_pd")) +
+  p1 <- ggplot(df_faith, aes(x = .data[[var]], y = faith_pd)) +
       geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
       labs(x = var, y = "Faith PD (16S)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -833,20 +886,47 @@ for (var in vars16S) {
 
 ```
 
+
+
 ##### Evenness Boxplot
 
 These boxplots display Pielou’s Evenness, highlighting how uniformly taxa are represented in each community. It allows us to isolate imbalance in dominance from richness effects.
 
+Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
+<a href="data/16S/alpha_diversity/s08_alpha_evenness_per_group/data/index.html" target="_blank">Pielou Evenness (16S)</a>
+
+Faith’s PD also varied significantly by establishment method (p = 0.0106), with both green hay/bush (q = 0.0148) and seed mix sites (q = 0.043) exhibiting greater phylogenetic diversity than natural regeneration. No significant difference was observed between green hay/bush and seed mix.
+
+
 ```{r evenness-16S-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-cat('Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
-<a href="data/16S/alpha_diversity/s08_alpha_evenness_per_group/data/index.html" target="_blank">Pielou Evenness (16S)</a>')
+
 
 for (var in vars16S) {
-
+  summary_stats <- df_even %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(pielou_evenness, na.rm = TRUE), 2),
+      median = round(median(pielou_evenness, na.rm = TRUE), 2),
+      Q1 = round(quantile(pielou_evenness, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(pielou_evenness, 0.75, na.rm = TRUE), 2)
+    )
   display_style <- ifelse(var== "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_even" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_even, aes_string(x = var, y = "pielou_evenness")) +
+  p1 <- ggplot(df_even, aes(x = .data[[var]], y = pielou_evenness)) +
       geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
       labs(x = var, y = "Evenness Significance (16S)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -878,11 +958,15 @@ function switchPlotAlpha16S() {
 }
 </script>
 
+
+
 ---
 
 #### Fungi (ITS) {.tabset}
 
 For the ITS dataset, the alpha diversity was done per sample. In order to align it with the 16S analysis—where samples were already grouped by site—we aggregated the alpha diversity values by computing the **mean per site**. Categorical metadata was simplified using the most common (modal) value per site. This ensures consistency across datasets in the visual outputs. However, users interested in the original, unaggregated sample-level data can explore the **full QIIME 2 results** via the links provided under each section.
+
+For the variable **pH_category**, the median is **7.94** and for **Age_category** it's **14 years**.
 
 <label for="variable_selector_AlphaITS">Select variable:</label>
 <select id="variable_selector_AlphaITS" onchange="switchPlotAlphaITS()">
@@ -899,17 +983,40 @@ For the ITS dataset, the alpha diversity was done per sample. In order to align 
 
 The boxplot below illustrate differences in Shannon diversity across groups. This metric reflects both species richness and how balanced the community is in terms of species abundance.
 
+Here is a link to the <strong>full QIIME2 results (ITS)</strong> : 
+<a href="data/ITS/Alpha_diversity/F03_shannon_significance/data/index.html" target="_blank">Shannon Index (ITS)</a>
+
+Fungal alpha diversity did not differ significantly between establishment methods or management types. However, Shannon diversity was significantly lower in alkaline soils (pH > 7.9, p < 0.02) and significantly higher in older sites (age > 14 years, p < 0.02), indicating that both soil pH and site age influence fungal richness and evenness.
 
 ```{r shannon-ITS-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-cat('Here is a link to the <strong>full QIIME2 results (ITS)</strong> : 
-<a href="data/ITS/alpha_diversity/shannon_significance/data/index.html" target="_blank">Shannon Index (ITS)</a>')
 
 for (var in varsITS) {
+  summary_stats <- df_shannon_ITS %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(shannon_entropy, na.rm = TRUE), 2),
+      median = round(median(shannon_entropy, na.rm = TRUE), 2),
+      Q1 = round(quantile(shannon_entropy, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(shannon_entropy, 0.75, na.rm = TRUE), 2)
+    )
   
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_shannon_ITS" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_shannon_ITS, aes_string(x = var, y = "shannon_entropy")) +
+  p1 <- ggplot(df_shannon_ITS, aes(x = .data[[var]], y = shannon_entropy)) +
       geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
       labs(x = var, y = "Shannon Index (16S)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -926,17 +1033,39 @@ for (var in varsITS) {
 
 These boxplots display Pielou’s Evenness, highlighting how uniformly taxa are represented in each community. It allows us to isolate imbalance in dominance from richness effects.
 
+Here is a link to the <strong>full QIIME2 results (ITS)</strong> : 
+<a href="data/ITS/Alpha_diversity/F03_evenness_vector/data/index.html" target="_blank">Pielou Evenness (ITS)</a>
+
+Sheep grazing was the only factor significantly affecting fungal evenness (p = 0.03), with grazed sites showing slightly higher Pielou’s Evenness. No significant effects were observed for establishment method, site age, or soil pH.
 
 ```{r evenness-ITS-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-cat('Here is a link to the <strong>full QIIME2 results (ITS)</strong> : 
-<a href="data/ITS/alpha_diversity/evenness_vector/data/index.html" target="_blank">Pielou Evenness (ITS)</a>')
 
 for (var in varsITS) {
-
+  summary_stats <- df_even_ITS %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(pielou_evenness, na.rm = TRUE), 2),
+      median = round(median(pielou_evenness, na.rm = TRUE), 2),
+      Q1 = round(quantile(pielou_evenness, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(pielou_evenness, 0.75, na.rm = TRUE), 2)
+    )
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_even_ITS" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_even_ITS, aes_string(x = var, y = "pielou_evenness")) +
+  p1 <- ggplot(df_even_ITS, aes(x = .data[[var]], y = pielou_evenness)) +
       geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
       labs(x = var, y = "Evenness Significance (ITS)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -990,7 +1119,11 @@ The Emperor plot is an **interactive 3D tool** developed for QIIME 2 that allows
 
 This type of plot is particularly useful for identifying clustering by experimental or environmental factors—such as establishment type, land management practices, or age group—and for detecting gradients or patterns in microbial community composition.
 
-###### Bacteria (16S) {.unnumbered}
+###### Bacteria (16S) 
+
+Bray-Curtis beta diversity analysis identified establishment method, pH, and sheep grazing as the strongest drivers of differences in bacterial community composition across sites. Site age also showed a significant effect with this metric.
+
+PCoA plots based on Bray-Curtis distances revealed clustering of samples according to establishment method, with visible separation between natural regeneration, green hay/bush, and seed mix groups, although some overlap was observed.
 
 Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
 
@@ -1038,7 +1171,11 @@ HTML("<p style='text-align: center; font-weight: bold;'>Figure 17. Bray-Curtis E
 
 
 
+
 ###### Fungi (ITS) {.unnumbered}
+
+Bray-Curtis analysis identified establishment method, soil pH, and site age as the primary drivers of fungal community differences, followed by sheep grazing, ploughing, and cutting. In PCoA plots, natural regeneration sites formed a loose cluster near seed mix sites, while green hay/bush sites clustered more distinctly along Axis 1. 
+
 
 Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (ITS)</a>
 
@@ -1090,6 +1227,12 @@ The **Bray–Curtis** distance takes into account the **relative abundance** of 
 
 ###### Bacteria (16S) 
 
+Bray-Curtis-based PERMANOVA revealed significant differences in bacterial community composition across establishment methods (pseudo-F = 3.78, p = 0.001), with all pairwise comparisons between methods also significant (q < 0.005). These results indicate that restoration strategy has a strong influence on both the composition and abundance structure of bacterial communities.
+
+Site age also had a significant but weaker effect (pseudo-F = 1.97, p = 0.037, q = 0.035). However, clustering by age in Bray-Curtis PCoA plots was less pronounced, suggesting more subtle shifts in community structure over time.
+
+Soil pH significantly shaped bacterial community composition (pseudo-F = 3.858, p = 0.001), with Bray-Curtis PCoA plots showing clear clustering between high and low-to-neutral pH soils
+
 
 You can **click on the images** below to access the **full QIIME2 report**.
 
@@ -1134,8 +1277,11 @@ function switchPlotPermanova_16S_bray() {
 </script>
 
 
-
 ###### Fungi (ITS) 
+
+PERMANOVA analysis identified pH category (p = 0.001) and establishment method (p = 0.002) as the strongest drivers of differences in fungal communities. Site age (p = 0.024) and sheep grazing (p = 0.025) also had significant effects.
+
+Pairwise comparisons showed the strongest differences between green hay/bush and seed mix sites (p = 0.008), followed by green hay/bush vs. natural regeneration (p = 0.011). Natural regeneration sites exhibited the highest variation in community composition, with Bray-Curtis distances ranging from 0.25 to 0.95.
 
 You can **click on the images** below to access the **full QIIME2 report**.
 
@@ -1246,6 +1392,8 @@ HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Jaccard Emper
 
 ###### Fungi (ITS) {.unnumbered}
 
+Jaccard analysis confirmed similar drivers of community structure—establishment method, pH, and age—with natural regeneration, seed mix, and green hay/bush sites forming distinguishable but overlapping clusters in higher dimensions. This suggests that both presence/absence and abundance-based differences in fungal communities are shaped by restoration strategy and site conditions.
+
 Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_jaccard_emperor/data/index.html" target="_blank">Jaccard Emperor Plot (ITS)</a>
 
 ```{r jaccard-plot-ITS, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
@@ -1344,6 +1492,10 @@ function switchPlotPermanova_16S_jacc() {
 
 ###### Fungi (ITS) {.unnumbered}
 
+With Jaccard dissimilarity, establishment method (p = 0.001) and pH (p = 0.002) remained the strongest drivers, followed by site age (p = 0.006), ploughing (p = 0.024), and cutting (p = 0.04).
+
+Pairwise comparisons showed the most significant differences between green hay/bush and both natural regeneration and seed mix sites (p = 0.001), and also between natural regeneration and seed mix (p = 0.004). Median Jaccard dissimilarity values were high across all establishment methods (0.75–0.85), indicating substantial variation in taxon presence/absence.
+
 You can **click on the images** below to access the **full QIIME2 report**.
 
 <div style="margin-bottom: 20px;">
@@ -1395,6 +1547,14 @@ function switchPlotPermanova_ITS_jacc() {
 #### Taxonomy Barplot {.tabset}
 
 ##### Bacteria (16S) 
+
+Microbial community composition varied notably across establishment methods :
+
+- Green hay/bush soils were dominated by Alphaproteobacteria, Actinobacteria, and Bacilli
+
+- Natural regeneration sites had higher abundances of Acidobacteria-6 and Thermoleophilia, suggesting adaptation to low-nutrient conditions
+
+- Seed mix sites showed increased proportions of Alphaproteobacteria, Gammaproteobacteria, and Betaproteobacteria, indicating more copiotrophic (resource-demanding) communities typical of early-successional stages
 
 Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2: <a href="data/16S/Taxonomy/s10_taxa_barplot_by_site/data/index.html" target="_blank">Taxonomy Barplot (16S)</a>
 
@@ -1633,6 +1793,10 @@ We used ANCOM to identify taxa whose relative abundances significantly differed 
 
 ##### Bacteria (16S) 
 
+ANCOM analysis revealed that while most bacterial taxa did not vary significantly across establishment methods, a subset—including Intrasporangiaceae and Blastococcus (both Actinobacteria)—showed strong differential abundance (W > 300, clr > 15). These taxa responded notably to restoration strategy, indicating that establishment method can drive specific shifts in bacterial community structure.
+
+Similarly, the ANCOM volcano plot for pH showed that although most bacterial taxa remained stable across the pH gradient, several taxa were strongly pH-responsive (W > 200). These results suggest that soil pH exerts a selective influence, favouring distinct bacterial groups in either more acidic or alkaline conditions.
+
 <div style="margin-bottom: 20px;">
   <label for="variable_selector_ANCOM_16S"><b>Select variable:</b></label>
   <select id="variable_selector_ANCOM_16S" onchange="switchPlotANCOM_16S()">
@@ -1647,6 +1811,7 @@ We used ANCOM to identify taxa whose relative abundances significantly differed 
     <option value="Age_binary">Age_binary</option>
   </select>
 </div>
+
 
 
 ```{r ancom-16s, echo=FALSE, message=FALSE, warning=FALSE, results='asis' }
@@ -1730,7 +1895,18 @@ function switchPlotANCOM_16S() {
 </script>
 
 
-##### Fungi (ITS) 
+##### Fungi (ITS)
+
+ANCOM analysis identified several fungal taxa as differentially abundant in relation to soil pH, site age, and establishment method:
+
+- Metapochonia (W = 386) was significantly more abundant in acidic soils, suggesting a preference for low-pH environments.
+
+- Two taxa were age-responsive: a Lasiosphaeriaceae taxon (W = 366) was more abundant in younger soils, while Paraphaeosphaeria (W = 320) was enriched in older soils, indicating shifts in fungal community structure with site maturation.
+
+- Regarding establishment method, Gibellulopsis (W = 596) was predominantly found in green hay/bush and seed mix sites, but rare in natural regeneration sites. In contrast, Metarhizium (W = 535) was most abundant in naturally regenerating sites, likely reflecting adaptation to less-disturbed, self-organising ecosystems.
+
+These findings highlight how restoration strategy, pH, and time since restoration can drive specific taxonomic responses, shaping fungal community composition in grassland soils.
+
 
 <div style="margin-bottom: 20px;">
   <label for="variable_selector_ANCOM_ITS"><b>Select variable:</b></label>
@@ -1744,6 +1920,7 @@ function switchPlotANCOM_16S() {
     <option value="pH_category">pH_category</option>
   </select>
 </div>
+
 
 
 ```{r ancom-its, results='asis' }
@@ -1864,6 +2041,9 @@ We examined three complementary metrics: **Shannon diversity** (richness and eve
 
 ##### Shannon Index Boxplots
 
+Here is a link to the **Shannon Index Boxplot** for more flexibility on QIIME2: <a href="data/16S/Functional_analysis/Functional_alpha/pathway_shannon_significance/data/index.html" target="_blank">Shannon Index Boxplot - Functional (16S)</a>
+
+
 
 ```{r shannon-significance-16S, results='asis'}
 
@@ -1884,14 +2064,35 @@ df_even <- df_even %>% filter(Plough != "unknown")
 vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_group", "pH_binary", "Age_binary")
 
 for (var in vars){
+  summary_stats <- df_shannon %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(shannon_entropy, na.rm = TRUE), 2),
+      median = round(median(shannon_entropy, na.rm = TRUE), 2),
+      Q1 = round(quantile(shannon_entropy, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(shannon_entropy, 0.75, na.rm = TRUE), 2)
+    )
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_shannon_sig" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_shannon, aes_string(x = var, y = "shannon_entropy")) +
+  p1 <- ggplot(df_shannon, aes(x = .data[[var]], y = shannon_entropy)) +
       geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
       labs(x = var, y = "Shannon Significance (16S)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
-  kw <- kruskal.test(df_shannon$shannon_entropy ~ df_even[[var]])
+  kw <- kruskal.test(df_shannon$shannon_entropy ~ df_shannon[[var]])
   cat("<div style='text-align: center;'>") 
   print(p1)
   cat('</div>')
@@ -1905,17 +2106,41 @@ for (var in vars){
 
 ##### Observed Features Boxplots
 
+Here is a link to the **Observed features Boxplot** for more flexibility on QIIME2: <a href="data/16S/Functional_analysis/Functional_alpha/pathway_observed_features_significance/data/index.html" target="_blank">Observed Features Boxplot - Functional (16S)</a>
+
+
+
 ```{r obs-features, results='asis'}
 for (var in vars){
-  
+  summary_stats <- df_obs_features %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(observed_features, na.rm = TRUE), 2),
+      median = round(median(observed_features, na.rm = TRUE), 2),
+      Q1 = round(quantile(observed_features, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(observed_features, 0.75, na.rm = TRUE), 2)
+    )
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_obs_features_sig" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_obs_features, aes_string(x = var, y = "observed_features")) +
+  p1 <- ggplot(df_obs_features, aes(x = .data[[var]], y = observed_features)) +
       geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
       labs(x = var, y = "Obeserved Features Significance (16S)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
-  kw <- kruskal.test(df_obs_features$observed_features ~ df_even[[var]])
+  kw <- kruskal.test(df_obs_features$observed_features ~ df_obs_features[[var]])
   cat("<div style='text-align: center;'>") 
   print(p1)
   cat('</div>')
@@ -1926,13 +2151,37 @@ for (var in vars){
 
 ##### Evenness Significance Boxplots
 
+Here is a link to the **Evenness Boxplot** for more flexibility on QIIME2: <a href="data/16S/Functional_analysis/Functional_alpha/pathway_pielou_e_significance/data/index.html" target="_blank">Evenness Boxplot - Functional (16S)</a>
+
+
 ```{r evenness-sig, results='asis'}
 
 for (var in vars){
+  summary_stats <- df_even %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(pielou_evenness, na.rm = TRUE), 2),
+      median = round(median(pielou_evenness, na.rm = TRUE), 2),
+      Q1 = round(quantile(pielou_evenness, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(pielou_evenness, 0.75, na.rm = TRUE), 2)
+    )
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_even_sig" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_even, aes_string(x = var, y = "pielou_evenness")) +
+  p1 <- ggplot(df_even, aes(x = .data[[var]], y = pielou_evenness)) +
       geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
       labs(x = var, y = "Evenness Significance (16S)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -2218,6 +2467,7 @@ The metrics below—**Shannon diversity** and **Evenness**—summarise the varia
 
 ##### Shannon Index Boxplots
 
+Here is a link to the **Shannon Index Boxplot** for more flexibility on QIIME2: <a href="data/ITS/Functional_analysis/Functional_alpha/alpha_shannon_ITS/data/index.html" target="_blank">Shannon Index Boxplot - Functional (ITS)</a>
 
 ```{r shannon-significance-ITS, results='asis'}
 
@@ -2237,12 +2487,33 @@ get_mode <- function(x) {
 vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age", "pH_category", "Age_category")
 
 for (var in vars){
+  summary_stats <- df_shannon %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(shannon_entropy, na.rm = TRUE), 2),
+      median = round(median(shannon_entropy, na.rm = TRUE), 2),
+      Q1 = round(quantile(shannon_entropy, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(shannon_entropy, 0.75, na.rm = TRUE), 2)
+    )
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_shannon_sig_ITS" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_shannon, aes_string(x = var, y = "shannon_entropy")) +
+  p1 <- ggplot(df_shannon, aes(x = .data[[var]], y = shannon_entropy)) +
       geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
-      labs(x = var, y = "Shannon Significance (16S)") +
+      labs(x = var, y = "Shannon Significance (ITS)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
   kw <- kruskal.test(df_shannon$shannon_entropy ~ df_shannon[[var]])
   cat("<div style='text-align: center;'>") 
@@ -2258,17 +2529,39 @@ for (var in vars){
 
 ##### Evenness Significance Boxplots
 
+Here is a link to the **Evenness Boxplot** for more flexibility on QIIME2: <a href="data/ITS/Functional_analysis/Functional_alpha/alpha_evenness_ITS/data/index.html" target="_blank">Evenness Boxplot - Functional (ITS)</a>
 
 
 ```{r evenness-sig-ITS, results='asis'}
 
 for (var in vars){
+  summary_stats <- df_even %>%
+    group_by(.data[[var]]) %>%
+    summarise(
+      mean = round(mean(pielou_evenness, na.rm = TRUE), 2),
+      median = round(median(pielou_evenness, na.rm = TRUE), 2),
+      Q1 = round(quantile(pielou_evenness, 0.25, na.rm = TRUE), 2),
+      Q3 = round(quantile(pielou_evenness, 0.75, na.rm = TRUE), 2)
+    )
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_even_sig_ITS" style="display:', display_style, ';">'))
-  p1 <- ggplot(df_even, aes_string(x = var, y = "pielou_evenness")) +
+  p1 <- ggplot(df_even, aes(x = .data[[var]], y = pielou_evenness)) +
       geom_boxplot(fill = "deepskyblue3") +
+    stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = mean, label =mean),
+              color = "darkblue", vjust = 1.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q3, label = Q3),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = median, label = median),
+              color = "black", vjust = -0.5, size = 3, inherit.aes = FALSE) +
+    geom_text(data = summary_stats, 
+              aes(x = .data[[var]], y = Q1, label = Q1),
+              color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
-      labs(x = var, y = "Evenness Significance (16S)") +
+      labs(x = var, y = "Evenness Significance (ITS)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
   kw <- kruskal.test(df_even$pielou_evenness ~ df_even[[var]])
   cat("<div style='text-align: center;'>")  
@@ -2557,6 +2850,8 @@ cat('</div>')
 
 The figure below shows the total abundance of fungal ASVs across sites, aggregated by **functional guild**. This provides an overview of how **guild-level composition** varies between locations, which may reflect differences in land use, soil conditions, or restoration histories.
 
+Fungal communities were dominated by **Undefined Saprotrophs**, **Plant Pathogens**, and **Dung Saprotrophs**. A high proportion of Unassigned fungi highlights **limits** in current taxonomic resolution.
+
 
 ```{r fun-ab-total, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 meta <- read.delim("data/agg_metadata.txt", check.names = FALSE)
@@ -2664,6 +2959,18 @@ cat("<p style='text-align: center; font-weight: bold;'>Figure xx. Fungal Guild A
 
 ##### Guild Abundance by Variable
 
+###### Establishment
+
+**Natural regeneration** had the **highest** proportion of **Undefined Saprotrophs**, while **Green Hay/Bush** and **Seed Mix** had **more Plant Pathogens** and **Dung Saprotrophs**.
+
+###### pH
+
+**Alkaline** sites showed dominance of **Undefined Saprotrophs**; **acidic** sites had more **Animal Parasites**.
+
+###### Age
+
+**Older** sites had more **Undefined Saprotrophs**; **younger** sites showed higher proportions of **Plant Pathogens** and **Dung Saprotrophs**.
+
 ```{r fun-abundance-est-ph-age, echo=FALSE, results='asis'}
 vars <- c("pH_category", "Age_category", "Establishment")
 cat('
@@ -2749,6 +3056,12 @@ df_corr <- read.delim("data/bac_fun/taxa_corr_abundant.txt")
 df_corr <- df_corr %>%
   arrange(desc(r)) %>%
   mutate(
+    Bacteria = case_when(
+      row_number() == 7 ~ sub(".*c__", "", Bacteria),                    
+      row_number() %in% c(3, 5, 6) ~ sub(".*f__", "", Bacteria),            
+      TRUE ~ sub(".*o__", "", Bacteria)                               
+    ),
+    Fungi = sub(".*o__", "", Fungi),
     label = paste(Bacteria, Fungi, sep = ": "),
     correlation_sign = factor(r > 0, levels = c(TRUE, FALSE), labels = c("Positive", "Negative"))
   )
@@ -2757,7 +3070,7 @@ g <- ggplot(df_corr, aes(
   x = label, 
   y = r, 
   fill = correlation_sign,
-  text = paste("Bacteria:Fungi =", label, "<br>r =", round(r, 3))
+  text = paste(label, "<br>r =", round(r, 3))
 )) +
   geom_col() +
   coord_flip() +
@@ -2784,6 +3097,8 @@ htmltools::div(
 
 ```{r corr_func}
 df_corr_fun <- read.delim("data/bac_fun/func_corr.txt")
+
+
 df_corr_fun <- df_corr_fun %>%
   arrange(desc(r)) %>%
   mutate(
@@ -2791,11 +3106,13 @@ df_corr_fun <- df_corr_fun %>%
     correlation_sign = factor(r > 0, levels = c(TRUE, FALSE), labels = c("Positive", "Negative"))
   )
 
+
+
 g <- ggplot(df_corr_fun, aes(
   x = label, 
   y = r, 
   fill = correlation_sign,
-  text = paste("Guild:Pathway =", label, "<br>r =", round(r, 3))
+  text = paste( label, "<br>r =", round(r, 3))
 )) +
   geom_col() +
   coord_flip() +
