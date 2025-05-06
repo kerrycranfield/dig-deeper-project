@@ -708,29 +708,27 @@ read_and_clean <- function(path, column) {
 }
 
 # 16S data
-df_shannon <- read_and_clean("data/16S/alpha_diversity/s08_alpha_shannon_per_group/data/metadata.tsv", "shannon_entropy")
-df_faith   <- read_and_clean("data/16S/alpha_diversity/s08_alpha_faith_pd_per_group/data/metadata.tsv", "faith_pd")
-df_even    <- read_and_clean("data/16S/alpha_diversity/s08_alpha_evenness_per_group/data/metadata.tsv", "pielou_evenness")
+df_shannon_16S <- read_and_clean("data/16S/alpha_diversity/s08_alpha_shannon_per_group/data/metadata.tsv", "shannon_entropy")
+df_faith_16S   <- read_and_clean("data/16S/alpha_diversity/s08_alpha_faith_pd_per_group/data/metadata.tsv", "faith_pd")
+df_even_16S    <- read_and_clean("data/16S/alpha_diversity/s08_alpha_evenness_per_group/data/metadata.tsv", "pielou_evenness")
 
-df_shannon <- df_shannon %>% filter(Plough != "unknown")
-df_faith <- df_faith %>% filter(Plough != "unknown")
-df_even <- df_even %>% filter(Plough != "unknown")
+
 
 # ITS data
-df_shannon_ITS <- read_and_clean("data/ITS/Alpha_Diversity/F03_shannon_significance/data/metadata.tsv", "shannon_entropy")
-df_even_ITS    <- read_and_clean("data/ITS/Alpha_Diversity/F03_evenness_vector/data/metadata.tsv", "pielou_evenness")
+df_shannon_ITS1 <- read_and_clean("data/ITS/Alpha_Diversity/F03_shannon_significance/data/metadata.tsv", "shannon_entropy")
+df_even_ITS1  <- read_and_clean("data/ITS/Alpha_Diversity/F03_evenness_vector/data/metadata.tsv", "pielou_evenness")
 
-df_shannon_ITS <- df_shannon_ITS %>% filter(!is.na(Plough))
-df_even_ITS <- df_even_ITS %>% filter(!is.na(Plough))
 
-df_shannon_ITS <- df_shannon_ITS[ , ! colnames(df_shannon_ITS) %in% c("site_code", "plot_number", "OS_location", "Lat_long")]
+
+df_shannon_ITS1 <- df_shannon_ITS1[ , ! colnames(df_shannon_ITS1) %in% c("site_code", "plot_number", "OS_location", "Lat_long")]
+
 
 get_mode <- function(x) {
   ux <- na.omit(unique(x))
   ux[which.max(tabulate(match(x, ux)))]
 }
 
-df_shannon_ITS <- df_shannon_ITS %>%
+df_shannon_ITS1 <- df_shannon_ITS1 %>%
   group_by(Site) %>%
   summarise(
     shannon_entropy = mean(shannon_entropy, na.rm = TRUE),
@@ -739,8 +737,8 @@ df_shannon_ITS <- df_shannon_ITS %>%
     .groups = "drop"
   )
 
-df_even_ITS <- df_even_ITS[ , ! colnames(df_even_ITS) %in% c("site_code", "plot_number", "OS_location", "Lat_long")]
-df_even_ITS <- df_even_ITS %>%
+df_even_ITS1 <- df_even_ITS1[ , ! colnames(df_even_ITS1) %in% c("site_code", "plot_number", "OS_location", "Lat_long")]
+df_even_ITS1 <- df_even_ITS1 %>%
   group_by(Site) %>%
   summarise(
     pielou_evenness = mean(pielou_evenness, na.rm = TRUE),
@@ -749,7 +747,12 @@ df_even_ITS <- df_even_ITS %>%
     .groups = "drop"
   )
 
+df_shannon_Plough <- df_shannon_16S %>% filter(Plough != "unknown")
+df_faith_Plough <- df_faith_16S %>% filter(Plough != "unknown")
+df_even_Plough <- df_even_16S %>% filter(Plough != "unknown")
 
+df_shannon_ITS_Plough <- df_shannon_ITS1 %>% filter(!is.na(Plough))
+df_even_ITS_Plough <- df_even_ITS1 %>% filter(!is.na(Plough))
 
 vars16S <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "Age_group")
 varsITS <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category")
@@ -788,6 +791,11 @@ Shannon entropy revealed significant overall differences (p = 0.001), with green
 
 
 for (var in vars16S) {
+  
+  
+  
+  df_shannon <- if (var == "Plough") get("df_shannon_Plough") else get("df_shannon_16S")
+  
   summary_stats <- df_shannon %>%
     group_by(.data[[var]]) %>%
     summarise(
@@ -799,7 +807,7 @@ for (var in vars16S) {
 
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_shannon" style="display:', display_style, ';">'))
-
+  
   p1 <- ggplot(df_shannon, aes(x = .data[[var]], y = shannon_entropy)) +
     geom_boxplot(fill = "deepskyblue3") +
     stat_summary(fun = mean, geom = "point", shape = 20, size = 3, color = "darkblue") +
@@ -844,6 +852,8 @@ Pielou’s evenness differed significantly across establishment methods (p = 0.0
 ```{r faith-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 
 for (var in vars16S) {
+  df_faith <- if (var == "Plough") get("df_faith_Plough") else get("df_faith_16S")
+
   summary_stats <- df_faith %>%
     group_by(.data[[var]]) %>%
     summarise(
@@ -852,7 +862,8 @@ for (var in vars16S) {
       Q1 = round(quantile(faith_pd, 0.25, na.rm = TRUE), 2),
       Q3 = round(quantile(faith_pd, 0.75, na.rm = TRUE), 2)
     )
-  
+   
+   
   display_style <- ifelse(var == "Establishment", "block", "none")
   cat(paste0('<div id="plot_', var, '_faith" style="display:', display_style, ';">'))
   p1 <- ggplot(df_faith, aes(x = .data[[var]], y = faith_pd)) +
@@ -902,6 +913,8 @@ Faith’s PD also varied significantly by establishment method (p = 0.0106), wit
 
 
 for (var in vars16S) {
+  df_even <- if (var == "Plough") get("df_even_Plough") else get("df_even_16S")
+
   summary_stats <- df_even %>%
     group_by(.data[[var]]) %>%
     summarise(
@@ -911,6 +924,8 @@ for (var in vars16S) {
       Q3 = round(quantile(pielou_evenness, 0.75, na.rm = TRUE), 2)
     )
   display_style <- ifelse(var== "Establishment", "block", "none")
+   
+  
   cat(paste0('<div id="plot_', var, '_even" style="display:', display_style, ';">'))
   p1 <- ggplot(df_even, aes(x = .data[[var]], y = pielou_evenness)) +
       geom_boxplot(fill = "deepskyblue3") +
@@ -991,6 +1006,8 @@ Fungal alpha diversity did not differ significantly between establishment method
 ```{r shannon-ITS-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 
 for (var in varsITS) {
+  df_shannon_ITS <- if (var == "Plough") get("df_shannon_ITS_Plough") else get("df_shannon_ITS1")
+
   summary_stats <- df_shannon_ITS %>%
     group_by(.data[[var]]) %>%
     summarise(
@@ -1001,6 +1018,8 @@ for (var in varsITS) {
     )
   
   display_style <- ifelse(var == "Establishment", "block", "none")
+   
+  
   cat(paste0('<div id="plot_', var, '_shannon_ITS" style="display:', display_style, ';">'))
   p1 <- ggplot(df_shannon_ITS, aes(x = .data[[var]], y = shannon_entropy)) +
       geom_boxplot(fill = "deepskyblue3") +
@@ -1041,6 +1060,7 @@ Sheep grazing was the only factor significantly affecting fungal evenness (p = 0
 ```{r evenness-ITS-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 
 for (var in varsITS) {
+  df_even_ITS <- if (var == "Plough") get("df_even_ITS_Plough") else get("df_even_ITS1")
   summary_stats <- df_even_ITS %>%
     group_by(.data[[var]]) %>%
     summarise(
@@ -1050,6 +1070,9 @@ for (var in varsITS) {
       Q3 = round(quantile(pielou_evenness, 0.75, na.rm = TRUE), 2)
     )
   display_style <- ifelse(var == "Establishment", "block", "none")
+  
+  
+  
   cat(paste0('<div id="plot_', var, '_even_ITS" style="display:', display_style, ';">'))
   p1 <- ggplot(df_even_ITS, aes(x = .data[[var]], y = pielou_evenness)) +
       geom_boxplot(fill = "deepskyblue3") +
@@ -2053,17 +2076,19 @@ read_and_clean <- function(path, column) {
   return(df)
 }
 # 16S data
-df_shannon <- read_and_clean("data/16S/Functional_analysis/Functional_alpha/pathway_shannon_significance/data/metadata.tsv", "shannon_entropy")
-df_obs_features   <- read_and_clean("data/16S/Functional_analysis/Functional_alpha/pathway_observed_features_significance/data/metadata.tsv", "observed_features")
-df_even <- read_and_clean("data/16S/Functional_analysis/Functional_alpha/pathway_pielou_e_significance/data/metadata.tsv", "pielou_evenness")
+df_shannon_16S <- read_and_clean("data/16S/Functional_analysis/Functional_alpha/pathway_shannon_significance/data/metadata.tsv", "shannon_entropy")
+df_obs_features_16S   <- read_and_clean("data/16S/Functional_analysis/Functional_alpha/pathway_observed_features_significance/data/metadata.tsv", "observed_features")
+df_even_16S <- read_and_clean("data/16S/Functional_analysis/Functional_alpha/pathway_pielou_e_significance/data/metadata.tsv", "pielou_evenness")
 
-df_shannon <- df_shannon %>% filter(Plough != "unknown")
-df_obs_features <- df_obs_features %>% filter(Plough != "unknown")
-df_even <- df_even %>% filter(Plough != "unknown")
+df_shannon_Plough <- df_shannon_16S %>% filter(Plough != "unknown")
+df_obs_features_Plough <- df_obs_features_16S %>% filter(Plough != "unknown")
+df_even_Plough <- df_even_16S %>% filter(Plough != "unknown")
 
 vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_group", "pH_binary", "Age_binary")
 
 for (var in vars){
+  df_shannon <- if (var == "Plough") get("df_shannon_Plough") else get("df_shannon_16S")
+
   summary_stats <- df_shannon %>%
     group_by(.data[[var]]) %>%
     summarise(
@@ -2112,6 +2137,8 @@ Here is a link to the **Observed features Boxplot** for more flexibility on QIIM
 
 ```{r obs-features, results='asis'}
 for (var in vars){
+  df_obs_features <- if (var == "Plough") get("df_obs_features_Plough") else get("df_obs_features_16S")
+
   summary_stats <- df_obs_features %>%
     group_by(.data[[var]]) %>%
     summarise(
@@ -2157,6 +2184,9 @@ Here is a link to the **Evenness Boxplot** for more flexibility on QIIME2: <a hr
 ```{r evenness-sig, results='asis'}
 
 for (var in vars){
+  
+  df_even <- if (var == "Plough") get("df_even_Plough") else get("df_even_16S")
+
   summary_stats <- df_even %>%
     group_by(.data[[var]]) %>%
     summarise(
@@ -2473,11 +2503,11 @@ Here is a link to the **Shannon Index Boxplot** for more flexibility on QIIME2: 
 
 
 # ITS data
-df_shannon <- read_and_clean("data/ITS/Functional_analysis/Functional_alpha/alpha_shannon_ITS/data/metadata.tsv", "shannon_entropy")
-df_even <- read_and_clean("data/ITS/Functional_analysis/Functional_alpha/alpha_evenness_ITS/data/metadata.tsv", "pielou_evenness")
+df_shannon_ITS <- read_and_clean("data/ITS/Functional_analysis/Functional_alpha/alpha_shannon_ITS/data/metadata.tsv", "shannon_entropy")
+df_even_ITS <- read_and_clean("data/ITS/Functional_analysis/Functional_alpha/alpha_evenness_ITS/data/metadata.tsv", "pielou_evenness")
 
-df_shannon <- df_shannon %>% filter(Plough != "nan")
-df_even <- df_even %>% filter(Plough != "nan")
+df_shannon_Plough <- df_shannon_ITS %>% filter(Plough != "nan")
+df_even_Plough <- df_even_ITS %>% filter(Plough != "nan")
 
 get_mode <- function(x) {
   ux <- na.omit(unique(x))
@@ -2487,6 +2517,8 @@ get_mode <- function(x) {
 vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age", "pH_category", "Age_category")
 
 for (var in vars){
+  df_shannon <- if (var == "Plough") get("df_shannon_Plough") else get("df_shannon_ITS")
+
   summary_stats <- df_shannon %>%
     group_by(.data[[var]]) %>%
     summarise(
@@ -2535,6 +2567,8 @@ Here is a link to the **Evenness Boxplot** for more flexibility on QIIME2: <a hr
 ```{r evenness-sig-ITS, results='asis'}
 
 for (var in vars){
+  df_even <- if (var == "Plough") get("df_even_Plough") else get("df_even_ITS")
+  
   summary_stats <- df_even %>%
     group_by(.data[[var]]) %>%
     summarise(
