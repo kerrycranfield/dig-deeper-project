@@ -238,12 +238,12 @@ htmltools::HTML('
 
   <div style="flex: 1; text-align: center;">
     <img src="images/map_plot.png" style="max-width: 100%; height: auto;">
-    <p style="font-weight: bold;">Figure 2. Sample Zone - Based on GPS coordinates</p>
+    <p style="font-weight: bold;">Sample Zone - Based on GPS coordinates</p>
   </div>
 
   <div style="flex: 1;text-align: center;">
     ', table_html, '
-    <p style="font-weight: bold;">Figure 3. Sampling Summary</p>
+    <p style="font-weight: bold;">Sampling Summary</p>
   </div>
 
 </div></br></br>
@@ -286,7 +286,7 @@ kable(metadata_overview, format = "html", escape = FALSE,
   column_spec(1, bold = TRUE) %>%
   row_spec(0, bold = TRUE, background = "#d9eaf7")
 
-HTML("</br><p style='text-align: center; font-weight: bold;'>Figure xx. Metadata Summary</p>")
+HTML("</br><p style='text-align: center; font-weight: bold;'>Metadata Summary</p>")
 
 ```
 
@@ -322,7 +322,7 @@ Taxonomic classification of ASVs was then performed using trained classifiers ag
 cat('
 <div style="text-align: center;">
   <img src="images/16S_workflow.png" style="max-width: 50%; height: auto ;" alt="16S Pipeline thumbnail">
-  </br><p style="font-weight: bold;">Figure xx. Workflow (16S)</p>
+  </br><p style="font-weight: bold;">Workflow (16S)</p>
 </div>
 ')
 
@@ -345,7 +345,7 @@ cat('
   <a href="data/16S/Pre_processing/multiqc_report_16S.html" target="_blank">
     <img src="images/sequence_quality_hist_16S.png" style="max-width: 80%; height: auto;" alt="MutlitQc thumbnail">
   </a>
-  <p style="font-style: bold;">Figure xx. MultiQC Plot (16S)</p>
+  <p style="font-style: bold;">MultiQC Plot (16S)</p>
 </div>
 ')
 
@@ -365,7 +365,7 @@ cat('
   <a href="data/ITS/Pre-processing/F01_multiqc_report.html" target="_blank">
     <img src="images/sequence_quality_hist_ITS.png" style="max-width: 80%; height: auto;" alt="MutlitQc thumbnail">
   </a>
-  <p style="font-style: bold;">Figure xx. MultiQC Plot (ITS)</p>
+  <p style="font-style: bold;">MultiQC Plot (ITS)</p>
 </div>
 ')
 
@@ -409,7 +409,7 @@ datatable(
   )
 
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Statitics after denoising (16S)</p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Statitics after denoising (16S)</p>")
 
 ```
 
@@ -444,7 +444,7 @@ datatable(
   )
 
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Statitics after denoising (ITS)</p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Statitics after denoising (ITS)</p>")
 
 ```
 
@@ -461,7 +461,7 @@ These **Quality Control (QC) plots** were generated **after trimming** the seque
   <a href="data/16S/Pre_processing/s03_pe_dmx_trim/data/index.html" target="_blank">
     <img src="images/QC_plot_16S.png" style="max-width: 105%; height: auto;" alt="QC plot 16S thumbnail">
   </a>
-  <p style="font-style: bold;">Figure xx . QC plot (16S)</p>
+  <p style="font-style: bold;">QC plot (16S)</p>
 </div>
 
 
@@ -473,7 +473,7 @@ These **Quality Control (QC) plots** were generated **after trimming** the seque
   <a href="data/ITS/Pre-processing/F02_sequence/data/index.html" target="_blank">
     <img src="images/QC_plot_ITS.png" style="max-width: 105%; height: auto;" alt="QC plot thumbnail">
   </a>
-  <p style="font-style: bold;">Figure xx . QC plot (ITS)</p>
+  <p style="font-style: bold;">QC plot (ITS)</p>
 </div>
 
 
@@ -554,7 +554,7 @@ for (v in vars){
       tags$br(),
       tags$p(
         style = "text-align: center; font-weight: bold;",
-        sprintf("Figure xx. Rarefaction Curves of Observed Features by '%s' (16S)", v)
+        sprintf("Rarefaction Curves of Observed Features by '%s' (16S)", v)
       )
     )
   
@@ -626,7 +626,7 @@ for (v in vars){
     rename(group_var = 1) 
 
   
-  plot_rare <- plot_ly(
+   plot_rare <- plot_ly(
   data = rare_avg,
   x = ~depth,
   y = ~mean_obs,
@@ -645,12 +645,12 @@ for (v in vars){
   
   plotlist_rarefaction_ITS[[v]] <- tags$div(
       id = paste0("plot_rarefaction_ITS_", v),
-      style = ifelse(v == "plot_number", "display:block;", "display:none; text-align:center;"),
+      style = ifelse(v == "OS_location", "display:block;", "display:none; text-align:center;"),
       plot_rare,
       tags$br(),
       tags$p(
         style = "text-align: center; font-weight: bold;",
-        sprintf("Figure xx. Rarefaction Curves of Observed Features by '%s' (ITS)", v)
+        sprintf("Rarefaction Curves of Observed Features by '%s' (ITS)", v)
       )
     )
   
@@ -754,7 +754,7 @@ df_even_Plough <- df_even_16S %>% filter(Plough != "unknown")
 df_shannon_ITS_Plough <- df_shannon_ITS1 %>% filter(!is.na(Plough))
 df_even_ITS_Plough <- df_even_ITS1 %>% filter(!is.na(Plough))
 
-vars16S <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "Age_group")
+vars16S <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "Age_group", "pH_binary", "Age_binary")
 varsITS <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category")
 
 
@@ -774,6 +774,8 @@ In the plots below, we examine how the Shannon index, Faith PD and Evenness vary
   <option value="Plough">Plough</option>
   <option value="Year_group">Year group</option>
   <option value="Age_group">Age group</option>
+  <option value="pH_binary">pH binary</option>
+  <option value="Age_binary">Age binary</option>
 </select>
 
 
@@ -784,7 +786,7 @@ The boxplot below illustrate differences in Shannon diversity across groups. Thi
 Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
 <a href="data/16S/alpha_diversity/s08_alpha_shannon_per_group/data/index.html" target="_blank">Shannon Index (16S)</a>
 
-Shannon entropy revealed significant overall differences (p = 0.001), with green hay/bush sites showing higher diversity than both natural regeneration (q = 0.0019) and seed mix sites (q = 0.036). Seed mix sites also had higher Shannon diversity than natural regeneration (q = 0.0199).
+Shannon entropy revealed significant overall differences, with green hay/bush sites showing higher diversity than both natural regeneration and seed mix sites. Seed mix sites also had higher Shannon diversity than natural regeneration.
 
 ```{r shannon-16S-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 
@@ -958,7 +960,7 @@ for (var in vars16S) {
 <script>
 function switchPlotAlpha16S() {
   var val = document.getElementById("variable_selector_Alpha16S").value;
-  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "Age_group"];
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "Age_group", "pH_binary", "Age_binary"];
   
   all.forEach(function(v) {
     var el_shannon = document.getElementById("plot_" + v + "_shannon");
@@ -1037,7 +1039,7 @@ for (var in varsITS) {
               aes(x = .data[[var]], y = Q1, label = Q1),
               color = "black", vjust = 1.5, size = 3, inherit.aes = FALSE) +
       theme_minimal() +
-      labs(x = var, y = "Shannon Index (16S)") +
+      labs(x = var, y = "Shannon Index (ITS)") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
   kw <- kruskal.test(df_shannon_ITS$shannon_entropy ~ df_shannon_ITS[[var]])
   cat("<div style='text-align: center;'>")  
@@ -1185,7 +1187,7 @@ b <- plot_ly(
 
 htmltools::div(style = "text-align: center;", b)
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 17. Bray-Curtis Emperor Plot</p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Bray-Curtis Emperor Plot</p>")
 
 
 
@@ -1238,7 +1240,7 @@ b <- plot_ly(
 
 htmltools::div(style = "text-align: center;", b)
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 17. Bray-Curtis Emperor Plot (ITS) </p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Bray-Curtis Emperor Plot (ITS) </p>")
 
 
 
@@ -1250,11 +1252,11 @@ The **Bray–Curtis** distance takes into account the **relative abundance** of 
 
 ###### Bacteria (16S) 
 
-Bray-Curtis-based PERMANOVA revealed significant differences in bacterial community composition across establishment methods (pseudo-F = 3.78, p = 0.001), with all pairwise comparisons between methods also significant (q < 0.005). These results indicate that restoration strategy has a strong influence on both the composition and abundance structure of bacterial communities.
+Bray-Curtis-based PERMANOVA revealed significant differences in bacterial community composition across establishment methods, with all pairwise comparisons between methods also significant. These results indicate that restoration strategy has a strong influence on both the composition and abundance structure of bacterial communities.
 
-Site age also had a significant but weaker effect (pseudo-F = 1.97, p = 0.037, q = 0.035). However, clustering by age in Bray-Curtis PCoA plots was less pronounced, suggesting more subtle shifts in community structure over time.
+Site age also had a significant but weaker effect. However, clustering by age in Bray-Curtis PCoA plots was less pronounced, suggesting more subtle shifts in community structure over time.
 
-Soil pH significantly shaped bacterial community composition (pseudo-F = 3.858, p = 0.001), with Bray-Curtis PCoA plots showing clear clustering between high and low-to-neutral pH soils
+Soil pH significantly shaped bacterial community composition, with Bray-Curtis PCoA plots showing clear clustering between high and low-to-neutral pH soils
 
 
 You can **click on the images** below to access the **full QIIME2 report**.
@@ -1267,17 +1269,19 @@ You can **click on the images** below to access the **full QIIME2 report**.
     <option value="Cattle">Cattle</option>
     <option value="Sheep">Sheep</option>
     <option value="Plough">Plough</option>
-    <option value="Year_group">Year_group</option>
+    <option value="Year_group">Year group</option>
+    <option value="pH_binary">pH binary</option>
+    <option value="Age_binary">Age binary</option>
   </select>
 </div>
 
 
 ```{r permanova_16S_bray, results='asis'}
-vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group")
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
 
 for (v in vars) {
   img_path <- paste0("images/permanova/Bray_Curtis/16S/bray_permanova_", v, ".png")
-  link_path <- paste0("data/16S/Beta_Diversity/bray_permanova_", v, "/data/index.html")
+  link_path <- paste0("data/16S/Beta_Diversity/Permanova/bray_permanova_", v, "/data/index.html")
   display_style <- ifelse(v == "Establishment", "block", "none")
 
   cat(sprintf('<div id="plot_permanova_bray_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Bray–Curtis – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Bray–Curtis for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
@@ -1288,7 +1292,7 @@ for (v in vars) {
 <script>
 function switchPlotPermanova_16S_bray() {
   var val = document.getElementById("variable_selector_Permanova_16S_bray").value;
-  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group"];
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary","Age_binary"];
 
   all.forEach(function(v) {
     var el = document.getElementById("plot_permanova_bray_" + v);
@@ -1406,7 +1410,7 @@ b <- plot_ly(
 )
 
 htmltools::div(style = "text-align: center;", b)
-HTML("<p style='text-align: center; font-weight: bold;'>Figure 18. Jaccard Emperor Plot (16S) </p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Jaccard Emperor Plot (16S) </p>")
 
 
 
@@ -1453,7 +1457,7 @@ b <- plot_ly(
 
 htmltools::div(style = "text-align: center;", b)
 
-cat("<p style='text-align: center; font-weight: bold;'>Figure xx. Jaccard Emperor Plot (ITS)</p>")
+cat("<p style='text-align: center; font-weight: bold;'>Jaccard Emperor Plot (ITS)</p>")
 
 
 
@@ -1477,16 +1481,18 @@ You can **click on the images** below to access the **full QIIME2 report**.
     <option value="Sheep">Sheep</option>
     <option value="Plough">Plough</option>
     <option value="Year_group">Year_group</option>
+    <option value="pH_binary">pH binary</option>
+    <option value="Age_binary">Age binary</option>
   </select>
 </div>
 
 
 ```{r permanova_16S_jacc, results='asis'}
-vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group")
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
 
 for (v in vars) {
   img_path <- paste0("images/permanova/Jaccard/16S/jaccard_permanova_", v, ".png")
-  link_path <- paste0("data/16S/Beta_Diversity/jaccard_permanova_", v, "/data/index.html")
+  link_path <- paste0("data/16S/Beta_Diversity/Permanova/jaccard_permanova_", v, "/data/index.html")
   
   display_style <- ifelse(v == "Establishment", "block", "none")
   
@@ -1499,7 +1505,7 @@ for (v in vars) {
 <script>
 function switchPlotPermanova_16S_jacc() {
   var val = document.getElementById("variable_selector_Permanova_16S_jacc").value;
-  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group"];
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary", "Age_binary"];
   
   all.forEach(function(v) {
     var el = document.getElementById("plot_permanova_jacc_" + v);
@@ -1563,6 +1569,198 @@ function switchPlotPermanova_ITS_jacc() {
 }
 </script>
 
+#### Unweighted Unifrac - Only for Bacteria (16S)
+
+##### Emperor Plot
+
+Here is a link to the **Unweighted Unifrac Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/unweighted_unifrac_emperor/data/index.html" target="_blank">Unweighted Unifrac Emperor Plot (16S)</a>
+
+```{r uwunifrac-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+
+
+json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/unweighted_unifrac_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+HTML("<p style='text-align: center; font-weight: bold;'>Unweighted Unifrac Emperor Plot (16S) </p>")
+
+
+
+```
+
+##### PERMANOVA
+
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_16S_uwunifrac"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_16S_uwunifrac" onchange="switchPlotPermanova_16S_uwunifrac()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Year_group">Year_group</option>
+    <option value="pH_binary">pH binary</option>
+    <option value="Age_binary">Age binary</option>
+  </select>
+</div>
+
+
+```{r permanova_16S_uwunifrac, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Uwunifrac/uwunifrac_permanova_", v, ".png")
+  link_path <- paste0("data/16S/Beta_Diversity/Permanova/uwunifrac_permanova_", v, "/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  
+  cat(sprintf('<div id="plot_permanova_uwunifrac_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Unweighted Unifrac – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Unweighted Unifrac for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+}
+
+```
+
+<script>
+function switchPlotPermanova_16S_uwunifrac() {
+  var val = document.getElementById("variable_selector_Permanova_16S_uwunifrac").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary", "Age_binary"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_uwunifrac_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+#### Weighted Unifrac - Only for Bacteria (16S)
+
+##### Emperor Plot
+
+Here is a link to the **Weighted Unifrac Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/weighted_unifrac_emperor/data/index.html" target="_blank">Weighted Unifrac Emperor Plot (16S)</a>
+
+```{r wunifrac-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+
+
+json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/weighted_unifrac_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+HTML("<p style='text-align: center; font-weight: bold;'>Weighted Unifrac Emperor Plot (16S) </p>")
+
+
+
+```
+
+##### PERMANOVA
+
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_16S_wunifrac"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_16S_wunifrac" onchange="switchPlotPermanova_16S_wunifrac()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Year_group">Year_group</option>
+    <option value="pH_binary">pH binary</option>
+    <option value="Age_binary">Age binary</option>
+  </select>
+</div>
+
+
+```{r permanova_16S_wunifrac, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Wunifrac/wunifrac_permanova_", v, ".png")
+  link_path <- paste0("data/16S/Beta_Diversity/Permanova/wunifrac_permanova_", v, "/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  
+  cat(sprintf('<div id="plot_permanova_wunifrac_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Weighted Unifrac – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Weighted Unifrac for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+}
+
+```
+
+<script>
+function switchPlotPermanova_16S_wunifrac() {
+  var val = document.getElementById("variable_selector_Permanova_16S_wunifrac").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary", "Age_binary"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_wunifrac_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
 ---
 
 ### Taxonomy Composition
@@ -1593,11 +1791,34 @@ custom_blues <- c(
   "#C6DBEF"
 )
 
+
+```
+
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_taxobar_16S"><b>Select variable:</b></label>
+  <select id="variable_selector_taxobar_16S" onchange="switchPlottaxobar_16S()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Age_group">Age group</option>
+    <option value="pH_binary">pH binary</option>
+    <option value="Year_group">Year group</option>
+    <option value="Age_binary">Age binary</option>
+  </select>
+</div>
+
+
+```{r test-taxo-barplot}
 taxa_df <- read_csv("data/16S/Taxonomy/s10_taxa_barplot_by_site/data/level-2.csv")
+colnames(taxa_df)[1] <- "index"
 
-meta_cols <- c("Site", "Age", "OS_location", "pH", "Year_est", "Lat_long", "Cutting","Cattle","Sheep", "Plough", "EC", "Establishment")
+meta_cols <- c("index", "Age", "OS_location", "pH", "Year_est", "Lat_long", 
+               "Cutting", "Cattle", "Sheep", "Plough", "EC", "Establishment", 
+               "pH_binary", "Age_group", "Age_binary", "Year_group")
 
-colnames(taxa_df)[1] <- "Site"
 
 taxa_long <- taxa_df %>%
   pivot_longer(
@@ -1606,91 +1827,137 @@ taxa_long <- taxa_df %>%
     values_to = "Abundance"
   )
 
+
 taxa_rel <- taxa_long %>%
-  group_by(Site) %>%
+  group_by(index) %>%
   mutate(Abundance = Abundance / sum(Abundance, na.rm = TRUE)) %>%
-  ungroup()
+  ungroup() %>%
+  rename(Site = index)
 
-site_groups <- taxa_rel %>%
-  distinct(Site, Establishment) %>%
-  arrange(Establishment, Site)
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", 
+          "Age_group", "pH_binary", "Year_group", "Age_binary")
 
-site_order <- site_groups %>%
-  pull(Site)
+plotlist_taxobar_16S <- list()
 
-taxa_rel <- taxa_rel %>%
-  mutate(Site = factor(Site, levels = site_order))
+for (var in vars) {
 
+  if (var == "Age_group") {
+    desired_order <- c("0-10", "11-20", "21-30", "31-40", "61-70", "71-100", "100+")
+    taxa_rel[[var]] <- factor(taxa_rel[[var]], levels = desired_order, ordered = TRUE)
+  }
+  
+  site_groups <- taxa_rel %>%
+    distinct(Site, .data[[var]]) %>%
+    arrange(.data[[var]], Site)
+  
+  if (var == "Age_group") {
+    site_groups[[var]] <- factor(site_groups[[var]], levels = desired_order, ordered = TRUE)
+  }
+  
+  
+  
+  site_order <- site_groups$Site
+  
+  
+  taxa_rel <- taxa_rel %>%
+    mutate(Site = factor(Site, levels = site_order))
+  
+  
+  taxon_order <- taxa_rel %>%
+    group_by(Taxon) %>%
+    summarise(Total = sum(Abundance), .groups = "drop") %>%
+    arrange(desc(Total)) %>%
+    pull(Taxon)
+  
+  
+  taxa_rel <- taxa_rel %>%
+    mutate(Taxon = factor(Taxon, levels = taxon_order))
+  
+  
+  group_breaks <- site_groups %>%
+    group_by(.data[[var]]) %>%
+    summarise(n = n(), .groups = "drop") %>%
+    mutate(position = cumsum(n) + 0.5) %>%
+    filter(row_number() < n())
+  
+  site_groups <- site_groups %>%
+    mutate(pos_index = match(Site, site_order))
 
-
-taxon_order <- taxa_rel %>%
-  group_by(Taxon) %>%
-  summarise(Total = sum(Abundance), .groups = "drop") %>%
-  arrange(desc(Total)) %>%
-  pull(Taxon)
-
-
-
-group_breaks <- site_groups %>%
-  group_by(Establishment) %>%
-  summarise(n = n()) %>%
-  mutate(position = cumsum(n) + 0.5) %>%
-  filter(row_number() < n())
-
-site_groups <- site_groups %>%
-  mutate(Site = factor(Site, levels = unique(site_order)))
 
 group_labels <- site_groups %>%
-  group_by(Establishment) %>%
-  summarise(position = median(as.numeric(Site)), .groups = "drop")
+  group_by(.data[[var]]) %>%
+  summarise(position = median(pos_index), .groups = "drop")
+  plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
+    geom_bar(stat = "identity") +
+    scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
+    geom_vline(data = group_breaks, aes(xintercept = position), linetype = "dashed", colour = "black") +
+    geom_text(data = group_labels, aes(x = position, y = 105, label = .data[[var]]),
+              inherit.aes = FALSE, size = 3, fontface = "bold") +
+    labs(
+      x = "Site", 
+      y = "Relative Abundance (%)", 
+      fill = "Taxon", 
+      title = paste0("Relative abundance of taxa across sites at phylum level (16S), ordered by ", var)
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
+      axis.ticks.x = element_blank(),
+      legend.text = element_text(size = 5)
+    )
 
-
-taxa_rel <- taxa_rel %>%
-  mutate(Taxon = factor(Taxon, levels = taxon_order))
-
-
-plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
-  geom_bar(stat = "identity") +
-  scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
-  geom_vline(data = group_breaks, aes(xintercept = position), linetype = "dashed", colour = "black") +
-  geom_text(data = group_labels, aes(x = position, y = 105, label = Establishment),
-            inherit.aes = FALSE, size = 3, fontface = "bold") +
-  labs(
-    x = "Site", 
-    y = "Relative Abundance (%)", 
-    fill = "Taxon", 
-    title = "Relative abundance of taxa across sites at phylum level (16S), ordered by Establishment"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
-    axis.ticks.x = element_blank(),
-    legend.text = element_text(size = 5)
+  plotlist_taxobar_16S[[var]] <- tags$div(
+    id = paste0("plot_taxobar_16S_", var),
+    style = ifelse(var == "Establishment", "display:block; text-align:center; margin-bottom:50px; padding-bottom:20px;", 
+  "display:none; text-align:center; margin-bottom:50px; padding-bottom:20px;"
+),
+    ggplotly(plot) %>% layout(width = 900, height = 500),
+    tags$br(),
+    tags$p(
+      style = "text-align: center; font-weight: bold;",
+      sprintf("Taxonomy Barplots Associated with '%s' (16S)", var)
+    )
   )
+}
 
-htmltools::tagList(
-  ggplotly(plot) %>% layout(width = 900, height = 500),
-  tags$br(),
-  tags$p(
-    style = "text-align: center; font-weight: bold;",
-    "Figure 18. Taxonomy Barplot (16S)"
-  ),
-  tags$div(style = "height: 40px;") 
-)
-
-
+tagList(plotlist_taxobar_16S)
 
 ```
 
+<script>
+function switchPlottaxobar_16S() {
+  var val = document.getElementById("variable_selector_taxobar_16S").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_group", "pH_binary", "Year_group", "Age_binary"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_taxobar_16S_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
 
 
 ##### Fungi (ITS) 
 
 Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2: <a href="data/ITS/Taxonomy/Taxa_barplot/F03_taxa_barplot/data/index.html" target="_blank">Taxonomy Barplot (ITS)</a>
 
-```{r barplot-ITS, echo =FALSE, message=FALSE, warning=FALSE, results='asis'}
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_taxobar_ITS"><b>Select variable:</b></label>
+  <select id="variable_selector_taxobar_ITS" onchange="switchPlottaxobar_ITS()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Age_category">Age category</option>
+    <option value="pH_category">pH category</option>
+  </select>
+</div>
 
 
+```{r barplot-ITS}
 taxa_df <- read_csv("data/ITS/Taxonomy/Taxa_barplot/F03_taxa_barplot/data/level-2.csv")
 
 meta_cols <- c("Site", "Age", "OS_location", "pH", "Year_est","site_code", "Lat_long", "Cutting","Cattle","Sheep", "Plough", "pH_category", "Age_category", "EC", "Establishment")
@@ -1704,77 +1971,113 @@ taxa_long <- taxa_df %>%
     values_to = "Abundance"
   )
 
+
 taxa_rel <- taxa_long %>%
   group_by(Site) %>%
   mutate(Abundance = Abundance / sum(Abundance, na.rm = TRUE)) %>%
-  ungroup()
+  ungroup() 
 
-site_groups <- taxa_rel %>%
-  distinct(Site, Establishment) %>%
-  arrange(Establishment, Site)
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", 
+          "Age_category", "pH_category")
 
-site_order <- site_groups %>%
-  pull(Site)
+plotlist_taxobar_ITS <- list()
 
-taxa_rel <- taxa_rel %>%
-  mutate(Site = factor(Site, levels = site_order))
+for (var in vars) {
 
+  
+  
+  site_groups <- taxa_rel %>%
+    distinct(Site, .data[[var]]) %>%
+    arrange(.data[[var]], Site)
+ 
+  
+  
+  
+  site_order <- site_groups$Site
+  
+  
+  taxa_rel <- taxa_rel %>%
+    mutate(Site = factor(Site, levels = site_order))
+  
+  
+  taxon_order <- taxa_rel %>%
+    group_by(Taxon) %>%
+    summarise(Total = sum(Abundance), .groups = "drop") %>%
+    arrange(desc(Total)) %>%
+    pull(Taxon)
+  
+  
+  taxa_rel <- taxa_rel %>%
+    mutate(Taxon = factor(Taxon, levels = taxon_order))
+  
+  
+  group_breaks <- site_groups %>%
+    group_by(.data[[var]]) %>%
+    summarise(n = n(), .groups = "drop") %>%
+    mutate(position = cumsum(n) + 0.5) %>%
+    filter(row_number() < n())
+  
+  site_groups <- site_groups %>%
+    mutate(pos_index = match(Site, site_order))
 
-
-taxon_order <- taxa_rel %>%
-  group_by(Taxon) %>%
-  summarise(Total = sum(Abundance), .groups = "drop") %>%
-  arrange(desc(Total)) %>%
-  pull(Taxon)
-
-
-
-group_breaks <- site_groups %>%
-  group_by(Establishment) %>%
-  summarise(n = n()) %>%
-  mutate(position = cumsum(n) + 0.5) %>%
-  filter(row_number() < n())
-
-site_groups <- site_groups %>%
-  mutate(Site = factor(Site, levels = unique(site_order)))
 
 group_labels <- site_groups %>%
-  group_by(Establishment) %>%
-  summarise(position = median(as.numeric(Site)), .groups = "drop")
+  group_by(.data[[var]]) %>%
+  summarise(position = median(pos_index), .groups = "drop")
 
+  plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
+    geom_bar(stat = "identity") +
+    scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
+    geom_vline(data = group_breaks, aes(xintercept = position), linetype = "dashed", colour = "black") +
+    geom_text(data = group_labels, aes(x = position, y = 105, label = .data[[var]]),
+              inherit.aes = FALSE, size = 3, fontface = "bold") +
+    labs(
+      x = "Site", 
+      y = "Relative Abundance (%)", 
+      fill = "Taxon", 
+      title = paste0("Relative abundance of taxa across sites at phylum level (ITS), ordered by ", var)
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
+      axis.ticks.x = element_blank(),
+      legend.text = element_text(size = 5)
+    )
 
-taxa_rel <- taxa_rel %>%
-  mutate(Taxon = factor(Taxon, levels = taxon_order))
-
-
-plot <- ggplot(taxa_rel, aes(x = Site, y = Abundance * 100, fill = Taxon)) +
-  geom_bar(stat = "identity") +
-  scale_fill_manual(values = rep(custom_blues, length.out = n_distinct(taxa_rel$Taxon))) +
-  geom_vline(data = group_breaks, aes(xintercept = position), linetype = "dashed", colour = "black") +
-  geom_text(data = group_labels, aes(x = position, y = 105, label = Establishment),
-            inherit.aes = FALSE, size = 3, fontface = "bold") +
-  labs(
-    x = "Site", 
-    y = "Relative Abundance (%)", 
-    fill = "Taxon", 
-    title = "Relative abundance of taxa across sites at phylum level (ITS), ordered by Establishment"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
-    axis.ticks.x = element_blank(),
-    legend.text = element_text(size = 5)
+  plotlist_taxobar_ITS[[var]] <- tags$div(
+    id = paste0("plot_taxobar_ITS_", var),
+    style = ifelse(var == "Establishment", "display:block; text-align:center; margin-bottom:50px; padding-bottom:20px;", 
+  "display:none; text-align:center; margin-bottom:50px; padding-bottom:20px;"
+),
+    ggplotly(plot) %>% layout(width = 900, height = 500),
+    tags$br(),
+    tags$p(
+      style = "text-align: center; font-weight: bold;",
+      sprintf("Taxonomy Barplots Associated with '%s' (ITS)", var)
+    )
   )
-ggplotly(plot)  %>% layout(width = 900, height = 500)
+}
 
-cat("<p style='text-align: center; font-weight: bold;'>Figure 18. Taxonomy Barplot (ITS)</p></br>")
-
-
-
+tagList(plotlist_taxobar_ITS)
 
 ```
-</br>
-</br>
+
+<script>
+function switchPlottaxobar_ITS() {
+  var val = document.getElementById("variable_selector_taxobar_ITS").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_category", "pH_category"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_taxobar_ITS_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+
 
 #### Krona Plots {.tabset}
 
@@ -1795,7 +2098,7 @@ You can **click on the images** below to access the **Krona plots** for each sit
   <a href="data/16S/Taxonomy/Krona/krona_by_site_16S.html" target="_blank">
     <img src="images/krona_16S.png" style="max-width: 80%; height: auto;" alt="Krona thumbnail">
   </a>
-  <p style="font-style: bold;">Figure 19. Krona Plot for Baltic_farm_1 (16S)</p>
+  <p style="font-style: bold;">Krona Plot for Baltic_farm_1 (16S)</p>
 </div>
 
 
@@ -1805,7 +2108,7 @@ You can **click on the images** below to access the **Krona plots** for each sit
   <a href="data/ITS/Taxonomy/Krona/krona_by_site_ITS.html" target="_blank">
     <img src="images/krona_ITS.png" style="max-width: 80%; height: auto;" alt="Krona thumbnail">
   </a>
-  <p style="font-style: bold;">Figure 19. Krona Plot for Baltic_farm_1 (ITS)</p>
+  <p style="font-style: bold;">Krona Plot for Baltic_farm_1 (ITS)</p>
 </div>
 
 
@@ -1893,7 +2196,7 @@ for (v in vars) {
       tags$br(),
       tags$p(
         style = "text-align: center; font-weight: bold;",
-        sprintf("Figure xx. Differences in Taxa Abundance Associated with '%s' (ANCOM Results) (16S)", v)
+        sprintf("Differences in Taxa Abundance Associated with '%s' (ANCOM Results) (16S)", v)
       )
     )
   }
@@ -2001,7 +2304,7 @@ for (v in vars) {
       tags$br(),
       tags$p(
         style = "text-align: center; font-weight: bold;",
-        sprintf("Figure xx. Differences in Taxa Abundance Associated with '%s' (ANCOM Results) (ITS)", v)
+        sprintf("Differences in Taxa Abundance Associated with '%s' (ANCOM Results) (ITS)", v)
       )
     )
   }
@@ -2294,7 +2597,7 @@ b <- plot_ly(
 
 htmltools::div(style = "text-align: center;", b)
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Bray-Curtis Emperor Plot (Functional)</p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Bray-Curtis Emperor Plot (Functional)</p>")
 
 
 
@@ -2416,7 +2719,7 @@ for (v in vars) {
     tags$br(),
       tags$p(
         style = "text-align: center; font-weight: bold;",
-        sprintf("Figure xx. Differences in Pathway Abundance Associated with '%s' (ANCOM Results) (ITS)", v)
+        sprintf("Differences in Pathway Abundance Associated with '%s' (ANCOM Results) (ITS)", v)
       )
   )
 }
@@ -2630,7 +2933,9 @@ function switchPlotSignAlpha_ITS() {
 
 #### Functional Beta Diversity {.tabset}
 
-##### Emperor Plot – Bray-Curtis Distance
+##### Bray-Curtis
+
+###### Emperor Plot 
 
 
 Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Functional_analysis/Functional_beta/Emperor_Plot/bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
@@ -2670,14 +2975,14 @@ b <- plot_ly(
 
 htmltools::div(style = "text-align: center;", b)
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Bray-Curtis Emperor Plot (Fungi - ITS, Functional)</p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Bray-Curtis Emperor Plot (Fungi - ITS, Functional)</p>")
 
 
 
 ```
 
 
-##### PERMANOVA – Bray-Curtis
+###### PERMANOVA 
 
 
 <div style="margin-bottom: 20px;">
@@ -2719,7 +3024,9 @@ function switchPlotPermanova_ITS_bray_func() {
 }
 </script>
 
-##### Emperor Plot – Jaccard Distance
+##### Jaccard
+
+###### Emperor Plot 
 
 Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Functional_analysis/Functional_beta/Emperor_Plot/jaccard_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
 
@@ -2758,14 +3065,14 @@ b <- plot_ly(
 
 htmltools::div(style = "text-align: center;", b)
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Jaccard Emperor Plot (Fungi - ITS, Functional)</p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Jaccard Emperor Plot (Fungi - ITS, Functional)</p>")
 
 
 
 ```
 
 
-##### PERMANOVA – Jaccard Distance
+###### PERMANOVA
 
 You can **click on the images** below to access the **full QIIME2 report**.
 
@@ -2873,7 +3180,7 @@ theme(
     legend.text = element_text(size = 5)
   )
 
-HTML("<p style='text-align: center; font-weight: bold;'>Figure xx. Top 20 functional guilds</p>")
+HTML("<p style='text-align: center; font-weight: bold;'>Top 20 functional guilds</p>")
 
 cat('</div>')
 ```
@@ -2985,7 +3292,7 @@ htmltools::div(
   style = "display: block; margin-left: auto; margin-right: auto; width: 80%;",
   ggplotly(p)
 )
-cat("<p style='text-align: center; font-weight: bold;'>Figure xx. Fungal Guild Abundance by Site</p>")
+cat("<p style='text-align: center; font-weight: bold;'>Fungal Guild Abundance by Site</p>")
 
 
 ```
@@ -3070,7 +3377,7 @@ for (v in vars) {
     
     cat(sprintf('<div id="guild_%s_plot_percent" style="display:%s;">\n', v, div_style))
     cat(as.character(htmltools::div(style = "text-align: center;", ggplotly(p))))
-    cat(sprintf("<p style='text-align: center; font-weight: bold;'>Figure xx. Fungal Guild Relative Abundance by %s </p>", v))
+    cat(sprintf("<p style='text-align: center; font-weight: bold;'>Fungal Guild Relative Abundance by %s </p>", v))
     
     cat('</div>')
 }

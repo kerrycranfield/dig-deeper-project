@@ -1,9 +1,9 @@
 execution:
-    uuid: a26b6074-81db-4871-b11d-4226222ee048
+    uuid: 24fef4b4-0735-4695-8f7f-5b29740a9d85
     runtime:
-        start: 2025-04-11T12:53:51.973998+01:00
-        end: 2025-04-11T12:54:27.048287+01:00
-        duration: 35 seconds, and 74289 microseconds
+        start: 2025-04-23T15:00:23.546368+01:00
+        end: 2025-04-23T15:01:00.197002+01:00
+        duration: 36 seconds, and 650634 microseconds
     execution_context:
         type: synchronous
 
@@ -15,13 +15,13 @@ action:
     -   table: 118f4a15-bc34-42f1-bb5b-7c5205042cc4
     -   phylogeny: d1825877-ec10-4938-a90d-7b8ff2c2cc87
     parameters:
-    -   sampling_depth: 3529
+    -   sampling_depth: 9473
     -   metadata: !metadata 'metadata.tsv'
     -   with_replacement: false
     -   n_jobs_or_threads: 1
     -   ignore_missing_samples: false
     output-name: unweighted_unifrac_emperor
-    alias-of: 2e9dfc6e-17ac-4781-b17e-dc32938e18a3
+    alias-of: c2f955f3-7a9f-466b-b776-42736d7d5e7f
 
 environment:
     platform: linux-x86_64

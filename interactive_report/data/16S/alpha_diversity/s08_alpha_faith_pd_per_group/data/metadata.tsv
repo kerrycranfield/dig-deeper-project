@@ -1,68 +1,68 @@
-id	Year_est	Age	Establishment	Cutting	Cattle	Sheep	Plough	Year_group	Age_group	faith_pd
-#q2:types	categorical	categorical	categorical	categorical	categorical	categorical	categorical	categorical	categorical	numeric
-Whitelands_2018/19_	2018	3	seed_mix	no	no	yes	yes	2011-2020	0-10	40.8516208402268
-Castle_Field_West_(W)	2002	19	seed_mix	no	yes	yes	yes	2001-2010	11-20	37.2661982407996
-Toposcope_Field_-_1980s	1985	36	Natural_regen	no	yes	yes	no	1981-2000	31-40	37.6353687872482
-Bradenham_post-1986_b	1986	35	seed_mix	no	yes	yes	yes	1981-2000	31-40	37.2336286431576
-Lardon_Chase_The_Holies_motorcycle	2007	14	Natural_regen	no	no	yes	no	2001-2010	11-20	25.5338187101397
-Stonehenge_2000_2017a	2000	21	Green_hay/bush	no	yes	yes	yes	1981-2000	21-30	36.2091199422084
-Stonehenge_2003_2017b	2003	18	Green_hay/bush	no	yes	yes	yes	2001-2010	11-20	35.8402437729726
-Stonehenge_2009	2009	12	Green_hay/bush	no	no	yes	yes	2001-2010	11-20	37.0457847274673
-Stonehenge_2007_2016	2007	14	Green_hay/bush	no	yes	yes	yes	2001-2010	11-20	34.3555802793647
-Stonehenge_2005	2005	16	Green_hay/bush	no	no	yes	yes	2001-2010	11-20	34.1124394388659
-Stonehenge_2002_2017	2002	19	Green_hay/bush	no	yes	yes	yes	2001-2010	11-20	33.616074323366
-Stonehenge_2010	2010	11	Green_hay/bush	no	yes	yes	yes	2001-2010	11-20	34.6090663966498
-Stonehenge_2011	2011	10	Green_hay/bush	no	yes	yes	yes	2011-2020	0-10	36.1755445822635
-Stonehenge_-_Luxenborough_BankB	2000	21	Green_hay/bush	yes	no	yes	yes	1981-2000	21-30	36.4577390024839
-Watlington_natural_reversion	2000	21	Natural_regen	no	no	yes	no	1981-2000	21-30	37.4328881394525
-St_Catherines_A3	1994	27	Green_hay/bush	yes	yes	yes	no	1981-2000	21-30	33.3654040751764
-HARLEY_FARMS_Chittern	2013	8	seed_mix	yes	yes	no	yes	2011-2020	0-10	34.0310960357245
-HARLEY_FARMS_New1	2020	1	seed_mix	no	yes	no	no	2011-2020	0-10	37.4825545527179
-HARLEY_FARMS_new2b	2020	1	seed_mix	yes	no	no	no	2011-2020	0-10	41.8377558520491
-WINDMILL_farm	1990	31	seed_mix	yes	yes	yes	yes	1981-2000	31-40	30.7971842268115
-DRUIDS	2002	19	seed_mix	yes	yes	yes	yes	2001-2010	11-20	35.6135443219856
-Stratton_Wood	1995	26	seed_mix	yes	no	no	yes	1981-2000	21-30	33.2778351094778
-WESTMEAD_FARM	2000	21	seed_mix	yes	no	yes	no	1981-2000	21-30	31.3986176131743
-RSPB_orig_green	2006	15	Green_hay/bush	no	yes	yes	no	2001-2010	11-20	35.8998450161054
-RSPB_churchil	2010	11	Green_hay/bush	no	no	yes	no	2001-2010	11-20	32.7236688928221
-RSPB_junction	2007	14	Green_hay/bush	no	no	yes	no	2001-2010	11-20	38.8870665715433
-RSPB_Mainline	2016	5	Green_hay/bush	no	no	yes	no	2011-2020	0-10	35.8603493576325
-Baltic_farm_1	2005	16	Green_hay/bush	yes	yes	yes	no	2001-2010	11-20	25.8355834473571
-Baltic_farm_2	1998	23	Green_hay/bush	yes	yes	yes	no	1981-2000	21-30	30.6681027706698
-WestEndFarm	2019	2	Green_hay/bush	yes	no	yes	yes	2011-2020	0-10	25.9496918859502
-HorntonHouseFarm_1_parallel	2016	5	seed_mix	yes	yes	yes	no	2011-2020	0-10	30.6801841793487
-TownsendFarm_1	2017	4	seed_mix	yes	no	yes	no	2011-2020	0-10	36.4262553943518
-TownsendFarm_2	2010	11	seed_mix	yes	no	yes	no	2001-2010	11-20	37.1931315790108
-TownsendFarm_3_big	2014	7	Green_hay/bush	yes	no	yes	no	2011-2020	0-10	36.4200136517703
-ChurchFarm	2012	9	seed_mix	yes	yes	yes	no	2011-2020	0-10	40.7340343947963
-StowellFarms_1_adj	2015	6	seed_mix	yes	yes	yes	yes	2011-2020	0-10	30.2073022727118
-MannorFmAltonBarnes	2012	9	seed_mix	yes	yes	yes	no	2011-2020	0-10	28.8582072223609
-HommingtonFarm	2014	7	seed_mix	yes	yes	yes	yes	2011-2020	0-10	29.9494452086702
-ThropeManor_1	2002	19	seed_mix	yes	no	yes	no	2001-2010	11-20	25.635703436525
-ThropeManor_2	1998	23	seed_mix	yes	no	yes	yes	1981-2000	21-30	20.3078260362353
-ThropeManor_3	2000	21	seed_mix	yes	no	yes	no	1981-2000	21-30	22.2575168516387
-MannorFmBroadChalke	2010	11	Green_hay/bush	no	no	yes	no	2001-2010	11-20	25.7263885197392
-BigleyFm_1	2014	7	seed_mix	yes	yes	yes	yes	2011-2020	0-10	22.6788148935698
-BigleyFm_2	2017	4	seed_mix	yes	yes	yes	yes	2011-2020	0-10	22.514334938069
-NorringtonMannorFm_1	2009	12	seed_mix	no	no	yes	yes	2001-2010	11-20	22.5080687897139
-NorringtonMannorFm_2	2009	12	seed_mix	no	no	yes	no	2001-2010	11-20	26.4590782858142
-ManorFmBerwickStJohn_1	2014	7	seed_mix	yes	yes	yes	no	2011-2020	0-10	25.7041874913483
-ManorFmBerwickStJohn_3	2018	3	seed_mix	yes	yes	yes	no	2011-2020	0-10	23.195190459118
-Jemma_1	2010	11	Green_hay/bush	yes	yes	yes	no	2001-2010	11-20	24.4052355360234
-Jemma_2	2008	13	Natural_regen	no	yes	no	no	2001-2010	11-20	28.491959409551
-Jemma_7	2014	7	Green_hay/bush	no	no	yes	yes	2011-2020	0-10	28.0040639746396
-Jemma_4	2015	6	Green_hay/bush	yes	yes	yes	no	2011-2020	0-10	22.7623463602424
-Jemma_5	2015	6	seed_mix	yes	no	yes	no	2011-2020	0-10	32.5777927962209
-Jemma_6	2013	8	seed_mix	yes	no	yes	no	2011-2020	0-10	33.6291433098779
-Jemma_9	2015	6	seed_mix	yes	no	yes	no	2011-2020	0-10	23.1065895317501
-HomeFarm_WoodlandTrust_Hampshire_good_1c	1994	27	seed_mix	no	yes	no	no	1981-2000	21-30	26.1772936132373
-Crux_easton_70b1	2000	21	seed_mix	no	no	yes	yes	1981-2000	21-30	31.7120087468546
-Crux_easton_70b2	2002	19	seed_mix	yes	no	yes	no	2001-2010	11-20	32.7891648260155
-Martin_Down_arabel_reversion	1957	64	Natural_regen	no	no	yes	yes	1940-60	61-70	22.5781327584142
-Parsonage_down_reversion	1945	76	Natural_regen	no	yes	no	yes	1940-60	71-100	22.8090694748264
-TARGET_MartinDown	old	>100	Natural_regen	no	no	yes	unknown		100+	21.2668209224708
-TARGET_St_Catherines	old	>100	Natural_regen	no	no	yes	unknown		100+	22.1676601613449
-TARGET_ParsonageDown	old	>100	Natural_regen	no	no	yes	unknown		100+	23.1033131421383
-TARGET_KNEPP_A New_Barn_Field	2006	15	Natural_regen	no	yes	no	unknown	2001-2010	11-20	23.9521933223154
-Knepp_Pond_field	2003	18	Natural_regen	no	yes	no	unknown	2001-2010	11-20	19.0930868606136
-Knepp_Benton_field	2005	16	Natural_regen	no	yes	no	unknown	2001-2010	11-20	28.4779289441754
+id	Year_est	Age	Establishment	Cutting	Cattle	Sheep	Plough	Year_group	Age_group	Age_binary	pH_binary	faith_pd
+#q2:types	categorical	categorical	categorical	categorical	categorical	categorical	categorical	categorical	categorical	categorical	categorical	numeric
+Whitelands_2018_19_	2018	3	seed_mix	no	no	yes	yes	2011-2020	0-10	BelowMedian	AboveMedian	47.2837412137291
+Castle_Field_West__W_	2002	19	seed_mix	no	yes	yes	yes	2001-2010	11-20	AboveMedian	BelowMedian	42.2775924486887
+Toposcope_Field_-_1980s	1985	36	Natural_regen	no	yes	yes	no	1981-2000	31-40	AboveMedian	AboveMedian	42.6223033527603
+Bradenham_post-1986_b	1986	35	seed_mix	no	yes	yes	yes	1981-2000	31-40	AboveMedian	BelowMedian	43.5362496084
+Lardon_Chase_The_Holies_motorcycle	2007	14	Natural_regen	no	no	yes	no	2001-2010	11-20	BelowMedian	AboveMedian	27.365899487867
+Stonehenge_2000_2017a	2000	21	Green_hay_bush	no	yes	yes	yes	1981-2000	21-30	AboveMedian	BelowMedian	42.0911282851167
+Stonehenge_2003_2017b	2003	18	Green_hay_bush	no	yes	yes	yes	2001-2010	11-20	AboveMedian	BelowMedian	40.8899688103319
+Stonehenge_2009	2009	12	Green_hay_bush	no	no	yes	yes	2001-2010	11-20	BelowMedian	BelowMedian	44.0521111700998
+Stonehenge_2007_2016	2007	14	Green_hay_bush	no	yes	yes	yes	2001-2010	11-20	BelowMedian	BelowMedian	39.855654368077
+Stonehenge_2005	2005	16	Green_hay_bush	no	no	yes	yes	2001-2010	11-20	AboveMedian	BelowMedian	40.4204165541484
+Stonehenge_2002_2017	2002	19	Green_hay_bush	no	yes	yes	yes	2001-2010	11-20	AboveMedian	BelowMedian	41.0251644381532
+Stonehenge_2010	2010	11	Green_hay_bush	no	yes	yes	yes	2001-2010	11-20	BelowMedian	BelowMedian	40.1430600680625
+Stonehenge_2011	2011	10	Green_hay_bush	no	yes	yes	yes	2011-2020	0-10	BelowMedian	BelowMedian	44.6315083944163
+Stonehenge_-_Luxenborough_BankB	2000	21	Green_hay_bush	yes	no	yes	yes	1981-2000	21-30	AboveMedian	BelowMedian	42.1606229436848
+Watlington_natural_reversion	2000	21	Natural_regen	no	no	yes	no	1981-2000	21-30	AboveMedian	BelowMedian	44.5331004354914
+St_Catherines_A3	1994	27	Green_hay_bush	yes	yes	yes	no	1981-2000	21-30	AboveMedian	BelowMedian	37.6075084100802
+HARLEY_FARMS_Chittern	2013	8	seed_mix	yes	yes	no	yes	2011-2020	0-10	BelowMedian	BelowMedian	39.4980669112604
+HARLEY_FARMS_New1	2020	1	seed_mix	no	yes	no	no	2011-2020	0-10	BelowMedian	BelowMedian	43.8927349371413
+HARLEY_FARMS_new2b	2020	1	seed_mix	yes	no	no	no	2011-2020	0-10	BelowMedian	BelowMedian	47.0008574298869
+WINDMILL_farm	1990	31	seed_mix	yes	yes	yes	yes	1981-2000	31-40	AboveMedian	BelowMedian	34.4485706862575
+DRUIDS	2002	19	seed_mix	yes	yes	yes	yes	2001-2010	11-20	AboveMedian	BelowMedian	42.6061899344697
+Stratton_Wood	1995	26	seed_mix	yes	no	no	yes	1981-2000	21-30	AboveMedian	BelowMedian	38.8678039298251
+WESTMEAD_FARM	2000	21	seed_mix	yes	no	yes	no	1981-2000	21-30	AboveMedian	BelowMedian	34.5385628004895
+RSPB_orig_green	2006	15	Green_hay_bush	no	yes	yes	no	2001-2010	11-20	AboveMedian	AboveMedian	40.9030022189873
+RSPB_churchil	2010	11	Green_hay_bush	no	no	yes	no	2001-2010	11-20	BelowMedian	AboveMedian	36.6586709400005
+RSPB_junction	2007	14	Green_hay_bush	no	no	yes	no	2001-2010	11-20	BelowMedian	AboveMedian	46.4000763877062
+RSPB_Mainline	2016	5	Green_hay_bush	no	no	yes	no	2011-2020	0-10	BelowMedian	AboveMedian	40.6781491598897
+Baltic_farm_1	2005	16	Green_hay_bush	yes	yes	yes	no	2001-2010	11-20	AboveMedian	AboveMedian	28.151414948347
+Baltic_farm_2	1998	23	Green_hay_bush	yes	yes	yes	no	1981-2000	21-30	AboveMedian	AboveMedian	34.456318430102
+WestEndFarm	2019	2	Green_hay_bush	yes	no	yes	yes	2011-2020	0-10	BelowMedian	AboveMedian	28.3043112338227
+HorntonHouseFarm_1_parallel	2016	5	seed_mix	yes	yes	yes	no	2011-2020	0-10	BelowMedian	AboveMedian	33.5111879256179
+TownsendFarm_1	2017	4	seed_mix	yes	no	yes	no	2011-2020	0-10	BelowMedian	AboveMedian	42.8317346684484
+TownsendFarm_2	2010	11	seed_mix	yes	no	yes	no	2001-2010	11-20	BelowMedian	AboveMedian	40.6489467572912
+TownsendFarm_3_big	2014	7	Green_hay_bush	yes	no	yes	no	2011-2020	0-10	BelowMedian	BelowMedian	43.4583962283269
+ChurchFarm	2012	9	seed_mix	yes	yes	yes	no	2011-2020	0-10	BelowMedian	AboveMedian	47.6589589874933
+StowellFarms_1_adj	2015	6	seed_mix	yes	yes	yes	yes	2011-2020	0-10	BelowMedian	BelowMedian	34.9737367792301
+MannorFmAltonBarnes	2012	9	seed_mix	yes	yes	yes	no	2011-2020	0-10	BelowMedian	AboveMedian	30.5636332059021
+HommingtonFarm	2014	7	seed_mix	yes	yes	yes	yes	2011-2020	0-10	BelowMedian	AboveMedian	32.5209501270249
+ThropeManor_1	2002	19	seed_mix	yes	no	yes	no	2001-2010	11-20	AboveMedian	BelowMedian	26.7006369875734
+ThropeManor_2	1998	23	seed_mix	yes	no	yes	yes	1981-2000	21-30	AboveMedian	BelowMedian	21.1400406500993
+ThropeManor_3	2000	21	seed_mix	yes	no	yes	no	1981-2000	21-30	AboveMedian	AboveMedian	23.2149935571987
+MannorFmBroadChalke	2010	11	Green_hay_bush	no	no	yes	no	2001-2010	11-20	BelowMedian	AboveMedian	28.394025401105
+BigleyFm_1	2014	7	seed_mix	yes	yes	yes	yes	2011-2020	0-10	BelowMedian	AboveMedian	24.5374460820471
+BigleyFm_2	2017	4	seed_mix	yes	yes	yes	yes	2011-2020	0-10	BelowMedian	BelowMedian	23.3662184487086
+NorringtonMannorFm_1	2009	12	seed_mix	no	no	yes	yes	2001-2010	11-20	BelowMedian	BelowMedian	23.6570206506021
+NorringtonMannorFm_2	2009	12	seed_mix	no	no	yes	no	2001-2010	11-20	BelowMedian	AboveMedian	27.3883531172138
+ManorFmBerwickStJohn_1	2014	7	seed_mix	yes	yes	yes	no	2011-2020	0-10	BelowMedian	BelowMedian	26.4069199913724
+ManorFmBerwickStJohn_3	2018	3	seed_mix	yes	yes	yes	no	2011-2020	0-10	BelowMedian	AboveMedian	24.2695369706591
+Jemma_1	2010	11	Green_hay_bush	yes	yes	yes	no	2001-2010	11-20	BelowMedian	AboveMedian	25.5803636044368
+Jemma_2	2008	13	Natural_regen	no	yes	no	no	2001-2010	11-20	BelowMedian	AboveMedian	31.3467016746718
+Jemma_7	2014	7	Green_hay_bush	no	no	yes	yes	2011-2020	0-10	BelowMedian	AboveMedian	30.5129112174713
+Jemma_4	2015	6	Green_hay_bush	yes	yes	yes	no	2011-2020	0-10	BelowMedian	BelowMedian	23.601416261992
+Jemma_5	2015	6	seed_mix	yes	no	yes	no	2011-2020	0-10	BelowMedian	AboveMedian	36.0025040092684
+Jemma_6	2013	8	seed_mix	yes	no	yes	no	2011-2020	0-10	BelowMedian	AboveMedian	35.9777285528329
+Jemma_9	2015	6	seed_mix	yes	no	yes	no	2011-2020	0-10	BelowMedian	AboveMedian	24.5981604173525
+HomeFarm_WoodlandTrust_Hampshire_good_1c	1994	27	seed_mix	no	yes	no	no	1981-2000	21-30	AboveMedian	BelowMedian	28.0877403538491
+Crux_easton_70b1	2000	21	seed_mix	no	no	yes	yes	1981-2000	21-30	AboveMedian	BelowMedian	34.7077452189102
+Crux_easton_70b2	2002	19	seed_mix	yes	no	yes	no	2001-2010	11-20	AboveMedian	AboveMedian	39.2253975495603
+Martin_Down_arabel_reversion	1957	64	Natural_regen	no	no	yes	yes	1940-60	61-70	AboveMedian	AboveMedian	23.05598610214
+Parsonage_down_reversion	1945	76	Natural_regen	no	yes	no	yes	1940-60	71-100	AboveMedian	AboveMedian	23.7466112414154
+TARGET_MartinDown	old	>100	Natural_regen	no	no	yes	unknown		100+	AboveMedian	AboveMedian	21.6032712684836
+TARGET_St_Catherines	old	>100	Natural_regen	no	no	yes	unknown		100+	AboveMedian	AboveMedian	22.9930132287736
+TARGET_ParsonageDown	old	>100	Natural_regen	no	no	yes	unknown		100+	AboveMedian	AboveMedian	24.678243532103
+TARGET_KNEPP_A_New_Barn_Field	2006	15	Natural_regen	no	yes	no	unknown	2001-2010	11-20	AboveMedian	BelowMedian	24.7322345908582
+Knepp_Pond_field	2003	18	Natural_regen	no	yes	no	unknown	2001-2010	11-20	AboveMedian	BelowMedian	21.3082225480048
+Knepp_Benton_field	2005	16	Natural_regen	no	yes	no	unknown	2001-2010	11-20	AboveMedian	BelowMedian	29.42692585883
