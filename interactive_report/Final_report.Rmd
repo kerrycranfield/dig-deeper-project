@@ -38,7 +38,46 @@ iframe {
 
 ```{r custom-header, echo=FALSE, results='asis'}
 cat('
+
+
 <style>
+
+body {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+/* Agrandir les titres */
+h1, h2, h3, h4, h5 {
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 26px;
+}
+
+h3 {
+  font-size: 22px;
+}
+
+h4 {
+  font-size: 20px;
+}
+
+h5 {
+  font-size: 18px;
+}
+
+p {
+  font-size: 18px;
+}
+ul, ol, li {
+  font-size: 18px;
+}
 
 body, .main-container {
   max-width: 95%;
@@ -106,7 +145,7 @@ knitr::opts_chunk$set(echo = FALSE, cache = FALSE, fig.width = 6, fig.height = 4
 ```
 
 
-```{r dependencies, echo=FALSE, message=FALSE, warning=FALSE}
+```{r dependencies}
 #loading the dependencies :
 library(ggplot2)
 library(plotly)
@@ -175,6 +214,18 @@ The analysis focused on three main aspects:
 These microbial assessments complement broader ecosystem-level measurements within the **RestREco project**, including **vegetation**, **invertebrates**, and ecosystem functions such as **litter decomposition**, **pollination services**, and **soil thermodynamic efficiency**.
 
 The following sections describe the sampling design, metadata structure, and the processing pipeline used to characterise microbial communities.
+
+### **Research Questions** and **Hypotheses**
+
+This study investigates how **grassland site age**, **establishment method**, **management practices**, and **soil pH** influence the **diversity**, **taxonomic composition**, and **functional profiles** of bacterial and fungal communities during restoration. It also explores the **interactions between bacteria and fungi**, focusing on potential correlations between microbial taxa, functional pathways, and fungal guilds.
+
+The following hypotheses were formulated:
+
+1. **Site age**, **establishment method** (green hay/bush (GH), seed mix (SM), natural regeneration (NR)), **management type** (cutting, ploughing, sheep, cattle), and **pH** affect **alpha** and **beta diversity** in bacterial and fungal communities.
+2. These same variables influence the **taxonomic composition** of soil microbial communities.
+3. **Age**, **establishment method**, and **pH** influence the **functional diversity** of bacterial and fungal communities.
+4. There are **correlations in taxon abundance** between bacterial and fungal groups.
+5. There are **correlations in the abundance of functional pathways and guilds** between bacterial and fungal communities.
 
 ---
 
@@ -294,26 +345,37 @@ HTML("</br><p style='text-align: center; font-weight: bold;'>Metadata Summary</p
 
 ## Analysis Pipeline
 
-### Input Files Selection
+### Sample Processing and Sequencing Overview
 
-Before proceeding with bioinformatic analyses, it was necessary to select consistent input files for each sample.
-For both ITS and 16S datasets, each sample was associated with multiple types of sequencing files. For example, a sample such as `GF677` had up to five different files: `GF677_1.fastq.gz`, `GF677_2.fastq.gz` (paired-end reads with barcode and primer removed), `GF677.raw_1.fastq.gz`, `GF677.raw_2.fastq.gz` (raw unprocessed reads), and `GF677.extendedFrags.fastq.gz` (merged forward and reverse reads). To ensure consistency and avoid redundancy, we selected one file type per sample for downstream analysis. For the **16S dataset**, we used the **paired-end reads with barcode and primer removed** (`*_1.fastq.gz` and `*_2.fastq.gz`), while for the **ITS dataset**, we selected the **raw reads** (`*.raw_1.fastq.gz` and `*.raw_2.fastq.gz`), which were best suited for our quality filtering and denoising steps.
+A total of 330 soil samples were collected across 66 sites (five per site) by the **RestREco** team. After sieving (2 mm), all samples were frozen until DNA extraction, which was performed using the **QIAGEN PowerSoil** kit. Amplicon sequencing targeted two regions: the **V4–V5 region of the bacterial 16S rRNA gene** and the **ITS1 region of the fungal ITS gene**. Sequencing was carried out by **Novagene** using **Illumina paired-end reads** (2×250 bp), resulting in **660 FASTQ files per marker** (forward and reverse reads per sample). Metadata accompanying each sample included site characteristics (location, year of establishment, method), management practices (cutting, ploughing, grazing), and soil physicochemical properties.
 
-### Denoising and Feature Table Construction
+### 16S Amplicon Processing
 
-The sequencing data were processed using the **QIIME 2** bioinformatics platform — a widely used tool for microbiome analysis. Raw amplicon reads were **denoised** using the `DADA2` plugin, enabling accurate identification of *amplicon sequence variants (ASVs)* with single-nucleotide resolution. This step also included **chimera removal** and **read quality trimming**, ensuring high-confidence input for downstream analyses.
+Quality control of 16S reads was performed using **FastQC v0.12.1** and summarised with **MultiQC v1.14**. A custom Bash script (`S02_qc.sh`) ensured correct pairing of reads and removed five incomplete samples. Sequences were then imported into **QIIME2 v2022.10** using the `PairedEndFastqManifestPhred33V2` format, and primers were removed with **CutAdapt v4.4**. Read quality was visualised using `qiime demux summarize`.
 
-Following denoising, a **feature table** was constructed for each dataset (16S and ITS), summarising the number of sequences associated with each ASV across samples.
+Denoising and read pairing were performed using the **DADA2 plugin (QIIME2 v2024.2)**, generating ASV feature tables, representative sequences, and denoising statistics. Low-abundance ASVs (<10 reads) and singletons were filtered out. Representative sequences were aligned using **MAFFT** and used to build phylogenetic trees with **FastTree**.
 
-### Diversity Analysis and Taxonomic Assignment
+The ASV table was aggregated at the **site level** using a median-ceiling method, and rarefaction analysis was used to determine a sampling depth of **9473 reads/sample**. Alpha (Observed Features, Shannon, Evenness, Faith’s PD) and beta diversity (UniFrac, Jaccard, Bray-Curtis) metrics were calculated using this rarefied table and the rooted tree. Group comparisons (e.g., by establishment, livestock, pH) were assessed using **Kruskal-Wallis (alpha)** and **PERMANOVA (beta)**.
 
-Following quality control and feature extraction, downstream analyses were performed to characterise microbial diversity and taxonomic composition.
+Taxonomy was assigned using a **Naive Bayes classifier trained on Greengenes 13_8 (515F/806R)**. Taxonomic barplots were created from feature tables grouped by site. Tables were then collapsed at genus and family levels for **ANCOM** differential abundance testing. Pseudocounts were added where required.
 
-Alpha and beta diversity metrics were computed using the `diversity` and `emperor` plugins in QIIME 2, enabling comparison of microbial communities across restoration gradients and site conditions.
+Predicted functional profiles were generated using **PICRUSt2** to infer KEGG Orthology (KO), EC numbers, and pathways. High-abundance pathways were retained (≥600,000 reads in ≥60 samples), and visualised with heatmaps across metadata variables. Functional differential abundance was assessed using **ANCOM**.
 
-Taxonomic classification of ASVs was then performed using trained classifiers against reference databases: **GreenGene2** for bacterial 16S sequences and **UNITE** for fungal ITS sequences. This allowed each ASV to be annotated with its likely taxonomic lineage (from kingdom down to genus or species when possible).
+Functional alpha and beta diversity metrics were also computed, and significance was tested per metadata variable, using **Kruskal-Wallis** and **PERMANOVA**, respectively.
 
-**TO BE COMPLETED/CHANGED**
+### ITS Amplicon Processing
+
+Fungal ITS1 reads were processed using **ITSxpress v2.1.4**, which performed adapter trimming and retained fungal ITS1 regions. Quality was assessed with **FastQC** and summarised using **MultiQC v1.28** (`F01_itsexpress.sh`). Trimmed reads were imported into **QIIME2 v2024.10**, and denoised using **DADA2** with no truncation.
+
+ASV tables were aggregated by site and taxonomic assignment was performed using a pre-trained classifier based on the **UNITE v10 database**. Diversity analyses (Observed Features, Shannon, Evenness, Jaccard, Bray-Curtis) were conducted using a rarefied depth of **30,000 reads/sample**, and visualised using **PCoA** and **Emperor** plots. Significance testing followed the same approach as for 16S (**Kruskal-Wallis** and **PERMANOVA**).
+
+Taxonomic tables were collapsed at the genus level for **ANCOM** analyses. Ecological functional guilds were predicted using **FUNGuild v1.1**, based on collapsed species-level data formatted with custom Python scripts. Functional diversity metrics were then computed at the **guild level**, and visualised using core-metrics tools at a rarefied depth of **11,000 reads/sample**. Significance was assessed using **Kruskal-Wallis** and **PERMANOVA** (`F09` and `F10` scripts).
+
+### 16S–ITS Correlation Analyses
+
+To explore inter-kingdom interactions, **correlation analyses** were conducted between bacterial and fungal taxa and between predicted bacterial pathways (**PICRUSt2**) and fungal functional guilds (**FUNGuild**). Using **R v4.4.2** and the `psych::corr.test` function, **Pearson correlations** were calculated at the genus level. Results were adjusted using **Holm-Bonferroni** correction. Only strong and significant correlations (e.g., |r| > 0.7, adjusted p ≤ 0.05) were retained after filtering. Additional filters removed taxa/guilds with low overall abundance.
+
+For functional correlations, similar thresholds were applied, but due to limited signal strength, analyses were interpreted conservatively and filtered results were reported alongside raw values when relevant.
 
 ### Summary of Pipeline
 
@@ -683,6 +745,10 @@ function switchPlotRarefaction_ITS() {
 
 ## **Taxonomic Diversity** (Bacteria & Fungi)
 
+**Summary**  
+Microbial taxonomic diversity revealed clear responses to restoration strategies. For bacteria, establishment method was the strongest driver of alpha and beta diversity, followed by pH and grazing. For fungi, pH and age were more influential. NR sites generally showed lower bacterial diversity and functional richness than GH and SM.
+
+
 ### Alpha Diversity {.tabset}
 
 Alpha diversity refers to the variety of organisms within a particular sample or environment. It reflects both **richness**—the number of distinct taxa—and **evenness**—how evenly individuals are distributed among those taxa. One of the most widely used measures for assessing alpha diversity is the **Shannon index**.
@@ -697,7 +763,8 @@ We also include **Pielou’s Evenness index**, which specifically quantifies how
 To allow interactive exploration of alpha diversity metrics across different environmental variables, we implemented a drop-down menu that dynamically displays the corresponding plots. Some variables, such as `pH category`, are only present in the ITS dataset, while others, like `Year group`, are specific to the 16S dataset. Internally, variables are mapped to their dataset-specific equivalents where needed (e.g. `Age group` in 16S becomes `Age category` in ITS). It is important to note, however, that these variables are not always directly comparable: for instance, `Age group` (16S) divides sites into multiple discrete intervals based on restoration age, while `Age category` (ITS) is a binary classification based on whether a site is above or below the median age. Despite these differences, the interface ensures that only available and relevant plots are shown for each selection.
 
 
-
+**Summary**  
+Bacterial alpha diversity (Shannon, Faith PD, Evenness) significantly varied with establishment method. GH and SM showed greater diversity than NR. For fungi, alpha diversity was more sensitive to pH and site age, with lower diversity observed in alkaline and older soils.
 
 
 ```{r alpha-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
@@ -1125,9 +1192,13 @@ function switchPlotAlphaITS() {
 
 ### Comparative Microbial Community Composition (Beta Diversity)
 
+
 To explore differences in microbial communities, we often rely on dimensionality reduction techniques such as *Principal Coordinates Analysis* (PCoA), visualised through **Emperor plots**. Two commonly used distance metrics in this context are **Bray-Curtis** and **Jaccard**.
 
 While both metrics can reveal meaningful clustering and separation in microbial data, they capture complementary aspects of community structure.
+
+**Summary**  
+Beta diversity patterns confirmed that establishment type, pH, and grazing significantly shaped microbial community composition. For bacteria, strong clustering by method and significant PERMANOVA results support distinct assemblages. Fungal beta diversity followed similar trends but with additional sensitivity to site age.
 
 #### Bray-Curtis
 
@@ -1765,6 +1836,9 @@ function switchPlotPermanova_16S_wunifrac() {
 
 ### Taxonomy Composition
 
+**Summary**  
+Bacterial communities were dominated by Actinobacteria and Proteobacteria, with variation by establishment and pH. Verrucomicrobia was more frequent in NR sites. For fungi, Ascomycota, Mortierellomycota, and Basidiomycota dominated, though many taxa remained unclassified. Guilds such as saprotrophs, pathogens, and parasites varied with site conditions.
+
 #### Taxonomy Barplot {.tabset}
 
 ##### Bacteria (16S) 
@@ -2343,7 +2417,14 @@ Functional diversity refers to the variety of biological functions present in mi
 Alpha and beta diversity were analysed, along with differentially abundant functions or pathways.
 
 
+**Summary**  
+Functional diversity revealed strong effects of establishment method and pH on microbial pathway composition. Core metabolic functions were consistent across sites, but specific biosynthetic and degradation pathways differed by age, pH, and grazing. Saprotrophic functions were dominant in fungi, with guild shifts linked to disturbance and soil chemistry.
+
 ### Bacteria (16S)
+
+**Summary**  
+Bacterial functional alpha and beta diversity varied significantly across establishment types, with GH and SM plots showing enhanced diversity. Functional profiles also responded to pH and age. Several metabolic pathways, including heme and amino acid biosynthesis, were enriched in specific conditions, reflecting adaptive responses to restoration.
+
 
 #### Functional Alpha Diversity {.tabset}
 
@@ -2776,6 +2857,10 @@ slickR(obj = slides, slideType = 'html', height = 500) +
 ---
 
 ### Fungi (ITS)
+
+**Summary**  
+Fungal functional diversity was primarily influenced by pH and establishment method. Lower functional diversity was observed in alkaline soils. Guild analysis showed dominance of undefined saprotrophs, with dung-associated and pathogenic guilds more prevalent in managed or disturbed sites.
+
 
 #### Functional Alpha Diversity {.tabset}
 
@@ -3386,7 +3471,11 @@ for (v in vars) {
 
 ---
 
-## **Correlation between Bacteria and Fungi**
+## **Bacterial and Fungal Comparison**
+
+**Summary**  
+Correlations between bacterial and fungal taxa and functions revealed potential ecological links, particularly between saprotrophic/pathogenic fungi and sugar-degrading or nitrogen-associated bacterial pathways. Most associations were site-specific and stronger in NR plots, with nutrient cycling emerging as a shared functional axis.
+
 
 ### Taxonomic level
 
@@ -3473,4 +3562,13 @@ htmltools::div(
 )
 ```
 
+## Discussion 
+
+**Summary**  
+Microbial diversity patterns strongly support the role of restoration strategy and environmental variables in shaping both community composition and function. Bacterial alpha diversity responded mainly to establishment method, while beta diversity was influenced by pH, grazing, and site age. Functional profiles mirrored these patterns, with restoration type being the strongest driver. Despite these shifts, core microbial functions remained stable, indicating a conserved metabolic backbone across conditions.
+
+## Limitations
+
+**Summary**  
+Correlation analyses were limited by the complexity and abundance of fungal-bacterial interactions. Filtering was required to manage the volume of pairwise comparisons, which may have excluded meaningful associations. The ambiguity of FUNGuild annotations also constrained ecological interpretation. Alternative modelling approaches like GLMs may yield more robust insights into cross-kingdom interactions.
 
