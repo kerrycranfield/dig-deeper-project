@@ -15,20 +15,20 @@ The repository includes:
 ## Scripts description: ITS
 
 1. F01_itsxpress.sh – Trimming and Quality Control
-•	Purpose: Trims adapters and low-quality bases from raw ITS amplicon sequences and performs quality assessment.
-•	Tools: ITSxpress, FastQC, MultiQC.
+*	Purpose: Trims adapters and low-quality bases from raw ITS amplicon sequences and performs quality assessment.
+*	Tools: ITSxpress, FastQC, MultiQC.
 2. F02_denoise.sh – Denoising, Taxonomic Assignment, and Aggregation
-•	Purpose: Imports trimmed sequences into QIIME 2, denoises reads using DADA2, assigns taxonomy, and aggregates feature tables by site.
-•	Tools: QIIME2, DADA2.
+*	Purpose: Imports trimmed sequences into QIIME 2, denoises reads using DADA2, assigns taxonomy, and aggregates feature tables by site.
+*	Tools: QIIME2, DADA2.
 3. F03_metrics.sh – Diversity and Statistical Analysis
-•	Purpose: Computes diversity metrics (alpha and beta diversity), performs statistical tests, and generates visualisations.
-•	Tools: QIIME2.
+*	Purpose: Computes diversity metrics (alpha and beta diversity), performs statistical tests, and generates visualisations.
+*	Tools: QIIME2.
 4. F04_FUNGuild.sh – Functional Guild Classification
-•	Purpose: Collapses feature tables at genus level and identifies ecological guilds using FUNGuild.
-•	Tools: FUNGuild, QIIME2.
+*	Purpose: Collapses feature tables at genus level and identifies ecological guilds using FUNGuild.
+*	Tools: FUNGuild, QIIME2.
 5. F05_FUNSearch.sh – Species-Level Guild Identification
-•	Purpose: Performs species-level functional guild classification for detailed ecological insights.
-•	Tools: FUNGuild, QIIME2.
+*	Purpose: Performs species-level functional guild classification for detailed ecological insights.
+*	Tools: FUNGuild, QIIME2.
 6. F09_calc_func_div_metrics_ITS.sh - Functional diversity analysis
 * Purpose: Compute alpha and beta diversity metrics at guild level, alpha statistical significance
 * Tools: QIIME2
@@ -39,11 +39,11 @@ The repository includes:
 ## Scripts description: 16S
 
 1. S02_qc.sh - Quality control
-• Purpose: Performs quality assessment of reads
-• Tools: FastQC, MultiQC
+* Purpose: Performs quality assessment of reads
+* Tools: FastQC, MultiQC
 2. S03_q2_import_and_trim.sh - Trimming and visualising quality profiles
-• Purpose: Trim primer sequences and visualising quality profiles
-• Tools: QIIME2, CutAdapt
+* Purpose: Trim primer sequences and visualising quality profiles
+* Tools: QIIME2, CutAdapt
 3. S04_q2_denoise.sh - Denoising
 * Purpose: Denoises and pairs trimmed sequences, generates ASV feature tables
 * Tools: QIIME2, DADA2
