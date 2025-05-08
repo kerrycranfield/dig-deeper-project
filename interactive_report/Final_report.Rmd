@@ -183,6 +183,8 @@ Biodiversity loss, ecosystem degradation, and habitat destruction are increasing
 
 Ecological restoration plays a vital role in addressing these challenges. Rather than simply returning ecosystems to a previous state, modern approaches focus on **restoring ecological processes** and **enhancing ecosystem resilience** (Hicks, 2023).
 
+</br>
+
 ### The **RestREco** Initiative
 
 **RestREco** (*Restoring Resilient Ecosystems*) is a **NERC-funded** research project that adopts a *resilience-based* perspective on ecological restoration. The initiative brings together researchers from:
@@ -200,6 +202,8 @@ Using a **natural experiment design**, RestREco studies a network of **133 ecolo
 - **Proximity to existing woodland and grassland**
 
 The goal is to understand how these factors influence ecosystem **complexity**, **function**, and **resilience** to future pressures (RestREco, 2024).
+
+</br>
 
 ### The **Dig Deeper** Study
 
@@ -220,6 +224,8 @@ These microbial assessments complement broader ecosystem-level measurements with
 
 The following sections describe the sampling design, metadata structure, and the processing pipeline used to characterise microbial communities.
 
+</br>
+
 ### **Research Questions** and **Hypotheses**
 
 This study investigates how **grassland site age**, **establishment method**, **management practices**, and **soil pH** influence the **diversity**, **taxonomic composition**, and **functional profiles** of bacterial and fungal communities during restoration. It also explores the **interactions between bacteria and fungi**, focusing on potential correlations between microbial taxa, functional pathways, and fungal guilds.
@@ -231,6 +237,8 @@ The following hypotheses were formulated:
 3. **Age**, **establishment method**, and **pH** influence the **functional diversity** of bacterial and fungal communities.
 4. There are **correlations in taxon abundance** between bacterial and fungal groups.
 5. There are **correlations in the abundance of functional pathways and guilds** between bacterial and fungal communities.
+
+</br>
 
 ---
 
@@ -354,6 +362,8 @@ HTML("</br><p style='text-align: center; font-weight: bold;'>Metadata Summary</p
 
 A total of 330 soil samples were collected across 66 sites (five per site) by the **RestREco** team. After sieving (2 mm), all samples were frozen until DNA extraction, which was performed using the **QIAGEN PowerSoil** kit. Amplicon sequencing targeted two regions: the **V4–V5 region of the bacterial 16S rRNA gene** and the **ITS1 region of the fungal ITS gene**. Sequencing was carried out by **Novagene** using **Illumina paired-end reads** (2×250 bp), resulting in **660 FASTQ files per marker** (forward and reverse reads per sample). Metadata accompanying each sample included site characteristics (location, year of establishment, method), management practices (cutting, ploughing, grazing), and soil physicochemical properties.
 
+</br>
+
 ### 16S Amplicon Processing
 
 Quality control of 16S reads was performed using **FastQC v0.12.1** and summarised with **MultiQC v1.14**. A custom Bash script (`S02_qc.sh`) ensured correct pairing of reads and removed five incomplete samples. Sequences were then imported into **QIIME2 v2022.10** using the `PairedEndFastqManifestPhred33V2` format, and primers were removed with **CutAdapt v4.4**. Read quality was visualised using `qiime demux summarize`.
@@ -368,6 +378,8 @@ Predicted functional profiles were generated using **PICRUSt2** to infer KEGG Or
 
 Functional alpha and beta diversity metrics were also computed, and significance was tested per metadata variable, using **Kruskal-Wallis** and **PERMANOVA**, respectively.
 
+</br>
+
 ### ITS Amplicon Processing
 
 Fungal ITS1 reads were processed using **ITSxpress v2.1.4**, which performed adapter trimming and retained fungal ITS1 regions. Quality was assessed with **FastQC** and summarised using **MultiQC v1.28** (`F01_itsexpress.sh`). Trimmed reads were imported into **QIIME2 v2024.10**, and denoised using **DADA2** with no truncation.
@@ -376,11 +388,15 @@ ASV tables were aggregated by site and taxonomic assignment was performed using 
 
 Taxonomic tables were collapsed at the genus level for **ANCOM** analyses. Ecological functional guilds were predicted using **FUNGuild v1.1**, based on collapsed species-level data formatted with custom Python scripts. Functional diversity metrics were then computed at the **guild level**, and visualised using core-metrics tools at a rarefied depth of **11,000 reads/sample**. Significance was assessed using **Kruskal-Wallis** and **PERMANOVA** (`F09` and `F10` scripts).
 
+</br>
+
 ### 16S–ITS Correlation Analyses
 
 To explore inter-kingdom interactions, **correlation analyses** were conducted between bacterial and fungal taxa and between predicted bacterial pathways (**PICRUSt2**) and fungal functional guilds (**FUNGuild**). Using **R v4.4.2** and the `psych::corr.test` function, **Pearson correlations** were calculated at the genus level. Results were adjusted using **Holm-Bonferroni** correction. Only strong and significant correlations (e.g., |r| > 0.7, adjusted p ≤ 0.05) were retained after filtering. Additional filters removed taxa/guilds with low overall abundance.
 
 For functional correlations, similar thresholds were applied, but due to limited signal strength, analyses were interpreted conservatively and filtered results were reported alongside raw values when relevant.
+
+</br>
 
 ### Summary of Pipeline
 
@@ -549,9 +565,12 @@ For both bacteria and fungi, the shape of each curve indicates whether sequencin
 
 This step is crucial to ensure that downstream diversity analyses are not biased by unequal sampling effort.
 
+</br>
+
 ##### Bacteria (16S) 
 
 Here is a link to the **Rarefiction plots** for more flexibility on QIIME2: <a href="data/16S/alpha_rarefaction/data/index.html" target="_blank">Rarefiction plots (16S)</a>
+
 </br>
 
 <div style="margin-bottom: 20px;">
@@ -652,6 +671,7 @@ function switchPlotRarefaction_16S() {
 ##### Fungi (ITS)
 
 Here is a link to the **Rarefiction plots** for more flexibility on QIIME2: <a href="data/ITS/Pre-processing/F02_aggregated_rarefaction/data/index.html" target="_blank">Rarefiction plots (ITS)</a>
+
 </br>
 
 <div style="margin-bottom: 20px;">
@@ -747,22 +767,18 @@ function switchPlotRarefaction_ITS() {
 
 ---
 
-## Taxonomic Diversity (Bacteria & Fungi)
+## **Taxonomic Diversity** (Bacteria & Fungi)
 
 **Results Summary**  
 Microbial taxonomic diversity revealed clear responses to restoration strategies. For bacteria, establishment method was the strongest driver of alpha and beta diversity, followed by pH and grazing. For fungi, pH and age were more influential. NR sites generally showed lower bacterial diversity and functional richness than GH and SM.
 
+</br>
 
 ### Alpha Diversity {.tabset}
 
-Alpha diversity refers to the variety of organisms within a particular sample or environment. It reflects both **richness**—the number of distinct taxa—and **evenness**—how evenly individuals are distributed among those taxa. One of the most widely used measures for assessing alpha diversity is the **Shannon index**.
+Alpha diversity refers to the variety of organisms within a particular sample or environment. It reflects both **richness**—the number of distinct taxa—and **evenness**—how evenly individuals are distributed among those taxa.
 
-The Shannon index takes into account not only the number of species present, but also how evenly their abundances are distributed. A higher Shannon value generally indicates a more diverse and ecologically balanced community.
-
-Another important metric is **Faith’s Phylogenetic Diversity (Faith PD)**, which measures the total branch length of the phylogenetic tree that spans the species in a sample. Unlike the Shannon index, Faith PD incorporates evolutionary relationships, providing a phylogenetic perspective on diversity. (Bacteria only)
-
-We also include **Pielou’s Evenness index**, which specifically quantifies how equally individual organisms are distributed across taxa. While Shannon integrates both richness and evenness, this metric isolates the evenness component, providing a complementary view of diversity patterns.
-
+</br>
 
 To allow interactive exploration of alpha diversity metrics across different environmental variables, we implemented a drop-down menu that dynamically displays the corresponding plots. Some variables, such as `pH category`, are only present in the ITS dataset, while others, like `Year group`, are specific to the 16S dataset. Internally, variables are mapped to their dataset-specific equivalents where needed (e.g. `Age group` in 16S becomes `Age category` in ITS). It is important to note, however, that these variables are not always directly comparable: for instance, `Age group` (16S) divides sites into multiple discrete intervals based on restoration age, while `Age category` (ITS) is a binary classification based on whether a site is above or below the median age ( `Age_binary` for bacteria). Despite these differences, the interface ensures that only available and relevant plots are shown for each selection.
 
@@ -827,16 +843,16 @@ varsITS <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_categ
 
 ```
 
+</br>
 
 #### Bacteria (16S) {.tabset}
-
-In the plots below, we examine how the Shannon index, Faith PD and Evenness vary across different environmental and experimental conditions for the 16S (bacteria).
 
 **Results Summary**
 
 Shannon entropy revealed significant overall differences, with green hay/bush sites showing higher diversity than both natural regeneration and seed mix sites. Seed mix sites also had higher Shannon diversity than natural regeneration.
 Pielou’s evenness differed significantly across establishment methods (p = 0.0148), with green hay/bush sites being significantly more even than natural regeneration (q = 0.0148). The difference between seed mix and natural regeneration approached significance (q = 0.0597), while no significant difference was found between green hay/bush and seed mix.
 
+</br>
 
 <label for="variable_selector_Alpha16S">Select variable:</label>
 <select id="variable_selector_Alpha16S" onchange="switchPlotAlpha16S()">
@@ -851,10 +867,17 @@ Pielou’s evenness differed significantly across establishment methods (p = 0.0
   <option value="Age_binary">Age binary</option>
 </select>
 
+</br>
 
-##### Shannon Index Boxplot 
+##### Shannon Index Boxplots 
 
-The boxplot below illustrate differences in Shannon diversity across groups. This metric reflects both species richness and how balanced the community is in terms of species abundance.
+<details><summary><strong>Click for more information on Shannon index</strong></summary>
+
+The **Shannon index** takes into account not only the number of species present, but also how evenly their abundances are distributed. A higher Shannon value generally indicates a more diverse and ecologically balanced community.
+
+</details>
+
+</br>
 
 Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
 <a href="data/16S/alpha_diversity/s08_alpha_shannon_per_group/data/index.html" target="_blank">Shannon Index (16S)</a>
@@ -915,9 +938,15 @@ for (var in vars16S) {
 
 
 
-##### Faith PD Boxplot 
+##### Faith PD Boxplots 
 
-The following plots show Faith’s Phylogenetic Diversity, which integrates evolutionary relationships to capture how phylogenetically broad each microbial community is.
+<details><summary><strong>Click for more information on Faith PD</strong></summary>
+
+**Faith’s Phylogenetic Diversity (Faith PD)** measures the total branch length of the phylogenetic tree that spans the species in a sample. Unlike the Shannon index, Faith PD incorporates evolutionary relationships, providing a phylogenetic perspective on diversity. (Bacteria only)
+
+</details>
+
+</br>
 
 Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
 <a href="data/16S/alpha_diversity/s08_alpha_faith_pd_per_group/data/index.html" target="_blank">Faith PD (16S)</a>
@@ -974,9 +1003,15 @@ for (var in vars16S) {
 
 
 
-##### Evenness Boxplot
+##### Evenness Index Boxplots
 
-These boxplots display Pielou’s Evenness, highlighting how uniformly taxa are represented in each community. It allows us to isolate imbalance in dominance from richness effects.
+<details><summary><strong>Click for more information on Pielou's Evenness Index</strong></summary>
+
+**Pielou’s Evenness index** specifically quantifies how equally individual organisms are distributed across taxa. While Shannon integrates both richness and evenness, this metric isolates the evenness component, providing a complementary view of diversity patterns.
+
+</details>
+
+</br>
 
 Here is a link to the <strong>full QIIME2 results (16S)</strong> : 
 <a href="data/16S/alpha_diversity/s08_alpha_evenness_per_group/data/index.html" target="_blank">Pielou Evenness (16S)</a>
@@ -1052,9 +1087,9 @@ function switchPlotAlpha16S() {
 
 #### Fungi (ITS) {.tabset}
 
-For the ITS dataset, the alpha diversity was done per sample. In order to align it with the 16S analysis—where samples were already grouped by site—we aggregated the alpha diversity values by computing the **mean per site**. Categorical metadata was simplified using the most common (modal) value per site. This ensures consistency across datasets in the visual outputs. However, users interested in the original, unaggregated sample-level data can explore the **full QIIME 2 results** via the links provided under each section.
-
 For the variable **pH_category**, the median is **7.94** and for **Age_category** it's **13 years**.
+
+</br>
 
 **Results Summary**
 
@@ -1063,6 +1098,8 @@ Fungal alpha diversity showed limited variation across establishment methods, wi
 However, **soil pH** significantly affected fungal diversity, with **alkaline soils (pH > 7.9)** showing lower Shannon entropy values compared to neutral or slightly acidic soils (*p* < 0.02). **Site age** also influenced diversity, with **older sites** displaying lower median Shannon diversity (*p* < 0.02).
 
 Regarding community evenness, **sheep grazing** was the only factor associated with a significant difference: grazed sites had slightly higher Pielou’s evenness (*p* = 0.03). Other variables, including establishment method, age, and pH, showed no significant effect on evenness.
+
+</br>
 
 <label for="variable_selector_AlphaITS">Select variable:</label>
 <select id="variable_selector_AlphaITS" onchange="switchPlotAlphaITS()">
@@ -1075,9 +1112,16 @@ Regarding community evenness, **sheep grazing** was the only factor associated w
   <option value="pH_category">pH category</option>
 </select>
 
-##### Shannon Index Boxplot 
+##### Shannon Index Boxplots
 
-The boxplot below illustrate differences in Shannon diversity across groups. This metric reflects both species richness and how balanced the community is in terms of species abundance.
+<details><summary><strong>Click for more information on Shannon index</strong></summary>
+
+The **Shannon index** takes into account not only the number of species present, but also how evenly their abundances are distributed. A higher Shannon value generally indicates a more diverse and ecologically balanced community.
+
+</details>
+
+
+</br>
 
 Here is a link to the <strong>full QIIME2 results (ITS)</strong> : 
 <a href="data/ITS/Alpha_diversity/F03_shannon_significance/data/index.html" target="_blank">Shannon Index (ITS)</a>
@@ -1129,9 +1173,16 @@ for (var in varsITS) {
 }
 ```
 
-##### Evenness Boxplot
+##### Evenness Index Boxplots
 
-These boxplots display Pielou’s Evenness, highlighting how uniformly taxa are represented in each community. It allows us to isolate imbalance in dominance from richness effects.
+<details><summary><strong>Click for more information on Pielou's Evenness Index</strong></summary>
+
+**Pielou’s Evenness index** specifically quantifies how equally individual organisms are distributed across taxa. While Shannon integrates both richness and evenness, this metric isolates the evenness component, providing a complementary view of diversity patterns.
+
+</details>
+
+
+</br>
 
 Here is a link to the <strong>full QIIME2 results (ITS)</strong> : 
 <a href="data/ITS/Alpha_diversity/F03_evenness_vector/data/index.html" target="_blank">Pielou Evenness (ITS)</a>
@@ -1211,13 +1262,28 @@ While both metrics can reveal meaningful clustering and separation in microbial 
 
 This approach is useful to visualise group clustering by variables like **establishment type**, **management**, or **site age**, and complements statistical tests like **PERMANOVA**, which assess whether community structure significantly varies across those factors.
 
+</br>
+
 **Results Summary**  
 
 Beta diversity patterns confirmed that establishment type, pH, and grazing significantly shaped microbial community composition. For bacteria, strong clustering by method and significant PERMANOVA results support distinct assemblages. Fungal beta diversity followed similar trends but with additional sensitivity to site age.
 
+</br>
+
 #### Bacteria (16S)
 
 ##### Bray-Curtis
+
+<details><summary><strong>Click for more information on Bray-Curtis Distance Metric</strong></summary>
+
+**Bray-Curtis** is a non-phylogenetic beta diversity metric that compares microbial communities based on **species abundance**, taking into account both shared taxa and their **relative proportions**.
+Unlike presence/absence metrics, Bray-Curtis gives more weight to **dominant species** and is sensitive to changes in **abundance structure**. It ranges from 0 (identical composition and abundance) to 1 (completely different), reflecting how much two communities differ in the quantity of each taxon they contain.
+Bray-Curtis is especially useful for detecting shifts in **community structure** driven by changes in resource availability, disturbance, or other factors that influence the balance of taxa rather than just their presence.
+
+
+</details>
+
+</br>
 
 **Results Summary**
 
@@ -1229,6 +1295,8 @@ The Bray–Curtis metric revealed strong effects of **establishment method**, **
 **Results Summary**
 
 Beta diversity analysis using Bray–Curtis distance revealed that **establishment method**, **soil pH**, and **sheep grazing** were the primary factors shaping bacterial community structure. Significant differences in taxonomic composition were observed between all establishment types, with natural regeneration, seed mix, and green hay/bush plots forming distinct but partially overlapping clusters in PCoA space. **Site age** also had a detectable effect with Bray–Curtis, highlighting changes in relative abundance between younger and older sites.
+
+</br>
  
 Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
 
@@ -1286,11 +1354,13 @@ Bray-Curtis-based PERMANOVA revealed significant differences in bacterial commun
 Site age also had a significant but weaker effect. However, clustering by age in Bray-Curtis PCoA plots was less pronounced, suggesting more subtle shifts in community structure over time.
 
 Soil pH significantly shaped bacterial community composition, with Bray-Curtis PCoA plots showing clear clustering between high and low-to-neutral pH soils
-</br>
 
+</br>
 
 You can **click on the images** below to access the **full QIIME2 report**.
+
 </br>
+
 <div style="margin-bottom: 20px;">
   <label for="variable_selector_Permanova_16S_bray"><b>Select variable:</b></label>
   <select id="variable_selector_Permanova_16S_bray" onchange="switchPlotPermanova_16S_bray()">
@@ -1335,6 +1405,16 @@ function switchPlotPermanova_16S_bray() {
 
 
 ##### Jaccard 
+
+<details><summary><strong>Click for more information on Jaccard Distance Metric</strong></summary>
+
+**Jaccard** is a non-phylogenetic beta diversity metric that compares microbial communities based on the **presence or absence** of taxa, without considering their abundance or evolutionary relationships.
+It measures the proportion of shared taxa between samples relative to the total number of taxa present, treating all species equally. This makes it particularly sensitive to **community turnover**, highlighting whether two sites contain the same organisms, regardless of how abundant they are.
+Jaccard is well-suited for detecting changes in **community membership** across environmental gradients or treatment groups, especially when interested in whether taxa are present at all, rather than how dominant they are.
+
+</details>
+
+</br>
 
 ###### Emperor Plot
 
@@ -1433,16 +1513,23 @@ function switchPlotPermanova_16S_jacc() {
 
 ##### Unweighted Unifrac 
 
+<details><summary><strong>Click for more information on Unweighted Unifrac Distance Metric</strong></summary>
+
 **Unweighted UniFrac** is a phylogenetic beta diversity metric that compares microbial communities based solely on the **presence or absence** of taxa, while incorporating their **evolutionary relationships**.
 
 Unlike abundance-based measures, this metric considers whether lineages are shared between communities, regardless of how dominant they are. It is particularly sensitive to **rare or low-abundance taxa**, as all taxa are weighted equally.
 
 Unweighted UniFrac is useful for identifying broad differences in **community membership**—for example, whether two sites share the same species, even if those species occur at very different abundances. This makes it well-suited to detecting compositional shifts due to strong environmental filters or historical legacies.
 
+</details>
+
+</br>
+
 **Results Summary**
 
 Unweighted UniFrac, which focuses on phylogenetic presence/absence, similarly highlighted **establishment method**, **soil pH**, and **sheep grazing** as major drivers of variation. All pairwise comparisons between establishment types yielded statistically significant differences (*q* < 0.005), confirming shifts in community membership across restoration strategies. However, **site age** had no significant effect using this metric (*p* = 0.063), suggesting that observed changes with age were driven more by shifts in abundance than by changes in phylogenetic composition.
 
+</br>
 
 ###### Emperor Plot
 
@@ -1539,12 +1626,17 @@ function switchPlotPermanova_16S_uwunifrac() {
 
 ##### Weighted Unifrac 
 
+<details><summary><strong>Click for more information on Weighted Unifrac Distance Metric</strong></summary>
+
 **Weighted UniFrac** is a phylogenetic distance metric that takes into account both the **evolutionary relationships** between taxa and their **relative abundances** in each sample.
 
 It quantifies how much of the phylogenetic tree is **shared** between communities, with branches weighted by the proportion of abundance they represent. As a result, changes in dominant taxa have more influence on the distance than rare species.
 
 Weighted UniFrac is ideal for detecting differences in **community structure**, especially when those differences involve shifts in abundant lineages. It provides a more nuanced view than unweighted metrics by integrating both phylogenetic and quantitative information.
 
+</details>
+
+</br>
 
 ###### Emperor Plot
 
@@ -1648,6 +1740,17 @@ function switchPlotPermanova_16S_wunifrac() {
 
 ##### Bray-Curtis
 
+<details><summary><strong>Click for more information on Bray-Curtis Distance Metric</strong></summary>
+
+**Bray-Curtis** is a non-phylogenetic beta diversity metric that compares microbial communities based on **species abundance**, taking into account both shared taxa and their **relative proportions**.
+Unlike presence/absence metrics, Bray-Curtis gives more weight to **dominant species** and is sensitive to changes in **abundance structure**. It ranges from 0 (identical composition and abundance) to 1 (completely different), reflecting how much two communities differ in the quantity of each taxon they contain.
+Bray-Curtis is especially useful for detecting shifts in **community structure** driven by changes in resource availability, disturbance, or other factors that influence the balance of taxa rather than just their presence.
+
+
+</details>
+
+</br>
+
 ###### Emperor Plot
  
 
@@ -1655,6 +1758,7 @@ function switchPlotPermanova_16S_wunifrac() {
 
 Beta diversity analysis revealed that **establishment method**, **soil pH**, and **site age** had the most significant influence on fungal community composition, followed by **sheep grazing**, **ploughing**, and **cutting**. In PCoA plots, natural regeneration sites formed a loose cluster near seed mix sites, while green hay/bush sites clustered more distinctly along Axis 1. 
 
+</br>
 
 Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (ITS)</a>
 
@@ -1709,8 +1813,11 @@ PERMANOVA analysis identified pH category (p = 0.001) and establishment method (
 Pairwise comparisons showed the strongest differences between green hay/bush and seed mix sites (p = 0.008), followed by green hay/bush vs. natural regeneration (p = 0.011). Natural regeneration sites exhibited the highest variation in community composition, with Bray-Curtis distances ranging from 0.25 to 0.95.
 
 </br>
+
 You can **click on the images** below to access the **full QIIME2 report**.
+
 </br>
+
 <div style="margin-bottom: 20px;">
   <label for="variable_selector_Permanova_ITS_bray"><b>Select variable:</b></label>
   <select id="variable_selector_Permanova_ITS_bray" onchange="switchPlotPermanova_ITS_bray()">
@@ -1754,14 +1861,23 @@ function switchPlotPermanova_ITS_bray() {
 
 ##### Jaccard 
 
+<details><summary><strong>Click for more information on Jaccard Distance Metric</strong></summary>
+
+**Jaccard** is a non-phylogenetic beta diversity metric that compares microbial communities based on the **presence or absence** of taxa, without considering their abundance or evolutionary relationships.
+It measures the proportion of shared taxa between samples relative to the total number of taxa present, treating all species equally. This makes it particularly sensitive to **community turnover**, highlighting whether two sites contain the same organisms, regardless of how abundant they are.
+Jaccard is well-suited for detecting changes in **community membership** across environmental gradients or treatment groups, especially when interested in whether taxa are present at all, rather than how dominant they are.
+
+</details>
+
+</br>
 
 ###### Emperor Plot
 
 **Results Summary**
 
-
 Jaccard analysis confirmed similar drivers of community structure—**establishment method**, **pH**, and **age**—with natural regeneration, seed mix, and green hay/bush sites forming distinguishable but overlapping clusters in higher dimensions. This suggests that both presence/absence and abundance-based differences in fungal communities are shaped by restoration strategy and site conditions.
 
+</br> 
 
 Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_jaccard_emperor/data/index.html" target="_blank">Jaccard Emperor Plot (ITS)</a>
 
@@ -1811,14 +1927,16 @@ cat("<p style='text-align: center; font-weight: bold;'>Jaccard Emperor Plot (ITS
 
 **Results Summary**
 
-
 With Jaccard dissimilarity, establishment method (p = 0.001) and pH (p = 0.002) remained the strongest drivers, followed by site age (p = 0.006), ploughing (p = 0.024), and cutting (p = 0.04).
 
 Pairwise comparisons showed the most significant differences between green hay/bush and both natural regeneration and seed mix sites (p = 0.001), and also between natural regeneration and seed mix (p = 0.004). Median Jaccard dissimilarity values were high across all establishment methods (0.75–0.85), indicating substantial variation in taxon presence/absence.
 
 </br>
+
 You can **click on the images** below to access the **full QIIME2 report**.
+
 </br>
+
 <div style="margin-bottom: 20px;">
   <label for="variable_selector_Permanova_ITS_jacc"><b>Select variable:</b></label>
   <select id="variable_selector_Permanova_ITS_jacc" onchange="switchPlotPermanova_ITS_jacc()">
@@ -1871,16 +1989,17 @@ function switchPlotPermanova_ITS_jacc() {
 
 **Results Summary**
 
-
 Analysis of bacterial community composition at the phylum level across establishment types revealed that **Actinobacteria** and **Proteobacteria** were dominant, together accounting for 50–80% of relative abundance. Actinobacteria were particularly abundant in seed mix (SM) sites, where they reached up to ~48%, while their proportion was lowest in natural regeneration (NR) sites (~21%). In contrast, Proteobacteria were most prominent in NR soils, peaking at ~55%. Other frequently detected phyla included **Acidobacteria**, **Firmicutes**, **Chloroflexi**, **Verrucomicrobia**, **Planctomycetes**, and **Nitrospirae**, with **Verrucomicrobia** notably more abundant in NR plots.
 
 At the class level, **Alphaproteobacteria**, **Actinobacteria**, **Thermoleophilia**, and **Bacilli** dominated across sites. A higher proportion of **Spartobacteria** was observed in NR plots compared to GH and SM plots.
 
 When comparing soils with pH above and below the median, the dominant phyla remained broadly consistent. However, some shifts were noted: **Firmicutes** and **Planctomycetes** were more abundant in more acidic soils (below-median pH), with Firmicutes reaching up to ~30% (versus ~19% above the median), and Planctomycetes peaking at ~6.5% (compared to ~3.6%).
 
-
+</br>
 
 Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2: <a href="data/16S/Taxonomy/s10_taxa_barplot_by_site/data/index.html" target="_blank">Taxonomy Barplot (16S)</a>
+
+</br>
 
 ```{r barplot-16S, echo =FALSE, message=FALSE, warning=FALSE, results='asis'}
 custom_blues <- c(
@@ -2052,7 +2171,9 @@ When grouping sites by **pH category**, the most visible difference was an incre
 </br>
 
 Here is a link to the **Taxonomy Barplots** for more flexibility on QIIME2: <a href="data/ITS/Taxonomy/Taxa_barplot/F03_taxa_barplot/data/index.html" target="_blank">Taxonomy Barplot (ITS)</a>
+
 </br>
+
 <div style="margin-bottom: 20px;">
   <label for="variable_selector_taxobar_ITS"><b>Select variable:</b></label>
   <select id="variable_selector_taxobar_ITS" onchange="switchPlottaxobar_ITS()">
@@ -2200,7 +2321,11 @@ In this study, Krona plots provide a powerful and user-friendly way to:
 - Visualise which microbial groups dominate each site
 - Explore the taxonomic diversity present in bacterial, archaeal, and fungal communities
 
+</br>
+
 You can **click on the images** below to access the **Krona plots** for each site.
+
+</br>
 
 ##### Bacteria (16S) {.unnumbered}
 
@@ -2226,6 +2351,9 @@ You can **click on the images** below to access the **Krona plots** for each sit
 #### Differential Abundance Analysis with ANCOM {.tabset}
 
 We used ANCOM to identify taxa whose relative abundances significantly differed across groups. This method accounts for the compositional nature of microbiome data by comparing log-ratios between taxa. The results are shown as volcano-like plots, where the W statistic reflects how many pairwise comparisons a taxon was found to differ in. Significant taxa are highlighted accordingly.
+
+</br>
+
 
 ##### Bacteria (16S) 
 
@@ -2453,7 +2581,7 @@ function switchPlotANCOM_ITS() {
 
 ---
 
-## Functional Diversity (Bacteria & Fungi) {.tabset}
+## **Functional Diversity** (Bacteria & Fungi) {.tabset}
 
 
 Functional diversity refers to the variety of biological functions present in microbial communities. Unlike taxonomic analysis, which identifies *who is there*, functional analysis explores *what they can do*. This section includes two parallel analyses:
@@ -2462,13 +2590,15 @@ Functional diversity refers to the variety of biological functions present in mi
 - **Fungi (ITS)**: Functional roles were explored using **FUNGuild**, which assigns taxa to ecological guilds based on literature.
 
 Alpha and beta diversity were analysed, along with differentially abundant functions or pathways.
-
+ 
+</br>
 
 **Results Summary** 
 
 
 Functional diversity revealed strong effects of establishment method and pH on microbial pathway composition. Core metabolic functions were consistent across sites, but specific biosynthetic and degradation pathways differed by age, pH, and grazing. Saprotrophic functions were dominant in fungi, with guild shifts linked to disturbance and soil chemistry.
 
+</br>
 
 ### Bacteria (16S)
 
@@ -2476,15 +2606,19 @@ Functional diversity revealed strong effects of establishment method and pH on m
  
 Bacterial functional alpha and beta diversity varied significantly across establishment types, with GH and SM plots showing enhanced diversity. Functional profiles also responded to pH and age. Several metabolic pathways, including heme and amino acid biosynthesis, were enriched in specific conditions, reflecting adaptive responses to restoration.
 
+</br>
 
 #### Functional Alpha Diversity {.tabset}
 
 
 We examined three complementary metrics: **Shannon diversity** (richness and evenness), **Observed Features** (richness only), and **Evenness** (dominance balance). You can use the menu below to explore how each metric varies according to different experimental variables.
+
 </br>
+
 **Results Summary**
 
 Functional alpha diversity, based on **PICRUSt2-inferred** metabolic pathways, varied significantly across establishment types. Diversity was higher in SM and GH plots compared to NR, while no significant difference was detected between SM and GH.
+
 
 </br>
 
@@ -2616,7 +2750,7 @@ for (var in vars){
 }
 ```
 
-##### Evenness Significance Boxplots
+##### Evenness Index Boxplots
 
 Here is a link to the **Evenness Boxplot** for more flexibility on QIIME2: <a href="data/16S/Functional_analysis/Functional_alpha/pathway_pielou_e_significance/data/index.html" target="_blank">Evenness Boxplot - Functional (16S)</a>
 
@@ -2690,9 +2824,10 @@ function switchPlotSignAlpha_16S() {
 }
 </script>
 
-#### Functional Beta Diversity {.tabset}
+#### Functional Beta Diversity 
 
 ##### Emperor Plot – Bray-Curtis Distance
+
 
 **Results Summary**
 
@@ -2701,6 +2836,7 @@ Functional beta diversity analyses based on **PICRUSt2** pathway profiles showed
 Establishment method had the strongest effect, with distinct functional profiles observed across all establishment types. Soil pH also shaped functional composition, with samples from high- and low-pH sites showing partial separation.
 In addition, grazing by sheep was associated with significant shifts in predicted functional pathways, despite some overlap between grazed and ungrazed plots.
 
+</br>
 
 Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Functional_analysis/Functional_beta/pathway_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
 
@@ -2746,7 +2882,7 @@ HTML("<p style='text-align: center; font-weight: bold;'>Bray-Curtis Emperor Plot
 ```
 
 
-##### PERMANOVA
+##### PERMANOVA – Bray-Curtis Distance
 
 You can **click on the images** below to access the **full QIIME2 report**.
 
@@ -2800,8 +2936,9 @@ function switchPlotPermanova_16S_bray_func() {
 
 *To identify pathways with significantly different abundances between groups, ANCOM was applied to PICRUSt2 pathway predictions.*
 
-**Results Summary**
+</br>
 
+**Results Summary**
 
 
 Differential abundance analysis of predicted microbial functions (ANCOM) revealed that several pathways varied significantly in response to environmental factors.
@@ -2909,6 +3046,8 @@ function switchPlotFunctDiv_16S() {
 
 These **heatmaps** display the **relative abundance** of predicted functional pathways across different samples, based on **PICRUSt2-inferred** metagenomic profiles from 16S rRNA gene data. Generated using QIIME2, each **row** represents a **metabolic pathway** (from MetaCyc), and each **column** corresponds to a **sample group**. The **colour intensity** indicates the **predicted abundance** of each functional pathway in the respective group.
 
+</br>
+
 You can **click on each image** to view a **larger** version in a new tab.
 
 ```{r heatmaps}
@@ -2943,7 +3082,7 @@ slickR(obj = slides, slideType = 'html', height = 500) +
 
 Fungal functional diversity was primarily influenced by pH and establishment method. Lower functional diversity was observed in alkaline soils. Guild analysis showed dominance of undefined saprotrophs, with dung-associated and pathogenic guilds more prevalent in managed or disturbed sites.
 
-
+</br>
 
 #### Functional Alpha Diversity {.tabset}
 
@@ -3040,7 +3179,7 @@ for (var in vars){
 
 ```
 
-##### Evenness Significance Boxplots
+##### Evenness Index Boxplots
 
 Here is a link to the **Evenness Boxplot** for more flexibility on QIIME2: <a href="data/ITS/Functional_analysis/Functional_alpha/alpha_evenness_ITS/data/index.html" target="_blank">Evenness Boxplot - Functional (ITS)</a>
 
@@ -3121,10 +3260,11 @@ For **pH category**, clustering was less distinct with Bray–Curtis but more ap
 
 **Site age** also had a significant effect on guild composition for both metrics. The effect was more pronounced with Bray–Curtis (*p*-adjusted = 0.009) than with Jaccard (*p*-adjusted = 0.04). While PCoA plots suggested some separation by age, each age group contained a mix of sites, indicating **partial overlap** in guild structure across age categories.
 
+</br>
+
 ##### Bray-Curtis
 
 ###### Emperor Plot 
-
 
 Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Functional_analysis/Functional_beta/Emperor_Plot/bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (16S)</a>
 
@@ -3324,6 +3464,8 @@ This functional classification provides valuable insights into what fungi are li
 
 This section explores the functional roles of fungi within each site, based on guild-level annotations provided by **FUNGuild**. Fungal guilds reflect ecological functions such as **saprotrophy**, **symbiosis** (e.g., mycorrhizal fungi), or **pathogenicity**. This approach provides insight into how fungal communities may contribute to ecosystem processes, complementing traditional taxonomic analyses.
 
+</br>
+
 
 ##### Top 20 Most Abundant Guilds
 
@@ -3489,6 +3631,7 @@ cat("<p style='text-align: center; font-weight: bold;'>Fungal Guild Abundance by
 
 ##### Guild Abundance by Variable
 
+
 ###### Establishment
 
 **Natural regeneration** had the **highest** proportion of **Undefined Saprotrophs**, while **Green Hay/Bush** and **Seed Mix** had **more Plant Pathogens** and **Dung Saprotrophs**.
@@ -3575,11 +3718,12 @@ for (v in vars) {
 
 ---
 
-## Bacterial and Fungal Comparison
+## **Bacterial and Fungal Comparison**
 
 **Results Summary**  
 Correlations between bacterial and fungal taxa and functions revealed potential ecological links, particularly between saprotrophic/pathogenic fungi and sugar-degrading or nitrogen-associated bacterial pathways. Most associations were site-specific and stronger in NR plots, with nutrient cycling emerging as a shared functional axis.
 
+</br>
 
 ### Taxonomic level
 
@@ -3622,6 +3766,8 @@ df_corr <- df_corr %>%
     label = paste(Bacteria, Fungi, sep = ": "),
     correlation_sign = factor(r > 0, levels = c(TRUE, FALSE), labels = c("Positive", "Negative"))
   )
+
+df_corr <- df_corr[-7,]
 
 g <- ggplot(df_corr, aes(
   x = label, 
@@ -3677,7 +3823,6 @@ kable(taxa_corr, "html", escape = FALSE, align = "lccc",
 ---
 
 ### Functional level
-
 
 
 A total of **42 significant correlations** were identified between **bacterial pathways** (from the MetaCyc database) and **fungal guilds** (from FUNGuild). Among these, **40 correlations were positive**, and **2 were negative**, with Pearson correlation values ranging from **-0.75 to 0.98**.
@@ -3779,40 +3924,52 @@ kable(functional_corr, "html", escape = FALSE, align = "lccc",
 ```
 </details>
 
-## Discussion
+</br>
+
+## **Discussion**
 
 **Bacterial Alpha and Beta Diversity**
+
 Microbial alpha diversity was significantly higher in assisted restoration plots (GH and SM) compared to natural regeneration (NR), suggesting that sown vegetation enhances microbial richness and evenness, likely via increased plant inputs and rhizosphere complexity (Van der Putten et al., 2013; Bardgett & van der Wal, 2014). In contrast, soil pH, management, and site age had no significant impact on alpha diversity, possibly due to functional redundancy that stabilises core microbial functions (Louca et al., 2018).
 Beta diversity was strongly shaped by all tested factors—restoration method, site age, soil pH, and grazing—particularly establishment method, which significantly altered both community membership (Unweighted UniFrac, p = 0.001) and abundance profiles (Bray-Curtis, p = 0.001). Site age influenced Bray-Curtis dissimilarities but not UniFrac distances, suggesting abundance shifts without major taxonomic turnover (Fierer et al., 2010; Nemergut et al., 2013). Soil pH acted as a strong environmental filter, affecting microbial community structure by influencing enzyme activity, nutrient availability, and stress response (Lauber et al., 2009; Rousk et al., 2010). Grazing also altered beta diversity, likely through disturbance and nutrient inputs (Bardgett & Wardle, 2010; Patra et al., 2005).
 
 **Functional Diversity and Key Drivers**
+
 Functional beta diversity was also significantly affected by environmental gradients, with the restoration method again exerting the strongest influence (PERMANOVA p = 0.001). Functional divergence likely reflected changes in rhizosphere chemistry and substrate input driven by vegetation type (Eisenhauer et al., 2017; Zhalnina et al., 2018; Lange et al., 2015).
 Soil pH had a strong effect on functional profiles (PERMANOVA p = 0.012), with alkaline soils enriched in pathways related to secondary metabolism (e.g., pentalenolactone biosynthesis), a trait associated with antibiotic production in Actinobacteria (Tetzlaff et al., 2006). Site age had a moderate effect (p = 0.035), with younger sites enriched in biosynthetic pathways such as heme and methionine biosynthesis (Choby & Skaar, 2016; Mohany et al., 2021). These functions are linked to early successional microbial activity (Fierer et al., 2010; Nemergut et al., 2013). Grazing influenced functions tied to nitrogen and organic matter degradation (Wang et al., 2020; Tang et al., 2020).
 
 **Differential Pathways and Functional Responses**
+
 Pathway-level differences revealed microbial adaptation to specific environmental contexts. Alkaline soils were enriched in antibiotic-related pathways (Tetzlaff et al., 2006), while younger sites showed prioritisation of growth-related functions (Choby & Skaar, 2016). In GH and SM plots, increased peptidoglycan and thiamine biosynthesis pathways suggested higher microbial growth and activity (Heijenoort, 2001; Begley et al., 1999; Eisenhauer et al., 2017). These adaptations reflect changes in vegetation and nutrient input linked to restoration strategy.
 
 **Core Metabolism and Redundancy**
+
 Despite compositional variation, core biosynthetic and energy metabolism pathways were conserved across all sites, including amino acid synthesis and pyruvate fermentation. This points to the persistence of essential ecosystem functions and supports the concept of functional redundancy (Louca et al., 2018).
 
 **Taxonomic Trends and Indicators**
+
 Dominant phyla included Actinobacteria and Proteobacteria, consistent with nutrient-rich conditions in SM and GH plots (Spain et al., 2009). Acidobacteria, associated with acidic soils, remained common even in slightly acidic environments (Jones et al., 2009). Conexibacteraceae were more abundant in lower-pH soils (Lauber et al., 2009; Fierer & Jackson, 2006), while Intrasporangiaceae and Blastococcus preferred SM and GH sites, responding to increased organic inputs (Jangid et al., 2011).
 
 **Fungal Diversity and Environmental Drivers**
+
 Fungal diversity was mainly shaped by pH and site age. Alpha diversity decreased in alkaline soils, potentially due to reduced nutrient use efficiency in fungi (Ma et al., 2023), contradicting previous findings of increased diversity at high pH (Seaton et al., 2022). Older sites supported more complex fungal communities, consistent with longer recovery times post-disturbance (Gao et al., 2021). Establishment method also influenced fungal composition, with GH and SM sites hosting distinct taxa.
 
 **Fungal Composition and Functional Guilds**
+
 Metarhizium was more frequent in NR sites, reflecting reduced disturbance (Zimmermann, 2007). Gibellulopsis, potentially linked to pathogenic interactions, appeared in GH and SM plots (Alisaac & Götz, 2022). Sheep grazing was associated with higher Helotiales and dung-associated fungi like Preussia (Kruys et al., 2006; Bruyant et al., 2024), while ploughing promoted taxa like Saitozyma capable of breaking down plant-derived carbon (Aliyu et al., 2021). Site age influenced composition, with early successional fungi like Lasiosphaeriaceae more common in younger plots, and potential endophytes like Paraphaeosphaeria found in older sites (Baroncelli et al., 2020; Louw et al., 2022).
 
 **Fungal Functional Guild Shifts**
+
 Functional guild analysis showed lower abundance of pathogens and dung saprotrophs in NR sites, with higher prevalence in GH and SM plots. pH subtly influenced parasite abundance, while site age showed more complex guild structuring, aligning with patterns observed in forest restoration studies (Fang et al., 2023). Across all sites, saprotrophs dominated, particularly unclassified ones, underlining gaps in fungal ecological data (Nilsson et al., 2020).
 
 **Fungal-Bacterial Comparison and Interactions**
 While bacterial diversity was most strongly shaped by establishment method, fungal diversity was more affected by pH and age. However, community composition (beta diversity) for both kingdoms was driven by similar environmental filters. Cross-kingdom correlations included co-occurrence of taxa in GH and SM sites, such as Proteobacteria and Gibellulopsis. Functional comparisons showed complementarity in decomposition and nutrient cycling, supporting previous observations of cross-kingdom cooperation (Wagg et al., 2019; Kohlmeier et al., 2005).
 
 **Functional and Taxonomic Correlations**
+
 Bradyrhizobiaceae (oligotrophic, nitrogen-fixing bacteria) were associated with saprotrophic yeasts (Saitozyma) and parasitic fungi (Keithomyces), possibly due to shared preference for low pH (Sawada et al., 2023). Rhodospirillaceae and Dermoloma co-occurred on one site, suggesting shared habitat preferences. Most functional correlations involved nutrient cycling: Thermothielavioides (a dung saprotroph) was associated with sugar degradation pathways and propionate metabolism (Camargo et al., 2020; Caspi et al., 2020). These patterns indicate that bacteria and fungi carry out complementary metabolic roles, particularly in NR sites, where successional complexity may support tighter functional coupling (Gao et al., 2021).
 
+</br>
 
 ## Limitations
 
