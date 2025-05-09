@@ -1,0 +1,4 @@
+Group 1,Group 2,Sample size,Permutations,pseudo-F,p-value,q-value
+No,Yes,42,999,1.3081555977348318,0.024,0.0405
+No,nan,24,999,1.527489331614239,0.027,0.0405
+Yes,nan,20,999,1.627027896679259,0.1,0.1

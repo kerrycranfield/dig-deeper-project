@@ -1,0 +1,18 @@
+✅ 开始按 Genus 分组并运行 ANCOM...
+➡️ Collapsing to Genus level...
+➡️ Adding pseudocount...
+   ➤ 处理: Establishment
+     ✅ 'Establishment' ANCOM 完成
+   ➤ 处理: Cutting
+     ✅ 'Cutting' ANCOM 完成
+   ➤ 处理: Cattle
+     ✅ 'Cattle' ANCOM 完成
+   ➤ 处理: Sheep
+     ✅ 'Sheep' ANCOM 完成
+   ➤ 处理: Plough
+     ✅ 'Plough' ANCOM 完成
+   ➤ 处理: Age_binary
+     ✅ 'Age_binary' ANCOM 完成
+   ➤ 处理: pH_binary
+     ✅ 'pH_binary' ANCOM 完成
+������ 所有 ANCOM 分析已完成，输出目录：/mnt/beegfs/home/shangda.zhu/groupproject/results/genus_ancom_results

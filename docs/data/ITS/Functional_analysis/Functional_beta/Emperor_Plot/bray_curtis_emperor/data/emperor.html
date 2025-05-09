@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Emperor</title>
+    <!-- core dependencies that are otherwise included via the jupyter notebook -->
+<script src="./vendor/js/require-2.1.22.min.js"></script>
+<script src="./vendor/js/jquery-2.1.4.min.js"></script>
+    <meta charset="utf-8">
+
+    <script type="text/javascript">
+if (document.querySelector("#emperor-css") === null){
+    document.querySelector("head").insertAdjacentHTML("beforeend",[
+        '<link id="emperor-css" rel="stylesheet" type="text/css" href="./css/emperor.css">',
+        '<link rel="stylesheet" type="text/css" href="./vendor/css/jquery-ui.min.css">',
+        '<link rel="stylesheet" type="text/css" href="./vendor/css/slick.grid.min.css">',
+        '<link rel="stylesheet" type="text/css" href="./vendor/css/spectrum.min.css">',
+        '<link rel="stylesheet" type="text/css" href="./vendor/css/chosen.min.css">',
+        '<link rel="stylesheet" type="text/css" href="./vendor/css/jquery.contextMenu.min.css">'
+    ]);
+}
+</script>
+
+
+    <style>
+      #emperor-notebook-0xa33cab83 {
+        height:100vh !important;
+        padding: 0px !important;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        outline: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='emperor-notebook-0xa33cab83' style="position: relative; width:100%; height:500px;">
+  <div class='loading' style="position: absolute;top: 50%;left: 50%;margin-left: -229px; margin-top: -59px; z-index: 10000;height:118px;width:458px;padding:0px"><img src='./img/emperor.png' alt='Emperor resources missing. Expected them to be found in .'></div>
+</div>
+</div>
+    <script type="text/javascript">
+    // When running in the Jupyter notebook we've encountered version conflicts
+// with some dependencies. So instead of polluting the global require context,
+// we define a new context.
+var emperorRequire = require.config({
+'context': 'emperor',
+// the left side is the module name, and the right side is the path
+// relative to the baseUrl attribute, do NOT include the .js extension
+'paths': {
+  /* jQuery */
+  'jquery': './vendor/js/jquery-2.1.4.min',
+  'jqueryui': './vendor/js/jquery-ui.min',
+  'jquery_drag': './vendor/js/jquery.event.drag-2.2.min',
+
+  /* jQuery plugins */
+  'chosen': './vendor/js/chosen.jquery.min',
+  'spectrum': './vendor/js/spectrum.min',
+  'position': './vendor/js/jquery.ui.position.min',
+  'contextmenu': './vendor/js/jquery.contextMenu.min',
+
+  /* other libraries */
+  'underscore': './vendor/js/underscore-min',
+  'chroma': './vendor/js/chroma.min',
+  'filesaver': './vendor/js/FileSaver.min',
+  'blob': './vendor/js/Blob',
+  'canvastoblob': './vendor/js/canvas-toBlob',
+  'd3': './vendor/js/d3.min',
+
+  /* THREE.js and plugins */
+  'three': './vendor/js/three.min',
+  'orbitcontrols': './vendor/js/three.js-plugins/OrbitControls',
+  'projector': './vendor/js/three.js-plugins/Projector',
+  'svgrenderer': './vendor/js/three.js-plugins/SVGRenderer',
+  'canvasrenderer': './vendor/js/three.js-plugins/CanvasRenderer',
+  'selectionbox': './vendor/js/three.js-plugins/SelectionBox',
+  'selectionhelper': './vendor/js/three.js-plugins/SelectionHelper',
+
+  /* SlickGrid */
+  'slickcore': './vendor/js/slick.core.min',
+  'slickgrid': './vendor/js/slick.grid.min',
+  'slickformatters': './vendor/js/slick.editors.min',
+  'slickeditors': './vendor/js/slick.formatters.min',
+  'slickdataview': './vendor/js/slick.dataview.min',
+
+  /* Emperor's objects */
+  'util': './js/util',
+  'model': './js/model',
+  'multi-model': './js/multi-model',
+  'view': './js/view',
+  'controller': './js/controller',
+  'draw': './js/draw',
+  'scene3d': './js/sceneplotview3d',
+  'shapes': './js/shapes',
+  'animationdirector': './js/animate',
+  'trajectory': './js/trajectory',
+  'uistate': './js/ui-state',
+
+  /* controllers */
+  'abcviewcontroller': './js/abc-view-controller',
+  'viewcontroller': './js/view-controller',
+  'colorviewcontroller': './js/color-view-controller',
+  'visibilitycontroller': './js/visibility-controller',
+  'opacityviewcontroller': './js/opacity-view-controller',
+  'scaleviewcontroller': './js/scale-view-controller',
+  'shapecontroller': './js/shape-controller',
+  'axescontroller': './js/axes-controller',
+  'animationscontroller': './js/animations-controller',
+
+  /* editors */
+  'shape-editor': './js/shape-editor',
+  'color-editor': './js/color-editor',
+  'scale-editor': './js/scale-editor'
+
+},
+/*
+   Libraries that are not AMD compatible need shim to declare their
+   dependencies.
+ */
+'shim': {
+  'jquery_drag': {
+    'deps': ['jquery', 'jqueryui']
+  },
+  'chosen': {
+    'deps': ['jquery'],
+    'exports': 'jQuery.fn.chosen'
+  },
+  'contextmenu' : {
+    'deps': ['jquery', 'jqueryui', 'position']
+  },
+  'filesaver' : {
+    'deps': ['blob']
+  },
+  'canvastoblob' : {
+    'deps': ['blob']
+  },
+  'slickcore': ['jqueryui'],
+  'slickgrid': ['slickcore', 'jquery_drag', 'slickformatters', 'slickeditors',
+                'slickdataview']
+}
+});
+
+emperorRequire(
+["jquery", "model", "controller"],
+function($, model, EmperorController) {
+  var DecompositionModel = model.DecompositionModel;
+
+  var div = $('#emperor-notebook-0xa33cab83');
+
+  var data = {"info": null, "plot": {"decomposition": {"axes_names": [0, 1, 2, 3, 4], "ci": null, "coordinates": [[-0.18682070685962077, -0.7155633963501002, -0.305357626245183, 0.08632961678301046, 0.0029219925484569058], [0.3122227045726539, -0.08067099310284054, -0.05963096419131522, 0.06849199864123562, 0.03837083607483739], [0.16722749547278748, 0.16867206260924403, 0.1376002722906782, 0.13324377050118721, -0.05418465108598197], [-0.3812778249122228, -0.12489291151769778, 0.10445458996682092, -0.31943957681679824, -0.055778549131362105], [0.3948790319580161, 0.38300489235603175, -0.025890164393739454, 0.025956892036067894, -0.04059043908605195], [-0.4345489495027794, -0.338061571509712, 0.8246491446261174, 0.3865522928919716, 0.08325075154033414], [0.14686128746840355, 0.1169751457564602, 0.06084153248599039, -0.18086702358832613, 0.06273903200801649], [0.17432047017045202, 0.0056855739292134295, 0.10514911842334461, -0.3549156910884853, 0.05063318278474713], [0.021158205473843315, -0.29826248961403445, -0.02822126882242421, -0.14148670291412152, 0.08470269683960738], [0.027758379360584905, -0.06832704697373904, 0.2780227216611554, -0.22717035051365853, 0.14956578973044835], [0.08715528476452761, 0.11054631868126202, 0.049127669650719887, -0.13621427573881484, 0.1324638869071749], [0.05800319136308122, -0.1873562185537277, 0.13990505840180983, -0.11968385429205045, 0.03762473024461375], [0.12928199322604114, -0.3536273470335794, 0.07184466722727811, -0.12476585430114796, 0.05897109609823967], [0.1289551969845542, -0.2910011791700456, -0.1361815419474958, -0.021467085192752148, -0.07605587339841573], [0.3096995730512289, 0.3160740775972493, 0.04321372493213092, -0.2713310385981287, 0.12433532077403926], [-0.0772738146085608, 0.0924358371690264, -0.11678232180995968, -0.026435975973140555, 0.034449088713673005], [0.28280009525008926, -0.2739031920352952, -0.1276264049469467, 0.0312516466671156, -0.0647923365240664], [0.21291683234266714, -0.5916074740841569, -0.27426372452337, 0.11024172279712212, 0.5913897530427106], [-0.27972501864622445, -0.5095778964946892, -0.4020788123443316, 0.21010261166701627, 0.5193906896928701], [-0.45339926930984603, -0.031071543915955364, -0.159969214862305, -0.08207122863044196, -0.06147607221906672], [-0.45217528519436523, -0.11767254922272179, -0.3365459461603077, 0.1760650085452062, -0.5385412481774025], [-0.29130583205185, -0.028572674754353326, -0.10034615722925305, -0.48871746213994754, 0.3141008921860227], [0.17714517214505854, -0.003975645994279529, 0.17711856119097194, -0.3848196479155693, 0.0802440732169877], [0.37981504635865554, 0.01932506732384083, 0.14644264263206275, 0.08388603826631566, -0.10018789501371572], [0.42540978084128706, -0.04422355649866874, 0.16295889363404525, 0.0956046508947944, -0.2052871414505031], [0.011500150163023658, -0.10650981772273242, 0.2228231579147669, -0.40647534844054434, 0.10737896052701233], [0.4783691704753955, -0.08328966934403477, 0.00592433478391337, -0.05446393900930458, 0.22943354538096258], [-0.04942722713042803, -0.6461638267266784, -0.2773963706617002, -0.005803008865452573, 0.10507805650881101], [0.6814675947391816, 0.4137025894727748, -0.08072950643220134, 0.4420114842690771, 0.01074123226502536], [0.7620688591021566, 0.16868589251653507, -0.2543961712706001, 0.4583851032962779, 0.2493656623539439], [0.34340877966646166, -0.155495954863631, -0.14550058964856621, 0.04499101256871958, 0.03969046649049702], [0.25391467123093686, -0.04758305020688023, -0.09750697293256906, 0.05594824280447967, -0.2866303007770507], [0.5010773924254477, 0.0016671045021859675, -0.02392228347058429, 0.1340536324371279, -0.3542022818304386], [0.3500575991686737, -0.19996558017061833, -0.11344094620726179, 0.038844599772168094, -0.2950215510172549], [-0.20384160287375763, -0.6810488091842594, -0.26735426761109343, 0.28586571719153775, 0.11879788672666428], [-0.9962249700577689, 0.678046133749381, -0.477930051671396, 0.5368017067514969, 0.320616850651106], [-0.09052672204006942, -0.615523079170761, 0.027587015787485968, -0.08204532234131373, 0.0016893303839968102], [-0.25453095593579617, -0.06526407667647073, 0.8168922256033775, 0.18563966814572652, 0.09494521858577779], [-0.5973035506752076, -0.20438602438124603, -0.3106499231187682, 0.11798290824683215, -0.46836191760732315], [-0.5003917784064269, 0.04239838210914415, -0.03883712585404213, -0.015214553076595066, -0.2320644061135966], [-0.06581793521228382, -0.1176105836997264, -0.06591902890166178, -0.2975214843379197, -0.08453791981516337], [-0.3128549110490997, -0.10062752468793167, 0.3156819178376328, -0.2055186203108252, -0.07809874465295431], [0.3556928692666885, 0.19393468669441383, 0.09596068479968459, 0.16551751144237997, -0.1650119643129653], [-0.5250139991895431, -0.07062346702879757, 0.012026768417265268, -0.10510623382723155, -0.4210520645439496], [0.5879257893799518, -0.06539938485157593, -0.07950957902252631, 0.23518329847946243, -0.4376978020914557], [0.1228387724212853, 0.03922831004814495, 0.3166233067538083, -0.25286981569825934, -0.027713329663949803], [-0.6631099785658198, 0.10912905877956301, 0.00438485866155381, 0.11808900651294403, -0.29762598848097177], [-0.5016213458376255, -0.016121727854032136, 0.11967499332986666, -0.10860781722422796, -0.2524124267234072], [0.5414980593585309, 0.38247684904357443, 0.02835932449055469, 0.20722285332386123, 0.04031807148470259], [0.4048900798343247, 0.2351537093041575, -0.03589923920044954, 0.010324504490619132, 0.027907952031156858], [0.3647735502654967, -0.16344412067760528, -0.19379830366868642, 0.1296998306565593, 0.03610102797654117], [-0.12950527240227916, 0.21434634053116175, -0.0911325136887255, -0.22128342255381095, 0.09166454166249795], [0.1205860956153671, 0.2726072067985019, -0.025232043492864235, -0.16565659713090566, 0.1092649504323839], [0.28127729516599276, 0.145129008189335, 0.1734273270623967, -0.059857522487238427, 0.07834824308234188], [0.6220066391985504, 0.4050266233701091, 0.0077986275532488025, 0.2622149053733361, -0.010990334623441131], [-0.8499107227319237, 0.7116637745176403, -0.3561351817390094, 0.021344484912020657, 0.40466124775204054], [0.40834080927692423, 0.3304979157328534, 0.04907919234224994, -0.18803475656860946, 0.023339831442602953], [0.3079520537400327, 0.1318204456160271, -0.005388240937245223, -0.10465730252583338, 0.08065560245786875], [-0.3518572091803882, 0.3558652058936353, -0.006451908190045913, -0.36338884877723254, 0.045961339372863605], [0.14568626947787977, 0.1301844670826328, 0.008678499299463382, -0.07826544122235143, 0.056731825252946316], [-0.5867009569583074, 0.4392368685217873, 0.034290804086032335, -0.3041826086362429, -0.10761315046780041], [-0.3622687689047829, 0.2417962898964984, -0.13294258582609006, -0.06239553596502264, 0.05561360339973206], [0.4844029134331975, 0.18063687452044536, 0.06804433650040895, 0.1216168545735365, -0.022524276810645578], [-0.6585306728085436, 0.25349998567276094, -0.2534300581492646, 0.10802819381244998, -0.0005461041403912617], [-0.8181327581983733, -0.06389471668384736, 1.0, 0.7218709603229044, 0.2325587442282216], [-0.4912471149655363, 0.17186640277083226, -0.20218893317485176, 0.1513712176277432, -0.1870192330931485]], "edges": [], "percents_explained": [26.388040970725534, 13.63494253446286, 10.111196464161226, 8.263108083598377, 6.732751107447362], "sample_ids": ["Whitelands_2018_19", "Castle_Field_West_(W)", "Toposcope_Field_-_1980s", "Bradenham_post-1986_b", "Lardon_Chase_The_Holies_motorcycle", "Stonehenge_2000_2017a", "Stonehenge_2003_2017b", "Stonehenge_2009", "Stonehenge_2007_2016", "Stonehenge_2005", "Stonehenge_2002_2017", "Stonehenge_2010", "Stonehenge_2011", "Stonehenge_-_Luxenborough_BankB", "Watlington_natural_reversion", "St_Catherines_A3", "HARLEY_FARMS_Chittern", "HARLEY_FARMS_New1", "HARLEY_FARMS_new2b", "WINDMILL_farm", "DRUIDS", "Stratton_Wood", "WESTMEAD_FARM", "RSPB_orig_green", "RSPB_churchil", "RSPB_junction", "RSPB_Mainline", "Baltic_farm_1", "Baltic_farm_2", "WestEndFarm", "HorntonHouseFarm_1_parallel", "TownsendFarm_1", "TownsendFarm_2", "TownsendFarm_3_big", "ChurchFarm", "StowellFarms_1_adj", "MannorFmAltonBarnes", "HommingtonFarm", "ThropeManor_1", "ThropeManor_2", "ThropeManor_3", "MannorFmBroadChalke", "BigleyFm_1", "BigleyFm_2", "NorringtonMannorFm_1", "NorringtonMannorFm_2", "ManorFmBerwickStJohn_1", "ManorFmBerwickStJohn_3", "Jemma_1", "Jemma_2", "Jemma_7", "Jemma_4", "Jemma_5", "Jemma_6", "Jemma_9", "HomeFarm_WoodlandTrust_Hampshire_good_1c", "Crux_easton_70b1", "Crux_easton_70b2", "Martin_Down_arabel_reversion", "Parsonage_down_reversion", "TARGET_MartinDown", "TARGET_St_Catherines", "TARGET_ParsonageDown", "TARGET_KNEPP_A New_Barn_Field", "Knepp_Pond_field", "Knepp_Benton_field"]}, "metadata": [["Whitelands_2018_19", "1;nan", "2018", "3", "SU2990087100", "51.581972, -1.5698756", "seed_mix", "8.03", "136.4", "No", "No", "Yes", "Yes", "Above_median", "Below_median"], ["Castle_Field_West_(W)", "2;nan", "2002", "19", "SU2950086200", "51.573901, -1.5757235", "seed_mix", "7.93", "139.3", "No", "Yes", "Yes", "Yes", "Below_median", "Above_median"], ["Toposcope_Field_-_1980s", "3;nan", "1985", "36", "SU2950086600", "51.577497, -1.5756901", "Natural_regen", "7.94", "139.7", "No", "Yes", "Yes", "No", "Above_median", "Above_median"], ["Bradenham_post-1986_b", "4;nan", "1986", "35", "SU8290097718", "51.672127, -0.80258692", "seed_mix", "7.84", "151.7", "No", "Yes", "Yes", "Yes", "Below_median", "Above_median"], ["Lardon_Chase_The_Holies_motorcycle", "nan", "2007", "14", "SU5930079800", "51.514021, -1.1468383", "Natural_regen", "7.94", "135.7", "No", "No", "Yes", "No", "Above_median", "Below_median"], ["Stonehenge_2000_2017a", "6;nan", "2000", "21", "SU1370042400", "51.180671, -1.8053828", "Green_hay_bush", "7.88", "144.3", "No", "Yes", "Yes", "Yes", "Below_median", "Above_median"], ["Stonehenge_2003_2017b", "7;nan", "2003", "18", "SU1150041600", "51.173525, -1.8368821", "Green_hay_bush", "7.69", "184.4", "No", "Yes", "Yes", "Yes", "Below_median", "Above_median"], ["Stonehenge_2009", "8;nan", "2009", "12", "SU1050041700", "51.174443, -1.8511833", "Green_hay_bush", "7.82", "156.5", "No", "No", "Yes", "Yes", "Below_median", "Below_median"], ["Stonehenge_2007_2016", "9;nan", "2007", "14", "SU1100041900", "51.176233, -1.8440251", "Green_hay_bush", "7.87", "158.8", "No", "Yes", "Yes", "Yes", "Below_median", "Below_median"], ["Stonehenge_2005", "10;nan", "2005", "16", "SU1140042200", "51.178922, -1.8382937", "Green_hay_bush", "7.85", "145.0", "No", "No", "Yes", "Yes", "Below_median", "Above_median"], ["Stonehenge_2002_2017", "11;nan", "2002", "19", "SU1480043200", "51.187837, -1.7896132", "Green_hay_bush", "7.91", "130.3", "No", "Yes", "Yes", "Yes", "Below_median", "Above_median"], ["Stonehenge_2010", "12;nan", "2010", "11", "SU1070043000", "51.186129, -1.8482842", "Green_hay_bush", "7.69", "202.0", "No", "Yes", "Yes", "Yes", "Below_median", "Below_median"], ["Stonehenge_2011", "13;nan", "2011", "10", "SU1050043600", "51.191528, -1.8511284", "Green_hay_bush", "7.85", "174.3", "No", "Yes", "Yes", "Yes", "Below_median", "Below_median"], ["Stonehenge_-_Luxenborough_BankB", "14;nan", "2000", "21", "SU1290041900", "51.176193, -1.8168457", "Green_hay_bush", "7.78", "186.6", "Yes", "No", "Yes", "Yes", "Below_median", "Above_median"], ["Watlington_natural_reversion", "15;nan", "2000", "21", "SU7050293600", "51.636798, -0.98266944", "Natural_regen", "7.8", "147.5", "No", "No", "Yes", "No", "Below_median", "Above_median"], ["St_Catherines_A3", "16;nan", "1994", "27", "SU4812327449", "51.044386, -1.3149275", "Green_hay_bush", "7.63", "222.0", "Yes", "Yes", "Yes", "No", "Below_median", "Above_median"], ["HARLEY_FARMS_Chittern", "17;nan", "2013", "8", "ST9762044730", "51.201778, -2.0354461", "seed_mix", "7.77", "197.9", "Yes", "Yes", "No", "Yes", "Below_median", "Below_median"], ["HARLEY_FARMS_New1", "18;nan", "2020", "1", "ST9346829822", "51.067692, -2.0945983", "seed_mix", "7.84", "144.1", "No", "Yes", "No", "No", "Below_median", "Below_median"], ["HARLEY_FARMS_new2b", "19;nan", "2020", "1", "ST9242629613", "51.065799, -2.1094648", "seed_mix", "7.09", "102.5", "Yes", "No", "No", "No", "Below_median", "Below_median"], ["WINDMILL_farm", "nan", "1990", "31", "SU7176229761", "51.06271, -0.97732036", "seed_mix", "7.32", "210.0", "Yes", "Yes", "Yes", "Yes", "Below_median", "Above_median"], ["DRUIDS", "21;nan", "2002", "19", "SU2964250324", "51.251319, -1.5766624", "seed_mix", "7.14", "176.3", "Yes", "Yes", "Yes", "Yes", "Below_median", "Above_median"], ["Stratton_Wood", "22;nan", "1995", "26", "SU1647289260", "51.601942, -1.7635665", "seed_mix", "7.41", "126.8", "Yes", "No", "No", "Yes", "Below_median", "Above_median"], ["WESTMEAD_FARM", "23;nan", "2000", "21", "SU6317525168", "51.022422, -1.1006408", "seed_mix", "7.75", "159.0", "Yes", "No", "Yes", "No", "Below_median", "Above_median"], ["RSPB_orig_green", "24;nan", "2006", "15", "SU2135640329", "51.161815, -1.6959767", "Green_hay_bush", "7.99", "138.1", "No", "Yes", "Yes", "No", "Above_median", "Above_median"], ["RSPB_churchil", "25;nan", "2010", "11", "SU2075340336", "51.1619, -1.7045994", "Green_hay_bush", "8.01", "116.8", "No", "No", "Yes", "No", "Above_median", "Below_median"], ["RSPB_junction", "26;nan", "2007", "14", "SU2267739280", "51.152332, -1.6771517", "Green_hay_bush", "8.41", "24.6", "No", "No", "Yes", "No", "Above_median", "Below_median"], ["RSPB_Mainline", "27;nan", "2016", "5", "SU2250539212", "51.151728, -1.6796151", "Green_hay_bush", "8.48", "23.4", "No", "No", "Yes", "No", "Above_median", "Below_median"], ["Baltic_farm_1", "28;nan", "2005", "16", "SU0459767825", "51.40943, -1.9352946", "Green_hay_bush", "7.94", "29.2", "Yes", "Yes", "Yes", "No", "Above_median", "Above_median"], ["Baltic_farm_2", "29;nan", "1998", "23", "SU0306867167", "51.403524, -1.9572835", "Green_hay_bush", "8.27", "29.6", "Yes", "Yes", "Yes", "No", "Above_median", "Above_median"], ["WestEndFarm", "30;nan", "2019", "2", "SU0297366901", "51.401133, -1.9586514", "Green_hay_bush", "8.44", "24.1", "Yes", "No", "Yes", "Yes", "Above_median", "Below_median"], ["HorntonHouseFarm_1_parallel", "31;nan", "2016", "5", "SU0584565118", "51.385079, -1.917395", "seed_mix", "8.6", "29.5", "Yes", "Yes", "Yes", "No", "Above_median", "Below_median"], ["TownsendFarm_1", "32;nan", "2017", "4", "SU0775065316", "51.386837, -1.8900159", "seed_mix", "8.2", "36.6", "Yes", "No", "Yes", "No", "Above_median", "Below_median"], ["TownsendFarm_2", "33;nan", "2010", "11", "SU0705164722", "51.381505, -1.9000725", "seed_mix", "8.45", "21.2", "Yes", "No", "Yes", "No", "Above_median", "Below_median"], ["TownsendFarm_3_big", "34;nan", "2014", "7", "SU0886965184", "51.385634, -1.8739384", "Green_hay_bush", "7.92", "42.7", "Yes", "No", "Yes", "No", "Below_median", "Below_median"], ["ChurchFarm", "35;nan", "2012", "9", "SU0979864321", "51.377859, -1.8606121", "seed_mix", "8.63", "20.7", "Yes", "Yes", "Yes", "No", "Above_median", "Below_median"], ["StowellFarms_1_adj", "36;nan", "2015", "6", "SU1362464180", "51.376513, -1.8056466", "seed_mix", "6.6", "21.8", "Yes", "Yes", "Yes", "Yes", "Below_median", "Below_median"], ["MannorFmAltonBarnes", "nan", "2012", "9", "SU1211561331", "51.35093, -1.827423", "seed_mix", "8.07", "21.6", "Yes", "Yes", "Yes", "No", "Above_median", "Below_median"], ["HommingtonFarm", "38;nan", "2014", "7", "SU1332825982", "51.033048, -1.811306", "seed_mix", "8.22", "26.3", "Yes", "Yes", "Yes", "Yes", "Above_median", "Below_median"], ["ThropeManor_1", "39;nan", "2002", "19", "SU0886123850", "51.013962, -1.8750607", "seed_mix", "7.54", "78.1", "Yes", "No", "Yes", "No", "Below_median", "Above_median"], ["ThropeManor_2", "40;nan", "1998", "23", "SU0843924348", "51.018447, -1.8810649", "seed_mix", "7.73", "28.8", "Yes", "No", "Yes", "Yes", "Below_median", "Above_median"], ["ThropeManor_3", "41;nan", "2000", "21", "SU0901525189", "51.026001, -1.8728325", "seed_mix", "8.13", "28.5", "Yes", "No", "Yes", "No", "Above_median", "Above_median"], ["MannorFmBroadChalke", "42;nan", "2010", "11", "SU0468023121", "51.007455, -1.9346701", "Green_hay_bush", "8.24", "24.3", "No", "No", "Yes", "No", "Above_median", "Below_median"], ["BigleyFm_1", "43;nan", "2014", "7", "ST9798720966", "50.988091, -2.0300532", "seed_mix", "8.1", "31.3", "Yes", "Yes", "Yes", "Yes", "Above_median", "Below_median"], ["BigleyFm_2", "44;nan", "2017", "4", "ST9796821801", "50.9956, -2.0303288", "seed_mix", "7.35", "46.8", "Yes", "Yes", "Yes", "Yes", "Below_median", "Below_median"], ["NorringtonMannorFm_1", "45;nan", "2009", "12", "ST9689721419", "50.99216, -2.0455866", "seed_mix", "7.83", "33.5", "No", "No", "Yes", "Yes", "Below_median", "Below_median"], ["NorringtonMannorFm_2", "46;nan", "2009", "12", "ST9699420390", "50.982907, -2.0441957", "seed_mix", "8.2", "28.5", "No", "No", "Yes", "No", "Above_median", "Below_median"], ["ManorFmBerwickStJohn_1", "47;nan", "2014", "7", "ST9468023123", "51.007466, -2.0772007", "seed_mix", "7.47", "17.83", "Yes", "Yes", "Yes", "No", "Below_median", "Below_median"], ["ManorFmBerwickStJohn_3", "48;nan", "2018", "3", "ST9422022841", "51.004926, -2.0837525", "seed_mix", "8.36", "23.0", "Yes", "Yes", "Yes", "No", "Above_median", "Below_median"], ["Jemma_1", "49;nan", "2010", "11", "SU1405276456", "51.486882, -1.7990143", "Green_hay_bush", "8.31", "33.5", "Yes", "Yes", "Yes", "No", "Above_median", "Below_median"], ["Jemma_2", "50;nan", "2008", "13", "SU1194873670", "51.46188, -1.8294093", "Natural_regen", "7.96", "104.2", "No", "Yes", "No", "No", "Above_median", "Below_median"], ["Jemma_7", "51;nan", "2014", "7", "SU1641473039", "51.456096, -1.7651546", "Green_hay_bush", "7.95", "106.1", "No", "No", "Yes", "Yes", "Above_median", "Below_median"], ["Jemma_4", "52;nan", "2015", "6", "SU1261971802", "51.44507, -1.8198169", "Green_hay_bush", "7.31", "145.8", "Yes", "Yes", "Yes", "No", "Below_median", "Below_median"], ["Jemma_5", "53;nan", "2015", "6", "SU1538172691", "51.452995, -1.7800368", "seed_mix", "8.2", "77.7", "Yes", "No", "Yes", "No", "Above_median", "Below_median"], ["Jemma_6", "54;nan", "2013", "8", "SU1560872573", "51.451928, -1.7767752", "seed_mix", "8.54", "66.9", "Yes", "No", "Yes", "No", "Above_median", "Below_median"], ["Jemma_9", "55;nan", "2015", "6", "SU1669072674", "51.452806, -1.7611995", "seed_mix", "8.22", "104.9", "Yes", "No", "Yes", "No", "Above_median", "Below_median"], ["HomeFarm_WoodlandTrust_Hampshire_good_1c", "56;nan", "1994", "27", "SU6579941829", "51.171925, -1.0602025", "seed_mix", "6.62", "28.4", "No", "Yes", "No", "No", "Below_median", "Above_median"], ["Crux_easton_70b1", "57;nan", "2000", "21", "SU4192556251", "51.303843, -1.3999827", "seed_mix", "7.78", "80.7", "No", "No", "Yes", "Yes", "Below_median", "Above_median"], ["Crux_easton_70b2", "58;nan", "2002", "19", "SU4195056550", "51.306529, -1.399589", "seed_mix", "8.4", "76.3", "Yes", "No", "Yes", "No", "Above_median", "Above_median"], ["Martin_Down_arabel_reversion", "59;nan", "1957", "64", "SU0390520162", "50.980853, -1.9457471", "Natural_regen", "8.23", "115.8", "No", "No", "Yes", "Yes", "Above_median", "Above_median"], ["Parsonage_down_reversion", "60;nan", "1945", "76", "SU0610341686", "51.174381, -1.9140803", "Natural_regen", "8.12", "89.8", "No", "Yes", "No", "Yes", "Above_median", "Above_median"], ["TARGET_MartinDown", "nan", "old", "\u003e100", "SU0558918665", "50.967378, -1.9217813", "Natural_regen", "8.05", "104.9", "No", "No", "Yes", "No", "Above_median", "Above_median"], ["TARGET_St_Catherines", "62;nan", "old", "\u003e100", "SU4832527522", "51.045025, -1.3120365", "Natural_regen", "7.95", "184.8", "No", "No", "Yes", "No", "Above_median", "Above_median"], ["TARGET_ParsonageDown", "63;nan", "old", "\u003e100", "SU0552141345", "51.17132, -1.9224106", "Natural_regen", "8.06", "112.3", "No", "No", "Yes", "No", "Above_median", "Above_median"], ["TARGET_KNEPP_A New_Barn_Field", "64;nan", "2006", "15", "TQ1420019600", "50.964513, -0.3751305", "Natural_regen", "6.72", "48.7", "No", "Yes", "No", "nan", "Below_median", "Above_median"], ["Knepp_Pond_field", "65;nan", "2003", "18", "TQ1410019300", "50.961836, -0.3766479", "Natural_regen", "6.62", "23.5", "No", "Yes", "No", "nan", "Below_median", "Above_median"], ["Knepp_Benton_field", "66;nan", "2005", "16", "TQ1450019800", "50.966251, -0.37079737", "Natural_regen", "6.52", "27.6", "No", "Yes", "No", "nan", "Below_median", "Above_median"]], "metadata_headers": ["SampleID", "site_code", "Year_est", "Age", "OS_location", "Lat_long", "Establishment", "pH", "EC", "Cutting", "Cattle", "Sheep", "Plough", "pH_category", "Age_category"], "settings": {}, "type": "scatter"}};
+
+  var plot, biplot = null, ec;
+
+  function init() {
+    // Initialize the DecompositionModel for the scatter plot, and optionally
+    // add one for the biplot arrows
+    plot = new DecompositionModel(data.plot.decomposition,
+                                  data.plot.metadata_headers,
+                                  data.plot.metadata,
+                                  data.plot.type);
+
+    if (data.biplot) {
+      biplot = new DecompositionModel(data.biplot.decomposition,
+                                      data.biplot.metadata_headers,
+                                      data.biplot.metadata,
+                                      data.biplot.type);
+    }
+
+    ec = new EmperorController(plot, biplot, "emperor-notebook-0xa33cab83", undefined,
+                               data.info);
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    ec.render();
+  }
+  $(window).resize(function() {
+    ec.resize(div.innerWidth(), div.innerHeight());
+  });
+
+  $(function(){
+    init();
+    animate();
+
+    ec.ready = function () {
+      // any other code that needs to be executed when emperor is loaded should
+      // go here
+      ec.loadConfig(data.plot.settings);
+
+      // sets up generic callbacks for 3rd party consumers
+      var plotView = ec.sceneViews[0];
+      /*__custom_on_ready_code__*/
+      
+    }
+  });
+
+}); // END REQUIRE.JS block
+    </script>
+  </body>
+</html>
