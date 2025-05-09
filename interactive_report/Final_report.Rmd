@@ -248,7 +248,7 @@ The following hypotheses were formulated:
 ### Sample Collection and Geographic Coverage
 
 
-A total of **330 soil samples** were collected in 66 sites of England for each marker (5 per site). Although five were removed due to being incomplete.
+A total of **330 soil samples** were collected in 66 sites of England for each marker (5 per site). Although some were removed due to being incomplete (missing from the metadata).
 
 
 ```{r table, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
@@ -356,45 +356,64 @@ HTML("</br><p style='text-align: center; font-weight: bold;'>Metadata Summary</p
 
 ---
 
-## Analysis Pipeline
+## Methods
 
-### Sample Processing and Sequencing Overview
+### Source data
 
-A total of 330 soil samples were collected across 66 sites (five per site) by the **RestREco** team. After sieving (2 mm), all samples were frozen until DNA extraction, which was performed using the **QIAGEN PowerSoil** kit. Amplicon sequencing targeted two regions: the **V4–V5 region of the bacterial 16S rRNA gene** and the **ITS1 region of the fungal ITS gene**. Sequencing was carried out by **Novagene** using **Illumina paired-end reads** (2×250 bp), resulting in **660 FASTQ files per marker** (forward and reverse reads per sample). Metadata accompanying each sample included site characteristics (location, year of establishment, method), management practices (cutting, ploughing, grazing), and soil physicochemical properties.
+A total of **330 soil samples across 66 sites** (five samples per site) were collected by the **RestREco** project. Soil was sieved to **2 mm** and then frozen before DNA extraction. DNA was extracted using a **QIAGEN PowerSoil kit**. The **V4–V5 region of the bacterial 16S gene** and the **ITS1–1F region of the fungal ITS gene** were sequenced by **Novagene** using Illumina paired-end reads (250 bp) on **Illumina NovaSeq 6000**. The primer sequences used were:
 
-</br>
+- `GTGCCAGCMGCCGCGGTAA` / `CCGTCAATTCCTTTGAGTTT`
 
-### 16S Amplicon Processing
+A total of **330 paired FASTQ files** were provided for each amplicon. Metadata files included Ordinance Survey location, latitude and longitude, year of establishment, age, establishment method, chemical and physical soil properties, and management method (cutting, cattle, sheep, plough).
 
-Quality control of 16S reads was performed using **FastQC v0.12.1** and summarised with **MultiQC v1.14**. A custom Bash script (`S02_qc.sh`) ensured correct pairing of reads and removed five incomplete samples. Sequences were then imported into **QIIME2 v2022.10** using the `PairedEndFastqManifestPhred33V2` format, and primers were removed with **CutAdapt v4.4**. Read quality was visualised using `qiime demux summarize`.
+### 16S
 
-Denoising and read pairing were performed using the **DADA2 plugin (QIIME2 v2024.2)**, generating ASV feature tables, representative sequences, and denoising statistics. Low-abundance ASVs (<10 reads) and singletons were filtered out. Representative sequences were aligned using **MAFFT** and used to build phylogenetic trees with **FastTree**.
+Initial quality control was performed using **FastQC v0.12.1** (Andrews, 2010) and summarised with **MultiQC v1.14** (Ewels et al., 2016). A custom Bash script created a QIIME2-compatible manifest (see `S02_qc.sh`). **Some samples** not in metadata were removed.
 
-The ASV table was aggregated at the **site level** using a median-ceiling method, and rarefaction analysis was used to determine a sampling depth of **9473 reads/sample**. Alpha (Observed Features, Shannon, Evenness, Faith’s PD) and beta diversity (UniFrac, Jaccard, Bray-Curtis) metrics were calculated using this rarefied table and the rooted tree. Group comparisons (e.g., by establishment, livestock, pH) were assessed using **Kruskal-Wallis (alpha)** and **PERMANOVA (beta)**.
+Raw sequences were imported into **QIIME2 v2022.10** (Bolyen et al., 2019). Primer/barcode removal was done using **CutAdapt v4.4** (Martin, 2011). Quality profiles were visualised with `qiime demux summarize`.
 
-Taxonomy was assigned using a **Naive Bayes classifier trained on Greengenes 13_8 (515F/806R)**. Taxonomic barplots were created from feature tables grouped by site. Tables were then collapsed at genus and family levels for **ANCOM** differential abundance testing. Pseudocounts were added where required.
+Denoising and merging were done using **DADA2 (QIIME2 v2024.2)** (Callahan et al., 2016). ASVs with <10 reads and singletons were filtered. Sequences were aligned using **MAFFT v7.505** (Katoh & Standley, 2013), and trees were built with **FastTree v2.1.11** (Price et al., 2010).
 
-Predicted functional profiles were generated using **PICRUSt2** to infer KEGG Orthology (KO), EC numbers, and pathways. High-abundance pathways were retained (≥600,000 reads in ≥60 samples), and visualised with heatmaps across metadata variables. Functional differential abundance was assessed using **ANCOM**.
+Feature tables were grouped by site using **median-ceiling values**. Rarefaction was applied at **9473 reads/sample**. Diversity metrics calculated included:
 
-Functional alpha and beta diversity metrics were also computed, and significance was tested per metadata variable, using **Kruskal-Wallis** and **PERMANOVA**, respectively.
+- **Alpha**: Observed Features, Shannon, Evenness, Faith’s PD
+- **Beta**: Bray-Curtis, Jaccard, Unweighted/Weighted UniFrac
 
-</br>
+Statistical tests included **Kruskal-Wallis** for alpha, **PERMANOVA** for beta.
 
-### ITS Amplicon Processing
+Taxonomy was assigned using a **Naive Bayes classifier** trained on **Greengenes 13_8** (DeSantis et al., 2006). Differential abundance was analysed via **ANCOM**, collapsed to **genus** and **family** levels.
 
-Fungal ITS1 reads were processed using **ITSxpress v2.1.4**, which performed adapter trimming and retained fungal ITS1 regions. Quality was assessed with **FastQC** and summarised using **MultiQC v1.28** (`F01_itsexpress.sh`). Trimmed reads were imported into **QIIME2 v2024.10**, and denoised using **DADA2** with no truncation.
+Functional predictions were generated using **PICRUSt2 (QIIME2 v2024.5)** (Douglas et al., 2020), followed by relative abundance, heatmaps, and differential testing. **Alpha** and **beta functional diversity** metrics were also calculated.
 
-ASV tables were aggregated by site and taxonomic assignment was performed using a pre-trained classifier based on the **UNITE v10 database**. Diversity analyses (Observed Features, Shannon, Evenness, Jaccard, Bray-Curtis) were conducted using a rarefied depth of **30,000 reads/sample**, and visualised using **PCoA** and **Emperor** plots. Significance testing followed the same approach as for 16S (**Kruskal-Wallis** and **PERMANOVA**).
+### ITS
 
-Taxonomic tables were collapsed at the genus level for **ANCOM** analyses. Ecological functional guilds were predicted using **FUNGuild v1.1**, based on collapsed species-level data formatted with custom Python scripts. Functional diversity metrics were then computed at the **guild level**, and visualised using core-metrics tools at a rarefied depth of **11,000 reads/sample**. Significance was assessed using **Kruskal-Wallis** and **PERMANOVA** (`F09` and `F10` scripts).
+ITS reads were processed with **ITSxpress v2.1.4** (Einarsson & Rivers, 2024), quality-checked via **FastQC** and **MultiQC**. Trimmed reads were imported into **QIIME2 v2024.10**, denoised with **DADA2**, and classified using a **Naive Bayes classifier** trained on **UNITE v10** (Abarenkov et al., 2025).
 
-</br>
+Diversity metrics were computed at **30,000 reads/sample**, visualised via **Emperor plots**, and tested using **Kruskal-Wallis** (alpha) and **PERMANOVA** (beta).
 
-### 16S–ITS Correlation Analyses
+Taxa tables were collapsed to **genus level** and analysed with **ANCOM**. **Fungal ecological roles** were assigned using **FUNGuild v1.1** (Nguyen et al., 2016), with classifications handled by a custom Python script (`FUN_Search.py`).
 
-To explore inter-kingdom interactions, **correlation analyses** were conducted between bacterial and fungal taxa and between predicted bacterial pathways (**PICRUSt2**) and fungal functional guilds (**FUNGuild**). Using **R v4.4.2** and the `psych::corr.test` function, **Pearson correlations** were calculated at the genus level. Results were adjusted using **Holm-Bonferroni** correction. Only strong and significant correlations (e.g., |r| > 0.7, adjusted p ≤ 0.05) were retained after filtering. Additional filters removed taxa/guilds with low overall abundance.
+Functional diversity (alpha and beta) based on fungal guilds was assessed at a rarefaction depth of **11,000 reads/sample**, with statistics via Kruskal-Wallis and PERMANOVA.
 
-For functional correlations, similar thresholds were applied, but due to limited signal strength, analyses were interpreted conservatively and filtered results were reported alongside raw values when relevant.
+### 16S–ITS correlations
+
+Correlations were computed in **R v4.4.2** using `psych::corr.test` (Revelle, 2025). Data came from genus-level **ASV feature tables** and **functional assignments** (PICRUSt2 and FUNGuild).
+
+Correlations were filtered based on:
+
+- **Strength**: \( r > 0.7 \) or \( r < -0.4 \)
+- **Significance**: adjusted \( p < 1 \times 10^{-20} \)
+
+Low-abundance taxa (< median counts) were excluded for robustness. For functional correlations, thresholds of:
+
+- Bacterial pathways: mean > 269,508
+- Fungal guilds: mean > 3946
+
+were applied.
+
+Final analyses were performed on both strict and extended filtered datasets.
+
+Scripts are available at: [GitHub – dig-deeper-project](https://github.com/kerrycranfield/dig-deeper-project)
 
 </br>
 
@@ -767,6 +786,10 @@ function switchPlotRarefaction_ITS() {
 
 ---
 
+Throughout the report, the **median pH value** used to define both **pH_binary** and **pH_category** is **7.94**, while the threshold for both **Age_binary** and **Age_category** is **13 years**.
+
+</br>
+
 ## **Taxonomic Diversity** (Bacteria & Fungi)
 
 **Results Summary**  
@@ -781,6 +804,8 @@ Alpha diversity refers to the variety of organisms within a particular sample or
 </br>
 
 To allow interactive exploration of alpha diversity metrics across different environmental variables, we implemented a drop-down menu that dynamically displays the corresponding plots. Some variables, such as `pH category`, are only present in the ITS dataset, while others, like `Year group`, are specific to the 16S dataset. Internally, variables are mapped to their dataset-specific equivalents where needed (e.g. `Age group` in 16S becomes `Age category` in ITS). It is important to note, however, that these variables are not always directly comparable: for instance, `Age group` (16S) divides sites into multiple discrete intervals based on restoration age, while `Age category` (ITS) is a binary classification based on whether a site is above or below the median age ( `Age_binary` for bacteria). Despite these differences, the interface ensures that only available and relevant plots are shown for each selection.
+
+For the bacteria plots, the data was aggragated by sites, while they were not for the fungi.
 
 
 ```{r alpha-plots, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
@@ -811,24 +836,7 @@ get_mode <- function(x) {
   ux[which.max(tabulate(match(x, ux)))]
 }
 
-df_shannon_ITS1 <- df_shannon_ITS1 %>%
-  group_by(Site) %>%
-  summarise(
-    shannon_entropy = mean(shannon_entropy, na.rm = TRUE),
-    pH_category = get_mode(pH_category),
-    across(c(Establishment, Age_category, Cutting, Plough, Sheep, Cattle, Year_est), ~ first(.x)),
-    .groups = "drop"
-  )
 
-df_even_ITS1 <- df_even_ITS1[ , ! colnames(df_even_ITS1) %in% c("site_code", "plot_number", "OS_location", "Lat_long")]
-df_even_ITS1 <- df_even_ITS1 %>%
-  group_by(Site) %>%
-  summarise(
-    pielou_evenness = mean(pielou_evenness, na.rm = TRUE),
-    pH_category = get_mode(pH_category),
-    across(c(Establishment, Age_category, Cutting, Plough, Sheep, Cattle, Year_est), ~ first(.x)),
-    .groups = "drop"
-  )
 
 df_shannon_Plough <- df_shannon_16S %>% filter(Plough != "unknown")
 df_faith_Plough <- df_faith_16S %>% filter(Plough != "unknown")
@@ -847,10 +855,16 @@ varsITS <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Age_categ
 
 #### Bacteria (16S) {.tabset}
 
+
 **Results Summary**
 
-Shannon entropy revealed significant overall differences, with green hay/bush sites showing higher diversity than both natural regeneration and seed mix sites. Seed mix sites also had higher Shannon diversity than natural regeneration.
-Pielou’s evenness differed significantly across establishment methods (p = 0.0148), with green hay/bush sites being significantly more even than natural regeneration (q = 0.0148). The difference between seed mix and natural regeneration approached significance (q = 0.0597), while no significant difference was found between green hay/bush and seed mix.
+Within group diversity was assessed using Faith’s Phylogenetic Diversity (PD), Shannon entropy, and Pielou’s evenness. Significant differences were observed between **establishment methods** across all three metrics, while pH, management type, and site age showed no significant effects.
+
+**Shannon entropy** differed significantly among establishment methods (p = 0.001), with green hay/bush (GH) sites showing higher diversity than natural regeneration (NR) (p-adjusted = 0.0019) and seed mix (SM) sites (p-adjusted = 0.036). SM also had higher diversity than NR (q = 0.0199).
+
+**Pielou’s evenness** was also affected by establishment method (p = 0.0148). Pairwise differences were significant between GH and NR (p-adjusted = 0.0148), while the SM–NR comparison approached significance (p-adjusted = 0.0597). No significant difference was found between GH and SM
+
+**Faith’s PD** also showed significant variation across establishment types (p = 0.0106), with GH sites exhibiting higher phylogenetic diversity than NR (q = 0.0148), and SM also higher than NR (q = 0.043). The difference between GH and SM was not significant. 
 
 </br>
 
@@ -938,11 +952,11 @@ for (var in vars16S) {
 
 
 
-##### Faith PD Boxplots 
+##### Faith's PD Boxplots 
 
-<details><summary><strong>Click for more information on Faith PD</strong></summary>
+<details><summary><strong>Click for more information on Faith's PD</strong></summary>
 
-**Faith’s Phylogenetic Diversity (Faith PD)** measures the total branch length of the phylogenetic tree that spans the species in a sample. Unlike the Shannon index, Faith PD incorporates evolutionary relationships, providing a phylogenetic perspective on diversity. (Bacteria only)
+**Faith’s Phylogenetic Diversity (Faith's PD)** measures the total branch length of the phylogenetic tree that spans the species in a sample. Unlike the Shannon index, Faith PD incorporates evolutionary relationships, providing a phylogenetic perspective on diversity. (Bacteria only)
 
 </details>
 
@@ -1087,17 +1101,19 @@ function switchPlotAlpha16S() {
 
 #### Fungi (ITS) {.tabset}
 
-For the variable **pH_category**, the median is **7.94** and for **Age_category** it's **13 years**.
 
 </br>
 
 **Results Summary**
 
-Fungal alpha diversity showed limited variation across establishment methods, with natural regeneration sites displaying slightly higher diversity, though differences were not statistically significant. Similarly, grazing, ploughing, and cutting had no detectable impact on overall fungal diversity.
+**Fungal alpha diversity was moderately influenced by environmental variables, particularly soil pH and site age.**  
+Although median Shannon diversity appeared slightly higher in **natural regeneration (NR)** plots, no significant differences were observed between establishment methods (GH, SM, NR). Similarly, management practices such as **sheep grazing, cattle grazing, ploughing, and cutting** had no detectable effect on fungal Shannon diversity.
 
-However, **soil pH** significantly affected fungal diversity, with **alkaline soils (pH > 7.9)** showing lower Shannon entropy values compared to neutral or slightly acidic soils (*p* < 0.02). **Site age** also influenced diversity, with **older sites** displaying lower median Shannon diversity (*p* < 0.02).
+However, **soil pH** showed a significant influence: **alkaline soils (pH > 7.9)** had significantly **lower Shannon diversity** compared to neutral or slightly acidic soils (*p* < 0.02, Kruskal-Wallis).  
+**Site age** also impacted fungal diversity, with **older sites (age > 13 years)** exhibiting a **lower median Shannon index** (*p* < 0.02), suggesting a reduction in taxonomic richness or evenness over time.
 
-Regarding community evenness, **sheep grazing** was the only factor associated with a significant difference: grazed sites had slightly higher Pielou’s evenness (*p* = 0.03). Other variables, including establishment method, age, and pH, showed no significant effect on evenness.
+Regarding **community evenness**, only **sheep grazing** had a statistically significant effect. Sites with sheep showed a **slightly higher median Pielou’s Evenness index** (*p* = 0.03). No significant differences were detected for other variables.
+
 
 </br>
 
@@ -1264,7 +1280,10 @@ This approach is useful to visualise group clustering by variables like **establ
 </br>
 
 **Results Summary**  
+
 Beta diversity patterns confirmed that establishment type, pH, and grazing significantly shaped microbial community composition. For bacteria, strong clustering by method and significant PERMANOVA results support distinct assemblages. Fungal beta diversity followed similar trends but with additional sensitivity to site age.
+
+</br>
 
 ---
 
@@ -1286,7 +1305,7 @@ Bray-Curtis is especially useful for detecting shifts in **community structure**
 
 **Results Summary**
 
-Beta diversity analysis using Bray–Curtis distance revealed that **establishment method**, **soil pH**, and **sheep grazing** were the primary factors shaping bacterial community structure. Significant differences in taxonomic composition were observed between all establishment types, with natural regeneration, seed mix, and green hay/bush plots forming distinct but partially overlapping clusters in PCoA space. **Site age** also had a detectable effect with Bray–Curtis, highlighting changes in relative abundance between younger and older sites.
+Bray–Curtis PCoA plots revealed a strong separation of bacterial communities according to restoration establishment method, with NR, GH, and SM forming distinguishable clusters, although some overlap was present. Soil pH also showed a clear gradient in community composition, while site age produced only weak visual separation, with no consistent clustering of younger versus older sites. Sheep grazing did not produce clearly distinct clusters in ordination space, though minor shifts were observable.
 
 </br>
  
@@ -1450,9 +1469,24 @@ function switchPlotPermanova_16S_bray() {
 
 **Results Summary**
 
-PERMANOVA analysis identified pH category (p = 0.001) and establishment method (p = 0.002) as the strongest drivers of differences in fungal communities. Site age (p = 0.024) and sheep grazing (p = 0.025) also had significant effects.
+Statistical analysis with PERMANOVA based on **Bray–Curtis distances** confirmed significant effects of multiple variables on fungal **community structure**:
 
-Pairwise comparisons showed the strongest differences between green hay/bush and seed mix sites (p = 0.008), followed by green hay/bush vs. natural regeneration (p = 0.011). Natural regeneration sites exhibited the highest variation in community composition, with Bray-Curtis distances ranging from 0.25 to 0.95.
+- **Establishment method**: *p* = 0.002  
+  - **GH vs. SM**: *p* = 0.008  
+  - **GH vs. NR**: *p* = 0.011  
+
+  These results show that assisted restoration strategies (GH, SM) led to distinct community abundance patterns, while **NR sites** displayed the **highest variation**, with dissimilarity values ranging from **0.25 to 0.95**.
+
+- **Soil pH**: *p* = 0.001  
+  The effect of pH was significant, with alkaline soils supporting **less diverse** but **more homogeneous** fungal communities compared to neutral or acidic sites.
+
+- **Site age**: *p* = 0.024  
+  Differences were observed between **younger and older** sites, consistent with gradual shifts in fungal community structure over time.
+
+- **Sheep grazing**: *p* = 0.025  
+  Grazing pressure appeared to influence community composition, possibly through soil disturbance or altered plant-fungal interactions.
+
+Overall, Bray–Curtis-based analyses highlight how **restoration strategy**, **soil conditions**, and **management** practices interact to shape fungal abundance profiles across the landscape.
 
 </br>
 
@@ -1563,7 +1597,14 @@ HTML("<p style='text-align: center; font-weight: bold;'>Jaccard Emperor Plot (16
 
 **Results Summary**
 
-Jaccard analysis confirmed similar drivers of community structure—**establishment method**, **pH**, and **age**—with natural regeneration, seed mix, and green hay/bush sites forming distinguishable but overlapping clusters in higher dimensions. This suggests that both presence/absence and abundance-based differences in fungal communities are shaped by restoration strategy and site conditions.
+The **Jaccard diversity index** revealed a **wider distribution** of points across PCoA space for all tested variables, indicating high variability in **community membership** (presence/absence-based).
+
+- **Establishment method**: Green hay/bush sites formed a **loose cluster**, with seed mix and natural regeneration showing **partial co-clustering** similar to the Bray–Curtis results. **Natural regeneration** sites exhibited stronger grouping in **PCs 3 to 5**, suggesting more consistent community membership among those sites in deeper dimensions.
+  
+- **Soil pH**: Sites appeared to form **three clusters**—one containing **mostly alkaline soils**, one with **mixed pH profiles**, and a third comprising three **strongly acidic** sites (pH 6.6–6.62), which separated distinctly.
+
+- **Site age**: Two main clusters emerged—one made up mostly of **younger sites** (age < 13), and a second with **mixed-age sites**, suggesting some **temporal structuring**.
+
 
 </br> 
 
@@ -1665,9 +1706,25 @@ function switchPlotPermanova_16S_jacc() {
 
 **Results Summary**
 
-With Jaccard dissimilarity, establishment method (p = 0.001) and pH (p = 0.002) remained the strongest drivers, followed by site age (p = 0.006), ploughing (p = 0.024), and cutting (p = 0.04).
+PERMANOVA analysis confirmed that fungal community composition was significantly influenced by multiple environmental factors:
 
-Pairwise comparisons showed the most significant differences between green hay/bush and both natural regeneration and seed mix sites (p = 0.001), and also between natural regeneration and seed mix (p = 0.004). Median Jaccard dissimilarity values were high across all establishment methods (0.75–0.85), indicating substantial variation in taxon presence/absence.
+- **Establishment method** had a strong effect (**Bray–Curtis**: *p* = 0.002; **Jaccard**: *p* = 0.001). Pairwise comparisons showed the most significant differences for:
+  - **Green hay/bush vs. seed mix** (*p* = 0.008)
+  - **Green hay/bush vs. natural regeneration** (*p* = 0.011)
+  - **NR vs. SM** (*p* = 0.004, Jaccard)
+
+  Notably, **natural regeneration** sites exhibited the **greatest variability** in fungal composition, with Bray–Curtis distances ranging from **0.25 to 0.95**, and Jaccard medians exceeding **0.75** across establishment types.
+
+- **Soil pH** was also a strong driver (**Bray–Curtis**: *p* = 0.001; **Jaccard**: *p* = 0.002), showing clear differences in fungal community structure between **alkaline** and **less alkaline** sites.
+
+- **Site age** significantly influenced fungal beta diversity (**Bray–Curtis**: *p* = 0.024; **Jaccard**: *p* = 0.006), supporting the idea of **successional community turnover**.
+
+- **Management practices** also had an effect:
+  - **Sheep grazing**: *p* = 0.025 (Bray–Curtis)
+  - **Ploughing**: *p* = 0.024 (Jaccard)
+  - **Cutting**: *p* = 0.04 (Jaccard)
+
+These findings highlight the combined influence of land-use strategy and edaphic conditions on fungal community turnover, particularly at the level of taxon presence/absence.
 
 </br>
 
@@ -1739,7 +1796,7 @@ Unweighted UniFrac is useful for identifying broad differences in **community me
 
 **Results Summary**
 
-Unweighted UniFrac, which focuses on phylogenetic presence/absence, similarly highlighted **establishment method**, **soil pH**, and **sheep grazing** as major drivers of variation. All pairwise comparisons between establishment types yielded statistically significant differences (*q* < 0.005), confirming shifts in community membership across restoration strategies. However, **site age** had no significant effect using this metric (*p* = 0.063), suggesting that observed changes with age were driven more by shifts in abundance than by changes in phylogenetic composition.
+PCoA based on Unweighted UniFrac distances showed that bacterial communities clustered primarily by establishment method, with separation between NR, GH, and SM. A small subset of NR samples appeared distinct from the main NR cluster, suggesting within-group heterogeneity. In contrast, site age and sheep grazing showed little to no clear visual separation in the top three axes, and pH presented only a mild gradient.
 
 </br>
 
@@ -1788,6 +1845,8 @@ HTML("<p style='text-align: center; font-weight: bold;'>Unweighted Unifrac Emper
 ```
 
 ##### PERMANOVA - Bacteria
+
+Unweighted UniFrac PERMANOVA showed that establishment method, soil pH, and sheep grazing all significantly influenced bacterial community membership (all p = 0.001 or 0.002), with strong effects across establishment types (q < 0.005 for all pairwise comparisons). In contrast, site age was not significant (p-adjusted = 0.063), suggesting that phylogenetic composition remains relatively stable across the age gradient, even if abundance shifts are occurring.
 
 You can **click on the images** below to access the **full QIIME2 report**.
 
@@ -2085,6 +2144,7 @@ group_labels <- site_groups %>%
     ) +
     theme_minimal() +
     theme(
+      #axis.text.x = element_blank(), 
       axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
       axis.ticks.x = element_blank(),
       legend.text = element_text(size = 5)
@@ -2127,11 +2187,11 @@ function switchPlottaxobar_16S() {
 
 **Results Summary**
 
-Across most sites, the dominant fungal phyla were **Ascomycota**, **Mortierellomycota**, and **Basidiomycota**, alongside a notable proportion of unclassified fungi (*incertae sedis*). Minor differences in community composition were observed among natural regeneration (NR) plots, with **Basidiomycota** being more prominent in one site.  
+For most of the studied sites, the dominant fungal phyla were **Ascomycota**, **Mortierellomycota**, and **Basidiomycota**, while a large proportion of sequences were classified as **incertae sedis**, indicating uncertain phylogenetic placement. Some variation in taxonomic composition was observed in **natural regeneration (NR)** sites, where **Basidiomycota** appeared more prominently in at least one site.
 
-At the class level, **Sordariomycetes**, **Mortierellomycetes**, **Dothideomycetes**, and **Leotiomycetes** were commonly detected across all sites. However, **Agaricomycetes** appeared less frequently in NR plots compared to GH and SM sites, except in one case.
+At the **class level**, the most commonly detected groups included **Sordariomycetes**, **Mortierellomycetes**, **Dothideomycetes**, and **Leotiomycetes**. NR sites generally exhibited a **lower frequency of Agaricomycetes**, except for a single outlier, compared to sites restored using **green hay (GH)** or **seed mix (SM)**.
 
-When grouping sites by **pH category**, the most visible difference was an increased presence of **Sordariomycetes** in slightly acidic to neutral soils (below the median pH), compared to more alkaline environments.
+When examining fungal composition by **pH category**, the only consistent pattern observed was a higher frequency of **Sordariomycetes** in **slightly acidic to neutral soils** (below median pH) compared to more **alkaline soils**.
 
 </br>
 
@@ -2436,15 +2496,11 @@ function switchPlotANCOM_16S() {
 
 **Results Summary**
 
-ANCOM analysis identified several fungal taxa as differentially abundant in relation to soil pH, site age, and establishment method:
+The fungal genus **Metapochonia** was identified as significantly differentially abundant between soils classified by **pH category** (above- vs. below-median). According to ANCOM results (*W* = 386), **Metapochonia** exhibited consistently higher abundance in soils with **below-median pH** (slightly acidic to neutral), with a notably higher **median (33.0 vs. 8.0)** and upper quartile abundance compared to soils with more **alkaline pH**.
 
-- Metapochonia (W = 386) was significantly more abundant in acidic soils, suggesting a preference for low-pH environments.
+ANCOM also revealed significant differences in fungal abundance between **site age categories**. A taxon from the **Lasiosphaeriaceae** family (*W* = 366) was more abundant in **younger soils** (below-median age), whereas the genus **Paraphaeosphaeria** (*W* = 320) was significantly enriched in **older soils**.
 
-- Two taxa were age-responsive: a Lasiosphaeriaceae taxon (W = 366) was more abundant in younger soils, while Paraphaeosphaeria (W = 320) was enriched in older soils, indicating shifts in fungal community structure with site maturation.
-
-- Regarding establishment method, Gibellulopsis (W = 596) was predominantly found in green hay/bush and seed mix sites, but rare in natural regeneration sites. In contrast, Metarhizium (W = 535) was most abundant in naturally regenerating sites, likely reflecting adaptation to less-disturbed, self-organising ecosystems.
-
-These findings highlight how restoration strategy, pH, and time since restoration can drive specific taxonomic responses, shaping fungal community composition in grassland soils.
+When comparing **restoration establishment methods**, two fungal taxa were found to differ significantly in abundance. The genus **Gibellulopsis** (*W* = 596) was most abundant in **green hay (GH)** sites (median = 200.5, max = 2118.0), followed by **seed mix (SM)** sites (median = 155.5), and was largely absent from **natural regeneration (NR)** sites. Conversely, **Metarhizium** (*W* = 535) showed its highest abundance in **NR sites** (median = 14.5, max = 327.0), with negligible presence in GH and SM sites.
 
 </br>
 
@@ -2582,8 +2638,7 @@ We examined three complementary metrics: **Shannon diversity** (richness and eve
 
 **Results Summary**
 
-Functional alpha diversity, based on **PICRUSt2-inferred** metabolic pathways, varied significantly across establishment types. Diversity was higher in SM and GH plots compared to NR, while no significant difference was detected between SM and GH.
-
+Functional alpha diversity, measured by Shannon entropy of predicted metabolic pathways (PICRUSt2), differed significantly across establishment types (Kruskal-Wallis p = 0.0148). Pairwise tests showed that SM plots had significantly higher functional diversity than NR (p-adjusted = 0.0034), and GH was also higher than NR (p-adjusted = 0.02). No significant difference was observed between SM and GH (p-adjusted = 0.75).
 
 </br>
 
@@ -2791,15 +2846,16 @@ function switchPlotSignAlpha_16S() {
 
 #### Functional Beta Diversity 
 
+
 ##### Emperor Plot – Bray-Curtis Distance
 
 
 **Results Summary**
 
-
 Functional beta diversity analyses based on **PICRUSt2** pathway profiles showed that multiple site-level factors significantly influenced microbial community composition.
-Establishment method had the strongest effect, with distinct functional profiles observed across all establishment types. Soil pH also shaped functional composition, with samples from high- and low-pH sites showing partial separation.
-In addition, grazing by sheep was associated with significant shifts in predicted functional pathways, despite some overlap between grazed and ungrazed plots.
+Establishment method had the strongest effect, with distinct functional profiles observed across all establishment types. 
+
+Beta diversity analysis of predicted microbial functions (Bray-Curtis) revealed that functional composition was significantly influenced by establishment method (p = 0.001), soil pH (p = 0.012), site age (p = 0.035), and grazing (p = 0.035). Pairwise comparisons confirmed significant differences between all establishment types (GH, SM, NR), while Emperor plots showed partial separation between high and low pH sites, and between grazed and ungrazed plots.
 
 </br>
 
@@ -2905,16 +2961,16 @@ function switchPlotPermanova_16S_bray_func() {
 
 **Results Summary**
 
+**Differential abundance analysis of predicted microbial pathways revealed distinct functional shifts across environmental and management gradients.**  
 
-Differential abundance analysis of predicted microbial functions (ANCOM) revealed that several pathways varied significantly in response to environmental factors.
+Establishment method had a notable effect on microbial functional profiles, with two pathways significantly differing between strategies: **PWY-5265** (peptidoglycan biosynthesis II in staphylococci) and **PWY-6892** (thiazole component of thiamine diphosphate biosynthesis I).  
 
-Establishment method strongly influenced functional potential, with two pathways significantly more abundant in specific restoration types: peptidoglycan biosynthesis II (staphylococci) and thiazole component of thiamine diphosphate biosynthesis.
+**Site age** was associated with changes in core biosynthetic functions, including **HEME-BIOSYNTHESIS-II**, **PWY-5918** (heme b biosynthesis), and **HOMOSER-METSYN-PWY** (L-methionine biosynthesis I).  
 
-Site age was associated with changes in core metabolic functions, including heme biosynthesis and L-methionine biosynthesis, which were enriched in specific age groups.
+**Soil pH** influenced two secondary metabolism pathways: **PWY-6915** and **PWY-6919**, both involved in pentalenolactone biosynthesis.  
 
-Soil pH also shaped functional composition, particularly influencing pathways involved in pentalenolactone and pentalenoketolactone biosynthesis.
+**Sheep grazing** showed the strongest functional signal, with five pathways significantly enriched or depleted, notably: **PWY-1541**, **P162-PWY**, **PWY-6944**, **PWY-3661**, and **PWY-5177**, reflecting enhanced nitrogen and steroid metabolism as well as osmolyte degradation.
 
-Finally, sheep grazing was linked to the greatest number of differentially abundant pathways, notably those involved in glutaryl-CoA degradation, L-glutamate degradation, androstenedione degradation, glycine betaine degradation, and other key metabolic routes.
 
 </br>
 
@@ -3043,7 +3099,6 @@ slickR(obj = slides, slideType = 'html', height = 500) +
 ### Fungi (ITS)
 
 **Results Summary**  
-
 
 Fungal functional diversity was primarily influenced by pH and establishment method. Lower functional diversity was observed in alkaline soils. Guild analysis showed dominance of undefined saprotrophs, with dung-associated and pathogenic guilds more prevalent in managed or disturbed sites.
 
@@ -3217,13 +3272,22 @@ function switchPlotSignAlpha_ITS() {
 
 **Results Summary**
 
-Beta diversity analysis of fungal guild composition revealed that **establishment method**, **soil pH**, and **site age** significantly influenced community structure, as assessed by both **Bray–Curtis** and **Jaccard** distance metrics.
+Analysis of fungal guild composition across the sites revealed significant effects of **establishment method**, **soil pH**, and **site age**, with patterns consistent across both **Bray-Curtis** and **Jaccard** distance metrics.
 
-PCoA plots showed some clustering by establishment type. Sites using **green hay** or **seed mix** were more widely dispersed, while **natural regeneration (NR)** sites formed a tighter and more cohesive cluster. PERMANOVA confirmed significant differences between establishment types for both Bray–Curtis (*p* = 0.003) and Jaccard (*p* = 0.002), with all pairwise comparisons significant. The strongest contrasts were observed between **GH and NR** for Bray–Curtis and between **NR vs. GH/SM** for Jaccard.
+PCoA plots showed partial clustering by **establishment method**, with **natural regeneration (NR)** sites forming a tighter group, while **green hay (GH)** and **seed mix (SM)** plots were more dispersed. Despite some overlap, NR sites displayed more consistent guild structure. Similar trends were observed for both Bray-Curtis and Jaccard indices.
 
-For **pH category**, clustering was less distinct with Bray–Curtis but more apparent with Jaccard, where sites with **slightly acidic to neutral soils** grouped more closely. PERMANOVA results supported these observations, with stronger significance for Jaccard (*p*-adjusted = 0.001) than for Bray–Curtis (*p*-adjusted = 0.003).
+Clustering by **pH** was more evident in **Jaccard-based** PCoAs, where sites with **slightly acidic to neutral** pH values (below median) grouped more tightly than those with alkaline soils. **Bray-Curtis** plots revealed less pronounced patterns.
 
-**Site age** also had a significant effect on guild composition for both metrics. The effect was more pronounced with Bray–Curtis (*p*-adjusted = 0.009) than with Jaccard (*p*-adjusted = 0.04). While PCoA plots suggested some separation by age, each age group contained a mix of sites, indicating **partial overlap** in guild structure across age categories.
+For **site age**, clustering was visible but overlapping, with two main groups composed of both **younger** (<13 years) and **older** (>13 years) sites, suggesting that while age influences guild composition, some core functional groups remain across time.
+
+PERMANOVA results confirmed these observations:
+
+- **Establishment method**: significant for both Bray-Curtis (*p* = 0.003) and Jaccard (*p* = 0.002), with all **pairwise comparisons** significant. The strongest differences were between NR and GH/SM sites.
+- **Soil pH category**: significant for both metrics, but stronger with Jaccard (Bray-Curtis *p*-adjusted = 0.003; Jaccard *p*-adjusted = 0.001).
+- **Age category**: also significant (Bray-Curtis *p*-adjusted = 0.009; Jaccard *p*-adjusted = 0.04), supporting the role of successional dynamics in shaping functional guild structure.
+
+These findings indicate that **functional beta diversity** in fungal communities responds sensitively to restoration strategy, edaphic conditions, and ecological time, with Jaccard providing slightly better resolution for detecting presence/absence-driven changes in community function.
+
 
 </br>
 
@@ -3431,6 +3495,29 @@ This section explores the functional roles of fungi within each site, based on g
 
 </br>
 
+
+**Results Summary**
+
+The analysis of fungal guild abundance across the sites revealed **high variability** in fungal ecological roles. A consistent observation was the **substantial proportion of unassigned fungi**, limiting interpretation in some cases. Among the **identified guilds**, the most dominant were:
+
+- **Undefined saprotrophs**
+- **Plant pathogens**
+- **Dung saprotrophs**
+
+In select sites, **animal parasites** were also present at noteworthy levels.
+
+Across **site age categories**, distinct patterns emerged. In **older sites** (above median age), the fungal community was dominated by **undefined saprotrophs**, comprising nearly **50% of the total abundance**. Plant pathogens and dung saprotrophs were also significantly represented. In **younger sites**, while undefined saprotrophs remained abundant, **plant pathogens** and **dung saprotrophs** were present in relatively **higher proportions**. In addition, **animal pathogens** and **wood saprotrophs** were detected in younger sites.
+
+When comparing **establishment methods**, the guild composition also varied:
+
+- **Green hay (GH)** sites showed high levels of **undefined saprotrophs**, **plant pathogens**, and **dung saprotrophs**.
+- **Natural regeneration (NR)** sites had the **highest percentage** of **undefined saprotrophs**, but **lower levels** of **plant pathogens** and **dung saprotrophs**.
+
+Regarding **soil pH**, sites with **above-median pH** displayed high abundances of **undefined saprotrophs**, followed by **plant pathogens** and **dung saprotrophs**. In contrast, **below-median pH** sites showed a **similar dominance** of undefined saprotrophs, but with an **increased proportion of animal parasites**.
+
+These patterns suggest that fungal functional composition is responsive to **restoration strategy**, **soil chemistry**, and **successional stage**.
+
+</br>
 
 ##### Top 20 Most Abundant Guilds
 
@@ -4046,12 +4133,27 @@ Most of the correlations were associated with sites that use NR as an establishm
 
 </br>
 
-## Limitations
+## **Limitations**
 
-Carrying out pairwise comparisons between fungi and bacteria resulted in thousands of correlations. Although correlations were filtered for abundance it may have resulted in potentially filtering out meaningful correlations while including correlations which, upon analysis, could not be clearly understood, even when taking the current literature into account. Additionally, some of the FUNGuild guild assignments included multiple, non-specific guilds for the same assignment, making it confusing for analysis. Methods other than pairwise correlations such as generalised linear models (Wagg et al, 2019) could be investigated. 
+Carrying out pairwise comparisons between fungi and bacteria resulted in thousands of correlations. Although correlations were filtered for abundance it may have resulted in potentially filtering out meaningful correlations while including correlations which, upon analysis, could not be clearly understood, even when taking the current literature into account. Additionally, some of the FUNGuild guild assignments included multiple, non-specific guilds for the same assignment, making it confusing for analysis. Methods other than pairwise correlations such as generalised linear models (Wagg et al, 2019) could be investigated.
 
-This study also considered each factor in isolation, potentially missing the effects of interactions between establishment method and age. For future studies, more advanced statistical methods could be used to take age into account when assessing the effects of establishment method. 
+This study also considered each factor in isolation, potentially missing the effects of interactions between establishment method and age. For future studies, more advanced statistical methods could be used to take age into account when assessing the effects of establishment method.
 
+
+
+## **Conclusions** 
+
+This study demonstrates how bioinformatics pipelines and analysis can be used to study grassland ecosystem dynamics and their impact on bacterial and fungal communities. Sequencing of the 16S and ITS amplicons have enabled the answering of research questions about the impact of restoration methods, soil physico-chemical properties, length of restoration and management practices on bacterial-fungal assemblies. Additionally, they can help ecological restoration projects such as RestREco establish best practices for restoring and building resilience in degraded grasslands.  
+
+This study determined that establishment method, pH and age were the biggest drivers of differences in bacterial and fungal communities, but that within-site bacterial taxonomic and functional diversity was significantly affected by establishment method while soil pH and age were the major factors affecting fungal diversity. Active restoration methods such as the planting of seed mixes appear to provide the biggest benefit to bacterial communities instead of a natural regeneration approach. Soil pH and grazing impact community composition while age affects functional specializations. Fungal communities respond more positively to longer-term restoration efforts while higher soil pH can have a negative effect on fungal diversity.   
+
+The dominance of specific taxa in bacterial communities such as decomposers Actinobacteria and Proteobacteria demonstrated bacterial preferences for soils with high nutrient availability while some less abundant phyla showed preferences for soils with lower pH values. For fungal communities the differential abundance of certain taxa, including saprotrophs and pathogenic fungi, in sites using different restoration methods and land management systems demonstrated the impact of plant diversity, nutrient inputs and soil disturbance on fungal assemblies.  
+
+Core bacterial pathways and fungal functions for survival, growth, organic matter breakdown and nutrient cycling were dominant throughout. However, the impact of establishment method, pH, age and management on function was more multi-faceted. Establishment and management method affected functioning for both kingdoms but for different reasons. For bacteria, both variables were associated with nutrient inputs driving growth, metabolism and organic matter breakdown pathways, while for fungi, they were associated with decomposition and disturbance. Soil pH shaped functional communities for both kingdoms but introduced competition for resources in bacteria, demonstrated by the abundance of antimicrobial producing bacteria in higher pH sites. The role of age in bacterial functions was related to more ‘core’ pathways geared towards growth and resource use in younger sites but specialization and functional redundancy in older sites. The functional shifts caused by age on fungal guild composition was less clear. 
+
+Inter-kingdom analysis showed correlations between different taxa and functions were strongly associated with complementary or opportunistic relationships including the dominance of different pathways and functions associated with macromolecule breakdown or bacteria and fungi taking advantage of nutrients being made more available by members of the other kingdom.  
+
+Overall, this study demonstrates that the impact of establishment method, pH and age on ecological restoration is complex, with bacterial and fungal communities responding differently to the three factors. For bacterial communities, assisted restoration methods provide the best chance of promoting diversity while for fungal communities ensuring pH levels are not too high and restoration projects are given enough time to allow communities to form are the key. Additionally, efforts to improve fungal taxa and functional classification methods should be stepped-up to increase understanding of fungal functions and how bacteria and fungi interact.  
 
 
 
