@@ -484,7 +484,7 @@ After denoising, quality control (QC) metrics provide essential insights into th
 
 df <- read.delim("data/16S/Pre_processing/s04_stats_dada2/data/metadata.tsv", comment.char = "#")
 
-cat('Here is a link to the **statistics after denoising** to view it on QIIME2 (16S) : <a href="data/16S/s04_stats_dada2/data/index.html" target="_blank">Statitics after denoising (16S)</a>')
+cat('Here is a link to the **statistics after denoising** to view it on QIIME2 (16S) : <a href="data/16S/Pre_processing/s04_stats_dada2/data/index.html" target="_blank">Statitics after denoising (16S)</a>')
 
 datatable(
   df,
@@ -588,7 +588,7 @@ This step is crucial to ensure that downstream diversity analyses are not biased
 
 ##### Bacteria (16S) 
 
-Here is a link to the **Rarefiction plots** for more flexibility on QIIME2: <a href="data/16S/alpha_rarefaction/data/index.html" target="_blank">Rarefiction plots (16S)</a>
+Here is a link to the **Rarefiction plots** for more flexibility on QIIME2: <a href="data/16S/Pre_processing/alpha_rarefaction/data/index.html" target="_blank">Rarefiction plots (16S)</a>
 
 </br>
 
