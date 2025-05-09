@@ -1253,8 +1253,7 @@ function switchPlotAlphaITS() {
 
 ---
 
-### Comparative Microbial Community Composition (Beta Diversity) {.tabset}
-
+### Comparative Microbial Community Composition (Beta Diversity)
 
 To explore differences in microbial communities, we often rely on dimensionality reduction techniques such as *Principal Coordinates Analysis* (PCoA), visualised through **Emperor plots**. Two commonly used distance metrics in this context are **Bray-Curtis** and **Jaccard**.
 
@@ -1265,14 +1264,11 @@ This approach is useful to visualise group clustering by variables like **establ
 </br>
 
 **Results Summary**  
-
 Beta diversity patterns confirmed that establishment type, pH, and grazing significantly shaped microbial community composition. For bacteria, strong clustering by method and significant PERMANOVA results support distinct assemblages. Fungal beta diversity followed similar trends but with additional sensitivity to site age.
 
-</br>
+---
 
-#### Bacteria (16S)
-
-##### Bray-Curtis
+#### Bray-Curtis
 
 <details><summary><strong>Click for more information on Bray-Curtis Distance Metric</strong></summary>
 
@@ -1283,15 +1279,11 @@ Bray-Curtis is especially useful for detecting shifts in **community structure**
 
 </details>
 
-</br>
+##### Emperor Plot {.tabset}
 
-**Results Summary**
-
-The Bray–Curtis metric revealed strong effects of **establishment method**, **soil pH**, and **sheep grazing** on bacterial community structure. Significant differences were detected across all establishment types (PERMANOVA *p* = 0.001), with clear clustering observed in PCoA space. **Soil age** also influenced community structure, with younger and older sites differing significantly (*p* = 0.035), despite weak visual separation. 
+###### Bacteria
 
 
-###### Emperor Plot
- 
 **Results Summary**
 
 Beta diversity analysis using Bray–Curtis distance revealed that **establishment method**, **soil pH**, and **sheep grazing** were the primary factors shaping bacterial community structure. Significant differences in taxonomic composition were observed between all establishment types, with natural regeneration, seed mix, and green hay/bush plots forming distinct but partially overlapping clusters in PCoA space. **Site age** also had a detectable effect with Bray–Curtis, highlighting changes in relative abundance between younger and older sites.
@@ -1342,10 +1334,61 @@ HTML("<p style='text-align: center; font-weight: bold;'>Bray-Curtis Emperor Plot
 
 ```
 
+###### Fungi
+
+**Results Summary**
+
+Beta diversity analysis revealed that **establishment method**, **soil pH**, and **site age** had the most significant influence on fungal community composition, followed by **sheep grazing**, **ploughing**, and **cutting**. In PCoA plots, natural regeneration sites formed a loose cluster near seed mix sites, while green hay/bush sites clustered more distinctly along Axis 1. 
+
+</br>
+
+Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (ITS)</a>
+
+```{r emperor-plot-16S, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
 
 
-###### PERMANOVA
 
+json <- fromJSON("data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+
+HTML("<p style='text-align: center; font-weight: bold;'>Bray-Curtis Emperor Plot (ITS) </p>")
+
+
+
+```
+
+##### PERMANOVA {.tabset}
+
+###### Bacteria 
 
 **Results Summary**
 
@@ -1403,408 +1446,7 @@ function switchPlotPermanova_16S_bray() {
 }
 </script>
 
-
-##### Jaccard 
-
-<details><summary><strong>Click for more information on Jaccard Distance Metric</strong></summary>
-
-**Jaccard** is a non-phylogenetic beta diversity metric that compares microbial communities based on the **presence or absence** of taxa, without considering their abundance or evolutionary relationships.
-It measures the proportion of shared taxa between samples relative to the total number of taxa present, treating all species equally. This makes it particularly sensitive to **community turnover**, highlighting whether two sites contain the same organisms, regardless of how abundant they are.
-Jaccard is well-suited for detecting changes in **community membership** across environmental gradients or treatment groups, especially when interested in whether taxa are present at all, rather than how dominant they are.
-
-</details>
-
-</br>
-
-###### Emperor Plot
-
-
-Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/jaccard_emperor/data/index.html" target="_blank">Jaccard Emperor Plot (16S)</a>
-
-```{r jaccard-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
-
-
-
-json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/jaccard_emperor/data/emperor.json")
-
-coords <- json$plot$decomposition$coordinates
-
-coord_df <- as.data.frame(coords)
-
-colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
-coord_df$SampleID <- json$plot$decomposition$sample_ids
-
-
-metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
-colnames(metadata) <- json$plot$metadata_headers
-
-df <- left_join(coord_df, metadata, by = "SampleID")
-
-
-b <- plot_ly(
-  df,
-  x = ~PC1,
-  y = ~PC2,
-  z = ~PC3,
-  color = ~Establishment,
-  text = ~SampleID,
-  type = "scatter3d",
-  mode = "markers",
-  marker = list(size = 4)
-  
-)
-
-htmltools::div(style = "text-align: center;", b)
-HTML("<p style='text-align: center; font-weight: bold;'>Jaccard Emperor Plot (16S) </p>")
-
-
-
-
-```
-
-###### PERMANOVA 
-
-
-You can **click on the images** below to access the **full QIIME2 report**.
-
-<div style="margin-bottom: 20px;">
-  <label for="variable_selector_Permanova_16S_jacc"><b>Select variable:</b></label>
-  <select id="variable_selector_Permanova_16S_jacc" onchange="switchPlotPermanova_16S_jacc()">
-    <option value="Establishment" selected>Establishment</option>
-    <option value="Cutting">Cutting</option>
-    <option value="Cattle">Cattle</option>
-    <option value="Sheep">Sheep</option>
-    <option value="Plough">Plough</option>
-    <option value="Year_group">Year_group</option>
-    <option value="pH_binary">pH binary</option>
-    <option value="Age_binary">Age binary</option>
-  </select>
-</div>
-
-
-```{r permanova_16S_jacc, results='asis'}
-vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
-
-for (v in vars) {
-  img_path <- paste0("images/permanova/Jaccard/16S/jaccard_permanova_", v, ".png")
-  link_path <- paste0("data/16S/Beta_Diversity/Permanova/jaccard_permanova_", v, "/data/index.html")
-  
-  display_style <- ifelse(v == "Establishment", "block", "none")
-  
-  
-  cat(sprintf('<div id="plot_permanova_jacc_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Jaccard – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Jaccard for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
-}
-
-```
-
-<script>
-function switchPlotPermanova_16S_jacc() {
-  var val = document.getElementById("variable_selector_Permanova_16S_jacc").value;
-  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary", "Age_binary"];
-  
-  all.forEach(function(v) {
-    var el = document.getElementById("plot_permanova_jacc_" + v);
-    if (el) {
-      el.style.display = (v === val) ? "block" : "none";
-    }
-  });
-}
-</script>
-
-##### Unweighted Unifrac 
-
-<details><summary><strong>Click for more information on Unweighted Unifrac Distance Metric</strong></summary>
-
-**Unweighted UniFrac** is a phylogenetic beta diversity metric that compares microbial communities based solely on the **presence or absence** of taxa, while incorporating their **evolutionary relationships**.
-
-Unlike abundance-based measures, this metric considers whether lineages are shared between communities, regardless of how dominant they are. It is particularly sensitive to **rare or low-abundance taxa**, as all taxa are weighted equally.
-
-Unweighted UniFrac is useful for identifying broad differences in **community membership**—for example, whether two sites share the same species, even if those species occur at very different abundances. This makes it well-suited to detecting compositional shifts due to strong environmental filters or historical legacies.
-
-</details>
-
-</br>
-
-**Results Summary**
-
-Unweighted UniFrac, which focuses on phylogenetic presence/absence, similarly highlighted **establishment method**, **soil pH**, and **sheep grazing** as major drivers of variation. All pairwise comparisons between establishment types yielded statistically significant differences (*q* < 0.005), confirming shifts in community membership across restoration strategies. However, **site age** had no significant effect using this metric (*p* = 0.063), suggesting that observed changes with age were driven more by shifts in abundance than by changes in phylogenetic composition.
-
-</br>
-
-###### Emperor Plot
-
-Here is a link to the **Unweighted Unifrac Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/unweighted_unifrac_emperor/data/index.html" target="_blank">Unweighted Unifrac Emperor Plot (16S)</a>
-
-```{r uwunifrac-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
-
-
-
-json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/unweighted_unifrac_emperor/data/emperor.json")
-
-coords <- json$plot$decomposition$coordinates
-
-coord_df <- as.data.frame(coords)
-
-colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
-coord_df$SampleID <- json$plot$decomposition$sample_ids
-
-
-metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
-colnames(metadata) <- json$plot$metadata_headers
-
-df <- left_join(coord_df, metadata, by = "SampleID")
-
-
-b <- plot_ly(
-  df,
-  x = ~PC1,
-  y = ~PC2,
-  z = ~PC3,
-  color = ~Establishment,
-  text = ~SampleID,
-  type = "scatter3d",
-  mode = "markers",
-  marker = list(size = 4)
-  
-)
-
-htmltools::div(style = "text-align: center;", b)
-HTML("<p style='text-align: center; font-weight: bold;'>Unweighted Unifrac Emperor Plot (16S) </p>")
-
-
-
-```
-
-###### PERMANOVA
-
-You can **click on the images** below to access the **full QIIME2 report**.
-
-<div style="margin-bottom: 20px;">
-  <label for="variable_selector_Permanova_16S_uwunifrac"><b>Select variable:</b></label>
-  <select id="variable_selector_Permanova_16S_uwunifrac" onchange="switchPlotPermanova_16S_uwunifrac()">
-    <option value="Establishment" selected>Establishment</option>
-    <option value="Cutting">Cutting</option>
-    <option value="Cattle">Cattle</option>
-    <option value="Sheep">Sheep</option>
-    <option value="Plough">Plough</option>
-    <option value="Year_group">Year_group</option>
-    <option value="pH_binary">pH binary</option>
-    <option value="Age_binary">Age binary</option>
-  </select>
-</div>
-
-
-```{r permanova_16S_uwunifrac, results='asis'}
-vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
-
-for (v in vars) {
-  img_path <- paste0("images/permanova/Uwunifrac/uwunifrac_permanova_", v, ".png")
-  link_path <- paste0("data/16S/Beta_Diversity/Permanova/uwunifrac_permanova_", v, "/data/index.html")
-  
-  display_style <- ifelse(v == "Establishment", "block", "none")
-  
-  
-  cat(sprintf('<div id="plot_permanova_uwunifrac_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Unweighted Unifrac – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Unweighted Unifrac for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
-}
-
-```
-
-<script>
-function switchPlotPermanova_16S_uwunifrac() {
-  var val = document.getElementById("variable_selector_Permanova_16S_uwunifrac").value;
-  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary", "Age_binary"];
-  
-  all.forEach(function(v) {
-    var el = document.getElementById("plot_permanova_uwunifrac_" + v);
-    if (el) {
-      el.style.display = (v === val) ? "block" : "none";
-    }
-  });
-}
-</script>
-
-
-##### Weighted Unifrac 
-
-<details><summary><strong>Click for more information on Weighted Unifrac Distance Metric</strong></summary>
-
-**Weighted UniFrac** is a phylogenetic distance metric that takes into account both the **evolutionary relationships** between taxa and their **relative abundances** in each sample.
-
-It quantifies how much of the phylogenetic tree is **shared** between communities, with branches weighted by the proportion of abundance they represent. As a result, changes in dominant taxa have more influence on the distance than rare species.
-
-Weighted UniFrac is ideal for detecting differences in **community structure**, especially when those differences involve shifts in abundant lineages. It provides a more nuanced view than unweighted metrics by integrating both phylogenetic and quantitative information.
-
-</details>
-
-</br>
-
-###### Emperor Plot
-
-Here is a link to the **Weighted Unifrac Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/weighted_unifrac_emperor/data/index.html" target="_blank">Weighted Unifrac Emperor Plot (16S)</a>
-
-```{r wunifrac-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
-
-
-
-json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/weighted_unifrac_emperor/data/emperor.json")
-
-coords <- json$plot$decomposition$coordinates
-
-coord_df <- as.data.frame(coords)
-
-colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
-coord_df$SampleID <- json$plot$decomposition$sample_ids
-
-
-metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
-colnames(metadata) <- json$plot$metadata_headers
-
-df <- left_join(coord_df, metadata, by = "SampleID")
-
-
-b <- plot_ly(
-  df,
-  x = ~PC1,
-  y = ~PC2,
-  z = ~PC3,
-  color = ~Establishment,
-  text = ~SampleID,
-  type = "scatter3d",
-  mode = "markers",
-  marker = list(size = 4)
-  
-)
-
-htmltools::div(style = "text-align: center;", b)
-HTML("<p style='text-align: center; font-weight: bold;'>Weighted Unifrac Emperor Plot (16S) </p>")
-
-
-
-```
-
-
-###### PERMANOVA
-
-
-You can **click on the images** below to access the **full QIIME2 report**.
-
-<div style="margin-bottom: 20px;">
-  <label for="variable_selector_Permanova_16S_wunifrac"><b>Select variable:</b></label>
-  <select id="variable_selector_Permanova_16S_wunifrac" onchange="switchPlotPermanova_16S_wunifrac()">
-    <option value="Establishment" selected>Establishment</option>
-    <option value="Cutting">Cutting</option>
-    <option value="Cattle">Cattle</option>
-    <option value="Sheep">Sheep</option>
-    <option value="Plough">Plough</option>
-    <option value="Year_group">Year_group</option>
-    <option value="pH_binary">pH binary</option>
-    <option value="Age_binary">Age binary</option>
-  </select>
-</div>
-
-
-```{r permanova_16S_wunifrac, results='asis'}
-vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
-
-for (v in vars) {
-  img_path <- paste0("images/permanova/Wunifrac/wunifrac_permanova_", v, ".png")
-  link_path <- paste0("data/16S/Beta_Diversity/Permanova/wunifrac_permanova_", v, "/data/index.html")
-  
-  display_style <- ifelse(v == "Establishment", "block", "none")
-  
-  
-  cat(sprintf('<div id="plot_permanova_wunifrac_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Weighted Unifrac – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Weighted Unifrac for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
-}
-
-```
-
-<script>
-function switchPlotPermanova_16S_wunifrac() {
-  var val = document.getElementById("variable_selector_Permanova_16S_wunifrac").value;
-  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary", "Age_binary"];
-  
-  all.forEach(function(v) {
-    var el = document.getElementById("plot_permanova_wunifrac_" + v);
-    if (el) {
-      el.style.display = (v === val) ? "block" : "none";
-    }
-  });
-}
-</script>
-
-
----
-
-
-#### Fungi (ITS) 
-
-##### Bray-Curtis
-
-<details><summary><strong>Click for more information on Bray-Curtis Distance Metric</strong></summary>
-
-**Bray-Curtis** is a non-phylogenetic beta diversity metric that compares microbial communities based on **species abundance**, taking into account both shared taxa and their **relative proportions**.
-Unlike presence/absence metrics, Bray-Curtis gives more weight to **dominant species** and is sensitive to changes in **abundance structure**. It ranges from 0 (identical composition and abundance) to 1 (completely different), reflecting how much two communities differ in the quantity of each taxon they contain.
-Bray-Curtis is especially useful for detecting shifts in **community structure** driven by changes in resource availability, disturbance, or other factors that influence the balance of taxa rather than just their presence.
-
-
-</details>
-
-</br>
-
-###### Emperor Plot
- 
-
-**Results Summary**
-
-Beta diversity analysis revealed that **establishment method**, **soil pH**, and **site age** had the most significant influence on fungal community composition, followed by **sheep grazing**, **ploughing**, and **cutting**. In PCoA plots, natural regeneration sites formed a loose cluster near seed mix sites, while green hay/bush sites clustered more distinctly along Axis 1. 
-
-</br>
-
-Here is a link to the **Bray-Curtis Emperor Plot** for more flexibility on QIIME2: <a href="data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/index.html" target="_blank">Bray-Curtis Emperor Plot (ITS)</a>
-
-```{r emperor-plot-16S, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
-
-
-
-json <- fromJSON("data/ITS/Beta_Diversity/F03_agg_bray_curtis_emperor/data/emperor.json")
-
-coords <- json$plot$decomposition$coordinates
-
-coord_df <- as.data.frame(coords)
-
-colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
-coord_df$SampleID <- json$plot$decomposition$sample_ids
-
-
-metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
-colnames(metadata) <- json$plot$metadata_headers
-
-
-df <- left_join(coord_df, metadata, by = "SampleID")
-
-
-b <- plot_ly(
-  df,
-  x = ~PC1,
-  y = ~PC2,
-  z = ~PC3,
-  color = ~Establishment,
-  text = ~SampleID,
-  type = "scatter3d",
-  mode = "markers",
-  marker = list(size = 4)
-  
-)
-
-htmltools::div(style = "text-align: center;", b)
-
-HTML("<p style='text-align: center; font-weight: bold;'>Bray-Curtis Emperor Plot (ITS) </p>")
-
-
-
-```
-
-###### PERMANOVA
+###### Fungi (ITS)
 
 **Results Summary**
 
@@ -1859,7 +1501,7 @@ function switchPlotPermanova_ITS_bray() {
 }
 </script>
 
-##### Jaccard 
+#### Jaccard
 
 <details><summary><strong>Click for more information on Jaccard Distance Metric</strong></summary>
 
@@ -1869,9 +1511,55 @@ Jaccard is well-suited for detecting changes in **community membership** across 
 
 </details>
 
-</br>
 
-###### Emperor Plot
+##### Emperor Plot {.tabset}
+
+###### Bacteria
+
+Here is a link to the **Jaccard Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/jaccard_emperor/data/index.html" target="_blank">Jaccard Emperor Plot (16S)</a>
+
+```{r jaccard-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+
+
+json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/jaccard_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+HTML("<p style='text-align: center; font-weight: bold;'>Jaccard Emperor Plot (16S) </p>")
+
+
+
+
+```
+
+###### Fungi
 
 **Results Summary**
 
@@ -1922,8 +1610,58 @@ cat("<p style='text-align: center; font-weight: bold;'>Jaccard Emperor Plot (ITS
 
 ```
 
-###### PERMANOVA
 
+##### PERMANOVA {.tabset}
+
+###### Bacteria (16S)
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_16S_jacc"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_16S_jacc" onchange="switchPlotPermanova_16S_jacc()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Year_group">Year_group</option>
+    <option value="pH_binary">pH binary</option>
+    <option value="Age_binary">Age binary</option>
+  </select>
+</div>
+
+
+```{r permanova_16S_jacc, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Jaccard/16S/jaccard_permanova_", v, ".png")
+  link_path <- paste0("data/16S/Beta_Diversity/Permanova/jaccard_permanova_", v, "/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  
+  cat(sprintf('<div id="plot_permanova_jacc_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Jaccard – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Jaccard for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+}
+
+```
+
+<script>
+function switchPlotPermanova_16S_jacc() {
+  var val = document.getElementById("variable_selector_Permanova_16S_jacc").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary", "Age_binary"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_jacc_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+###### Fungi (ITS)
 
 **Results Summary**
 
@@ -1972,6 +1710,233 @@ function switchPlotPermanova_ITS_jacc() {
   
   all.forEach(function(v) {
     var el = document.getElementById("plot_permanova_ITS_jacc_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+---
+
+
+**UniFrac metrics (both weighted and unweighted) rely on a phylogenetic tree to quantify the evolutionary distances between microbial taxa. Since the ITS region used for fungal community profiling does not provide reliable phylogenetic resolution, it is not suitable for generating accurate phylogenetic trees. As a result, UniFrac analyses were only conducted for 16S bacterial data, and not for fungi.**
+
+#### Unweighted Unifrac - Bacteria Only (16S)
+
+
+<details><summary><strong>Click for more information on Unweighted Unifrac Distance Metric</strong></summary>
+
+**Unweighted UniFrac** is a phylogenetic beta diversity metric that compares microbial communities based solely on the **presence or absence** of taxa, while incorporating their **evolutionary relationships**.
+
+Unlike abundance-based measures, this metric considers whether lineages are shared between communities, regardless of how dominant they are. It is particularly sensitive to **rare or low-abundance taxa**, as all taxa are weighted equally.
+
+Unweighted UniFrac is useful for identifying broad differences in **community membership**—for example, whether two sites share the same species, even if those species occur at very different abundances. This makes it well-suited to detecting compositional shifts due to strong environmental filters or historical legacies.
+
+</details>
+
+</br>
+
+**Results Summary**
+
+Unweighted UniFrac, which focuses on phylogenetic presence/absence, similarly highlighted **establishment method**, **soil pH**, and **sheep grazing** as major drivers of variation. All pairwise comparisons between establishment types yielded statistically significant differences (*q* < 0.005), confirming shifts in community membership across restoration strategies. However, **site age** had no significant effect using this metric (*p* = 0.063), suggesting that observed changes with age were driven more by shifts in abundance than by changes in phylogenetic composition.
+
+</br>
+
+##### Emperor Plot - Bacteria
+
+Here is a link to the **Unweighted Unifrac Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/unweighted_unifrac_emperor/data/index.html" target="_blank">Unweighted Unifrac Emperor Plot (16S)</a>
+
+```{r uwunifrac-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+
+
+json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/unweighted_unifrac_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+HTML("<p style='text-align: center; font-weight: bold;'>Unweighted Unifrac Emperor Plot (16S) </p>")
+
+
+
+```
+
+##### PERMANOVA - Bacteria
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_16S_uwunifrac"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_16S_uwunifrac" onchange="switchPlotPermanova_16S_uwunifrac()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Year_group">Year_group</option>
+    <option value="pH_binary">pH binary</option>
+    <option value="Age_binary">Age binary</option>
+  </select>
+</div>
+
+
+```{r permanova_16S_uwunifrac, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Uwunifrac/uwunifrac_permanova_", v, ".png")
+  link_path <- paste0("data/16S/Beta_Diversity/Permanova/uwunifrac_permanova_", v, "/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  
+  cat(sprintf('<div id="plot_permanova_uwunifrac_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Unweighted Unifrac – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Unweighted Unifrac for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+}
+
+```
+
+<script>
+function switchPlotPermanova_16S_uwunifrac() {
+  var val = document.getElementById("variable_selector_Permanova_16S_uwunifrac").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary", "Age_binary"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_uwunifrac_" + v);
+    if (el) {
+      el.style.display = (v === val) ? "block" : "none";
+    }
+  });
+}
+</script>
+
+
+#### Weighted Unifrac - Bacteria Only (16S)
+
+<details><summary><strong>Click for more information on Weighted Unifrac Distance Metric</strong></summary>
+
+**Weighted UniFrac** is a phylogenetic distance metric that takes into account both the **evolutionary relationships** between taxa and their **relative abundances** in each sample.
+
+It quantifies how much of the phylogenetic tree is **shared** between communities, with branches weighted by the proportion of abundance they represent. As a result, changes in dominant taxa have more influence on the distance than rare species.
+
+Weighted UniFrac is ideal for detecting differences in **community structure**, especially when those differences involve shifts in abundant lineages. It provides a more nuanced view than unweighted metrics by integrating both phylogenetic and quantitative information.
+
+</details>
+
+</br>
+
+##### Emperor Plot - Bacteria
+
+Here is a link to the **Weighted Unifrac Emperor Plot** for more flexibility on QIIME2: <a href="data/16S/Beta_Diversity/Emperor_plot/weighted_unifrac_emperor/data/index.html" target="_blank">Weighted Unifrac Emperor Plot (16S)</a>
+
+```{r wunifrac-plot-interactive, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+
+
+
+json <- fromJSON("data/16S/Beta_Diversity/Emperor_plot/weighted_unifrac_emperor/data/emperor.json")
+
+coords <- json$plot$decomposition$coordinates
+
+coord_df <- as.data.frame(coords)
+
+colnames(coord_df) <- paste0("PC", seq_len(ncol(coords)))
+coord_df$SampleID <- json$plot$decomposition$sample_ids
+
+
+metadata <- as.data.frame(json$plot$metadata, stringsAsFactors = FALSE)
+colnames(metadata) <- json$plot$metadata_headers
+
+df <- left_join(coord_df, metadata, by = "SampleID")
+
+
+b <- plot_ly(
+  df,
+  x = ~PC1,
+  y = ~PC2,
+  z = ~PC3,
+  color = ~Establishment,
+  text = ~SampleID,
+  type = "scatter3d",
+  mode = "markers",
+  marker = list(size = 4)
+  
+)
+
+htmltools::div(style = "text-align: center;", b)
+HTML("<p style='text-align: center; font-weight: bold;'>Weighted Unifrac Emperor Plot (16S) </p>")
+
+
+
+```
+
+
+##### PERMANOVA - Bacteria
+
+
+You can **click on the images** below to access the **full QIIME2 report**.
+
+<div style="margin-bottom: 20px;">
+  <label for="variable_selector_Permanova_16S_wunifrac"><b>Select variable:</b></label>
+  <select id="variable_selector_Permanova_16S_wunifrac" onchange="switchPlotPermanova_16S_wunifrac()">
+    <option value="Establishment" selected>Establishment</option>
+    <option value="Cutting">Cutting</option>
+    <option value="Cattle">Cattle</option>
+    <option value="Sheep">Sheep</option>
+    <option value="Plough">Plough</option>
+    <option value="Year_group">Year_group</option>
+    <option value="pH_binary">pH binary</option>
+    <option value="Age_binary">Age binary</option>
+  </select>
+</div>
+
+
+```{r permanova_16S_wunifrac, results='asis'}
+vars <- c("Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group","pH_binary","Age_binary")
+
+for (v in vars) {
+  img_path <- paste0("images/permanova/Wunifrac/wunifrac_permanova_", v, ".png")
+  link_path <- paste0("data/16S/Beta_Diversity/Permanova/wunifrac_permanova_", v, "/data/index.html")
+  
+  display_style <- ifelse(v == "Establishment", "block", "none")
+  
+  
+  cat(sprintf('<div id="plot_permanova_wunifrac_%s" style="display:%s; text-align:center;"><p><a href="%s" target="_blank">View full QIIME2 results (Weighted Unifrac – %s)</a></p><a href="%s" target="_blank"><img src="%s" style="max-width:650px; height:auto; cursor:zoom-in;"></a><p style="font-weight:bold;">Figure: PERMANOVA Weighted Unifrac for "%s" (16S)</p></div>', v, display_style, link_path, v, img_path, img_path, v))
+}
+
+```
+
+<script>
+function switchPlotPermanova_16S_wunifrac() {
+  var val = document.getElementById("variable_selector_Permanova_16S_wunifrac").value;
+  var all = ["Establishment", "Cutting", "Cattle", "Sheep", "Plough", "Year_group", "pH_binary", "Age_binary"];
+  
+  all.forEach(function(v) {
+    var el = document.getElementById("plot_permanova_wunifrac_" + v);
     if (el) {
       el.style.display = (v === val) ? "block" : "none";
     }
@@ -3928,54 +3893,164 @@ kable(functional_corr, "html", escape = FALSE, align = "lccc",
 
 ## **Discussion**
 
-**Bacterial Alpha and Beta Diversity**
+### Bacterial 
 
-Microbial alpha diversity was significantly higher in assisted restoration plots (GH and SM) compared to natural regeneration (NR), suggesting that sown vegetation enhances microbial richness and evenness, likely via increased plant inputs and rhizosphere complexity (Van der Putten et al., 2013; Bardgett & van der Wal, 2014). In contrast, soil pH, management, and site age had no significant impact on alpha diversity, possibly due to functional redundancy that stabilises core microbial functions (Louca et al., 2018).
-Beta diversity was strongly shaped by all tested factors—restoration method, site age, soil pH, and grazing—particularly establishment method, which significantly altered both community membership (Unweighted UniFrac, p = 0.001) and abundance profiles (Bray-Curtis, p = 0.001). Site age influenced Bray-Curtis dissimilarities but not UniFrac distances, suggesting abundance shifts without major taxonomic turnover (Fierer et al., 2010; Nemergut et al., 2013). Soil pH acted as a strong environmental filter, affecting microbial community structure by influencing enzyme activity, nutrient availability, and stress response (Lauber et al., 2009; Rousk et al., 2010). Grazing also altered beta diversity, likely through disturbance and nutrient inputs (Bardgett & Wardle, 2010; Patra et al., 2005).
+#### Alpha and beta diversity  
 
-**Functional Diversity and Key Drivers**
+Microbial alpha diversity was significantly influenced by restoration establishment methods, with GH and SM plots showing higher phylogenetic and taxonomic diversity than NR, as indicated by Faith’s phylogenetic diversity, Pielou’s evenness, and Shannon entropy. These results suggest assisted restoration approaches promote more diverse microbial communities, likely due to increased plant richness, root exudate variation, and organic inputs associated with sown vegetation (Van der Putten et al., 2013; Bardgett & van der Wal, 2014). In contrast, site pH, management type, and restoration age had no significant effect on alpha diversity, implying that richness and evenness remain relatively stable once communities are re-established, potentially buffered by functional redundancy among microbial taxa (Louca et al., 2018). 
 
-Functional beta diversity was also significantly affected by environmental gradients, with the restoration method again exerting the strongest influence (PERMANOVA p = 0.001). Functional divergence likely reflected changes in rhizosphere chemistry and substrate input driven by vegetation type (Eisenhauer et al., 2017; Zhalnina et al., 2018; Lange et al., 2015).
-Soil pH had a strong effect on functional profiles (PERMANOVA p = 0.012), with alkaline soils enriched in pathways related to secondary metabolism (e.g., pentalenolactone biosynthesis), a trait associated with antibiotic production in Actinobacteria (Tetzlaff et al., 2006). Site age had a moderate effect (p = 0.035), with younger sites enriched in biosynthetic pathways such as heme and methionine biosynthesis (Choby & Skaar, 2016; Mohany et al., 2021). These functions are linked to early successional microbial activity (Fierer et al., 2010; Nemergut et al., 2013). Grazing influenced functions tied to nitrogen and organic matter degradation (Wang et al., 2020; Tang et al., 2020).
+In terms of beta diversity, all four tested environmental factors—restoration method, site age, pH, and grazing—significantly influenced microbial community structure. Restoration method was the strongest driver, with clear differences in both community membership (Unweighted UniFrac, p = 0.001) and relative abundance (Bray-Curtis, p = 0.001), supporting the idea that assisted establishment strategies select for distinct microbial assemblages. These differences likely reflect the influence of plant-driven processes and disturbance regimes on microbial recruitment and filtering. Site age had a more moderate effect, primarily altering abundance patterns rather than community membership (Bray-Curtis p = 0.037; UniFrac p = 0.063), consistent with successional theory, which suggests that microbial communities become functionally more specialised over time rather than undergoing wholesale taxonomic turnover (Fierer et al., 2010; Nemergut et al., 2013). 
 
-**Differential Pathways and Functional Responses**
+Soil pH emerged as a strong environmental filter, affecting both composition and phylogenetic diversity (Bray-Curtis p = 0.001; UniFrac p = 0.002). Even moderate changes in soil pH led to noticeable differences in microbial communities. This is consistent with previous studies showing that pH shapes microbial composition by influencing nutrient availability, enzyme activity, and microbial stress responses (Lauber et al., 2009; Rousk et al., 2010). Grazing also significantly impacted community composition (PERMANOVA p = 0.001), likely via soil disturbance, altered plant cover, and localized nutrient enrichment from faeces and urine (Bardgett & Wardle, 2010; Patra et al., 2005). These findings highlight the combined importance of biotic management and edaphic conditions in shaping microbial diversity, with restoration strategy exerting strong initial filtering and environmental variables driving longer-term compositional dynamics. 
 
-Pathway-level differences revealed microbial adaptation to specific environmental contexts. Alkaline soils were enriched in antibiotic-related pathways (Tetzlaff et al., 2006), while younger sites showed prioritisation of growth-related functions (Choby & Skaar, 2016). In GH and SM plots, increased peptidoglycan and thiamine biosynthesis pathways suggested higher microbial growth and activity (Heijenoort, 2001; Begley et al., 1999; Eisenhauer et al., 2017). These adaptations reflect changes in vegetation and nutrient input linked to restoration strategy.
+#### Functional diversity  
 
-**Core Metabolism and Redundancy**
+Microbial functional beta diversity varied significantly across environmental gradients, indicating community function is responsive to restoration strategy and site conditions. Among all tested variables, restoration method exerted the strongest influence on functional composition (PERMANOVA p = 0.001), with clear differences in predicted pathway profiles between NR, SM, and GH plots. These differences likely reflect changes in rhizosphere conditions, litter chemistry, and substrate availability introduced by different plant communities (Eisenhauer et al., 2017; Zhalnina et al., 2018). Functional divergence under assisted restoration suggests that microbial communities assemble not only taxonomically but also functionally in response to the vegetation structure and resource environment shaped by establishment type (Lange et al., 2015). 
 
-Despite compositional variation, core biosynthetic and energy metabolism pathways were conserved across all sites, including amino acid synthesis and pyruvate fermentation. This points to the persistence of essential ecosystem functions and supports the concept of functional redundancy (Louca et al., 2018).
+Soil pH also significantly shaped microbial function (PERMANOVA p = 0.012), reinforcing its role as a major ecological filter. Functional differences between high- and low-pH sites may result from pH-driven shifts in microbial physiology, including changes in nutrient acquisition strategies and metabolic activity (Lauber et al., 2009; Rousk et al., 2010). For instance, alkaline soils favored pathways linked to secondary metabolism, such as pentalenolactone biosynthesis, associated with antimicrobial production in Actinobacteria (Tetzlaff et al., 2006). 
 
-**Taxonomic Trends and Indicators**
+Site age had a more modest yet significant effect on functional beta diversity (PERMANOVA p = 0.035), with older sites exhibiting functionally distinct communities. Younger sites showed enrichment in core biosynthetic pathways such as heme and methionine biosynthesis, consistent with early successional stages where microbial populations prioritise metabolic versatility and growth (Choby & Skaar, 2016; Mohany et al., 2021). Over time, these communities are likely to transition toward greater functional specialisation and redundancy, a pattern predicted by successional models of microbial assembly (Fierer et al., 2010; Nemergut et al., 2013; Delgado-Baquerizo et al., 2020). 
 
-Dominant phyla included Actinobacteria and Proteobacteria, consistent with nutrient-rich conditions in SM and GH plots (Spain et al., 2009). Acidobacteria, associated with acidic soils, remained common even in slightly acidic environments (Jones et al., 2009). Conexibacteraceae were more abundant in lower-pH soils (Lauber et al., 2009; Fierer & Jackson, 2006), while Intrasporangiaceae and Blastococcus preferred SM and GH sites, responding to increased organic inputs (Jangid et al., 2011).
+Grazing also influenced microbial functional composition (PERMANOVA p = 0.035), with grazed soils enriched in pathways related to nitrogen turnover and organic matter degradation, including glutaryl-CoA and glutamate degradation (Wang et al., 2020; Tang et al., 2020). These patterns reflect the combined effects of physical disturbance, nutrient enrichment, and vegetation shifts under grazing pressure (Patra et al., 2005; Bardgett & Wardle, 2010). 
 
-**Fungal Diversity and Environmental Drivers**
+#### Differential functional pathways  
 
-Fungal diversity was mainly shaped by pH and site age. Alpha diversity decreased in alkaline soils, potentially due to reduced nutrient use efficiency in fungi (Ma et al., 2023), contradicting previous findings of increased diversity at high pH (Seaton et al., 2022). Older sites supported more complex fungal communities, consistent with longer recovery times post-disturbance (Gao et al., 2021). Establishment method also influenced fungal composition, with GH and SM sites hosting distinct taxa.
+The differential abundance of specific microbial pathways across environmental gradients highlights how microbial communities adapt functionally to changes in soil conditions and management. In alkaline soils, two secondary metabolite biosynthesis pathways—pentalenolactone (PWY-6915) and neopentalenoketolactone/pentalenate (PWY-6919)—were enriched, suggesting that higher pH environments may favor Actinobacteria capable of producing antimicrobial compounds (Tetzlaff et al., 2006; Lauber et al., 2009) potentially conferring a competitive advantage in resource-limited or less acidic environments, indicating microbial adaptation to changes in soil chemistry. (Rousk et al., 2010). 
 
-**Fungal Composition and Functional Guilds**
+Site age also influenced key biosynthetic pathways, with younger sites enriched in functions related to heme and methionine biosynthesis which support oxidative metabolism and protein synthesis. This indicates that early-stage microbial communities prioritise metabolic generalism and resilience during colonisation (Choby & Skaar, 2016; Mohany et al., 2021). This supports successional theory, where functional activity in early communities is geared toward rapid establishment and broad resource use, gradually shifting toward specialisation over time (Fierer et al., 2010; Nemergut et al., 2013). 
 
-Metarhizium was more frequent in NR sites, reflecting reduced disturbance (Zimmermann, 2007). Gibellulopsis, potentially linked to pathogenic interactions, appeared in GH and SM plots (Alisaac & Götz, 2022). Sheep grazing was associated with higher Helotiales and dung-associated fungi like Preussia (Kruys et al., 2006; Bruyant et al., 2024), while ploughing promoted taxa like Saitozyma capable of breaking down plant-derived carbon (Aliyu et al., 2021). Site age influenced composition, with early successional fungi like Lasiosphaeriaceae more common in younger plots, and potential endophytes like Paraphaeosphaeria found in older sites (Baroncelli et al., 2020; Louw et al., 2022).
+The restoration method further shaped microbial functional potential. SM and GH plots showed higher relative abundance of peptidoglycan biosynthesis (PWY-5265) and thiamine diphosphate biosynthesis (PWY-6892), pathways associated with cell wall integrity and cofactor production, respectively (Heijenoort, 2001; Begley et al., 1999). These functions may reflect higher microbial growth rates and metabolic activity supported by richer vegetation inputs in assisted restoration systems (Eisenhauer et al., 2017; Lange et al., 2015). 
 
-**Fungal Functional Guild Shifts**
+These pathway-level shifts demonstrate that soil microbial communities respond to environmental variation with targeted functional adaptations. The enrichment of specialized metabolic traits under different pH, age, establishment, and grazing conditions reflects the dynamic role of microbes in mediating ecosystem processes under changing land management regimes. 
 
-Functional guild analysis showed lower abundance of pathogens and dung saprotrophs in NR sites, with higher prevalence in GH and SM plots. pH subtly influenced parasite abundance, while site age showed more complex guild structuring, aligning with patterns observed in forest restoration studies (Fang et al., 2023). Across all sites, saprotrophs dominated, particularly unclassified ones, underlining gaps in fungal ecological data (Nilsson et al., 2020).
+#### Core metabolic functions maintained across sites 
 
-**Fungal-Bacterial Comparison and Interactions**
-While bacterial diversity was most strongly shaped by establishment method, fungal diversity was more affected by pH and age. However, community composition (beta diversity) for both kingdoms was driven by similar environmental filters. Cross-kingdom correlations included co-occurrence of taxa in GH and SM sites, such as Proteobacteria and Gibellulopsis. Functional comparisons showed complementarity in decomposition and nutrient cycling, supporting previous observations of cross-kingdom cooperation (Wagg et al., 2019; Kohlmeier et al., 2005).
+Despite clear differences in microbial community structure and specialised metabolic pathways across environmental gradients, a conserved set of core functions was consistently maintained. The top 10 most abundant MetaCyc pathways were shared across all samples regardless of site age, soil pH, or restoration method, highlighting the persistence of key biosynthetic and energy-generating processes. These included pathways involved in branched-chain amino acid biosynthesis, pyruvate fermentation and aerobic respiration. Their ubiquity suggests microbial communities retain a stable functional core essential for survival and basic ecosystem functioning. 
 
-**Functional and Taxonomic Correlations**
+This pattern supports the concept of functional redundancy, where different microbial taxa may fulfill similar roles, ensuring continuity of core functions even as community composition or secondary pathways shift (Louca et al., 2018). While environmental factors drive differentiation in specific metabolic traits, the persistence of conserved pathways implies a buffering capacity within soil microbial systems that may contribute to ecosystem resilience. While microbial communities respond flexibly to environmental and management changes, their foundational metabolic roles remain remarkably robust. 
 
-Bradyrhizobiaceae (oligotrophic, nitrogen-fixing bacteria) were associated with saprotrophic yeasts (Saitozyma) and parasitic fungi (Keithomyces), possibly due to shared preference for low pH (Sawada et al., 2023). Rhodospirillaceae and Dermoloma co-occurred on one site, suggesting shared habitat preferences. Most functional correlations involved nutrient cycling: Thermothielavioides (a dung saprotroph) was associated with sugar degradation pathways and propionate metabolism (Camargo et al., 2020; Caspi et al., 2020). These patterns indicate that bacteria and fungi carry out complementary metabolic roles, particularly in NR sites, where successional complexity may support tighter functional coupling (Gao et al., 2021).
+#### Taxonomical composition 
+
+Actinobacteria were abundant across all soils, aiding organic matter decomposition (Bao et al., 2021). The dominance of copiotrophic Proteobacteria in potentially nutrient-rich SM and GH soils, could reflect their preference for environments with abundant nutrients (Spain, Krumholz, & Elshahed, 2009). Acidobacteria, linked to low-nutrient, acidic soils, were consistently present (~5–16%) (Jones et al., 2009), although the lower pH sites in this study were only slightly acidic.  
+
+Chloroflexi and Verrucomicrobia were less abundant overall, though Spartobacteria (in Verrucomicrobia) increased notably in NR soils. Verrucomicrobia is abundant in grassland soils and has a slow growth rate making it adaptable for exploiting sparse resources (Bergmann et al, 2011) in NR sites. 
+
+Above-median pH soils were dominated by Actinobacteria and Proteobacteria (~40–50%), while below-median pH soils showed higher Firmicutes (~25–35%), suggesting acid tolerance. Minor phyla were slightly more frequent in low pH soils, indicating greater microbial diversity. These trends align with models where copiotrophs thrive in higher pH, and oligotrophic, acid-tolerant taxa persist in acidic environments (Fierer, Bradford, & Jackson, 2007). Table 5 shows a breakdown of the ecological roles performed by different taxa. 
+
+</br>
+
+```{r fig-5}
+bacteria_taxa <- data.frame(
+  Phylum = c("Actinobacteria", "Firmicutes", "Proteobacteria", "Verrucomicrobia", 
+             "Acidobacteria", "Chloroflexi", "Planctomycetes", "Bacteroidetes", "Nitrospirae"),
+  Class = c("Actinobacteria", "Bacilli", "Alphaproteobacteria, Gammaproteobacteria", 
+            "Verrucomicrobiae", "Acidobacteria", "Anaerolineae", "Planctomycetacia", 
+            "Bacteroidia", "Nitrospira"),
+  Order = c("Actinomycetales", "Bacillales", "Rhizobiales, Pseudomonadales", 
+            "Bacillales", "Bacillales", "Anaerolineales", "Planctomycetales", 
+            "Bacteroidales", "Nitrospirales"),
+  Role = c(
+    "Decomposers of tough organic material; drought-tolerant",
+    "Stress-tolerant, spore-forming bacteria (e.g., Clostridia)",
+    "Fast growth, nutrient-responsive bacteria",
+    "Soil-associated oligotrophs, survive in low nutrient conditions",
+    "Abundant in acidic, low-nutrient soils; important in organic matter decomposition and soil stabilization",
+    "Slow degraders in moist microenvironments",
+    "Biofilm formers, complex carbon cycle contributors",
+    "Break down complex carbohydrates",
+    "Nitrogen cycle bacteria (nitrification)"
+  )
+)
+
+kable(bacteria_taxa, "html", escape = FALSE, align = "lccc",
+      caption = "Table 5: Taxonomical classification and ecological roles for the major bacterial taxa found in soils across the sites") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive", "bordered"),
+                full_width = FALSE, position = "center") %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#d9eaf7")
+```
+
+</br> 
+
+The significantly higher abundance of Conexibacteraceae in slightly acidic to neutral soils has been found in other studies and is attributed to a potential ecological preference for lower pH environments (Lauber et al., 2009; Fierer & Jackson, 2006) although there are few studies on their role in grassland systems. The bacterial family Intrasporangiaceae alongside Blastococus, showed preferences for sites seeded with GH and SM. Both families belong to Actinobacteria, a major decomposer. Their presence on sites with active restoration strategies suggests they respond positively to enhanced plant inputs and nutrient accessibility associated with planted vegetation (Jangid et al., 2011). This further supports the suggestion that assisted restoration methods promote more diverse microbial communities (Van der Putten et al., 2013; Bardgett & van der Wal, 2014). 
+
+</br>
+
+### Fungi 
+
+#### Alpha and beta diversity 
+
+The results for fungi partially support the hypothesis that age, establishment method, management type and pH have a significant effect on alpha and beta diversity in fungal communities. Of all the drivers, pH was the most significant for both alpha and beta diversity, followed by age. Establishment method was also a strong driver for the differences between sites.  
+
+The impact of pH on fungal diversity is strongly supported by other studies, although the literature is contradictory. Ma et al (2023) found a negative correlation between soil pH and Shannon diversity when comparing grasslands with soils ranging from pHs of 6 to 7, although the study focused on grasslands in China, limiting direct comparisons with this study. However, Seaton et al (2022) found a positive correlation when comparing sites with pH values ranging from 6 to 8. In this study sites were split between slightly acidic to neutral (pH 6.6-7.9) and alkaline (pH 7.91-8.63) with alkaline soils showing lower alpha diversity, contradicting the findings of Seaton et al (2022). Reduced fungal diversity in soils with high pH have been attributed to the reduced nutrient use efficiency of fungi in these soils leading to a reduction in fungal diversity (Ma et al, 2023). However, it is difficult to draw this conclusion in this study. 
+
+For age, this study found that younger sites had lower alpha diversity than middle-aged to older regeneration sites and that age was a major driver for fungal community differences. Fungal communities take longer to recover from ecosystem disturbance (Gao et al, 2021) therefore may require longer-term restoration efforts, demonstrated by sites in the more diverse, above median age category in this study ranging in age from 16 to 100 years. 
+ 
+
+#### Differential Abundance Analysis  
+
+Establishment method had a strong effect on differences in fungal composition between sites supported by the beta diversity PERMANOVA results. Differential abundance analysis showed Metarhizium was almost absent from GH and SM sites, but more frequent in NR plots. Metarhizium is an entomopathogen that infects insects. Its presence in less disturbed plots NR might be linked to more stable host populations and fewer changes in soil structure (Zimmermann, 2007). This suggests a preference for undisturbed environments or stable host availability. Despite its known resilience to harsh soil conditions (Vänninen et al., 2000), its absence in disturbed sites points to sensitivity to competitive or structural changes in soil. On the other hand, Gibellulopsis was barely detected in NR plots but found in both GH and SM sites. Although no ecological studies specifically addressing the genus Gibellulopsis were found, Gibellulopsis nigrescens (syn. Verticillium nigrescens) has been reported as a weak plant pathogen involved in Verticillium wilt on peppermint in Germany (Alisaac & Götz, 2022). While this is a highly specific case, it illustrates how certain fungal taxa may respond to plant-related or environmental conditions.  
+
+Sheep grazing was also shown to be a significant factor affecting differences in soil fungal communities and was associated with higher abundance of Helotiales_fam_Incertae_sedis and Preussia. The observed increase in Helotiales_fam_Incertae_sedis under sheep grazing may reflect a response to changes in plant-derived inputs (e.g., litter or root exudates) induced by herbivory. Although the ecological roles of many Helotiales taxa remain unresolved—with approximately 70% of species lacking clear lifestyle or ecological data (Bruyant, Moënne-Loccoz, & Almario, 2024)—the order includes a broad diversity of functional types such as saprotrophs, endophytes, and mycorrhizal symbionts (Rissi, Ijaz, & Baschien, 2024).  Sheep contribute to soil dynamics via dung and urine deposition, which can alter soil chemistry and nutrient availability. Although this effect is mainly documented in the context of greenhouse gas emissions, it implies a modification of soil organic inputs (Jiang et al., 2014). Some Preussia species have been isolated from dung (Kruys et al., 2006), suggesting that at least some members of the genus may benefit from such inputs. 
+
+Ploughing also affected some fungal taxa, notably Saitozyma, a saprotrophic yeast more commonly found in ploughed plots. Genomic studies have shown that Saitozyma podzolica (previously Cryptococcus podzolicus) possesses the metabolic capacity to break down plant-derived carbon sources such as glucose and xylose and convert them into lipids and gluconic acid (Aliyu et al., 2021). These traits suggest that Saitozyma may benefit from the increased availability of labile substrates and altered soil conditions caused by ploughing, enabling it to rapidly colonise and exploit disturbed soils. Xenopyrenochaetopsis and Gloniaceae (gen. Incertae sedis) were also more common in plots disturbed by ploughing, suggesting they may behave as saprotrophs or endophytes capable of exploiting decomposing material or altered microhabitats. However, due to the limited documentation available on their functional roles or ecological preferences, any such interpretation remains speculative. 
+
+Fungal composition also shifted with site age. Paraphaeosphaeria was only found in older sites, though in low abundance. This genus is known as an endophyte, sometimes linked to biocontrol functions (Baroncelli et al., 2020). In contrast, Lasiosphaeriaceae_gen_Incertae_sedis was more abundant in younger sites. Members of this fungal family are frequently described as saprotrophs, including species associated with dung or decaying vegetation (Louw et al., 2022), which may allow them to benefit from the high organic input and disturbance typical of early successional systems. 
+
+Finally, we observed that Metapochonia was more frequently detected in soils with lower pH values ( <7.94). Although this pattern suggests a possible ecological preference, there is currently no clear documentation on the ecological role or functional traits of this genus in acidic environments. Further studies are needed to clarify the ecological function of Metapochonia in soil systems. 
+
+
+#### Differential abundance of functional guilds 
+
+The results on fungal functional guilds support the hypothesis that site age, establishment method, and soil pH influence the ecological structure of fungal communities, although taxa identification is limited by the lower resolution of amplicon sequencing. Among these factors, establishment method appeared to exert the strongest influence, particularly distinguishing NR sites from those established via GH or SM. 
+
+These patterns likely reflect the influence of disturbance intensity and grazing regime. NR sites, which experience reduced intervention, exhibited the lowest relative abundance of plant pathogens and dung saprotrophs. In contrast, sown plots showed markedly higher proportions of these guilds, potentially due to increased herbivore activity, elevated plant biomass, or initial organic matter inputs. This supports previous findings that fungal functional composition responds sensitively to land management and vegetation structure (Hannula et al., 2017). 
+
+The influence of soil pH was subtler but notable. Although overall guild diversity remained stable, animal parasites were more abundant in acidic soils, suggesting pH-dependent shifts in host-parasite dynamics or soil biodiversity patterns. This observation aligns with evidence that soil chemistry—including pH and salinity—can shape fungal guild composition, sometimes enhancing the abundance of specific groups (Chandran et al., 2023). 
+
+We observed a relative influence of site age on fungal community composition in our grassland system, similar patterns have been reported in forest restoration contexts. For instance, in subalpine Picea asperata plantations, stand age was identified as the main driver of variation in fungal community composition and functional guilds (Fang et al., 2023). While these findings support the idea that successional time can influence soil fungal communities, they should be interpreted with caution given the ecological differences between forest systems and grasslands. The extent to which such patterns generalise across ecosystems likely depends on vegetation type, soil properties, and dominant fungal functional groups. 
+
+A recurrent and striking pattern across all site types was the dominance of saprotrophic fungi, particularly undefined saprotrophs. This suggests a strong functional role in decomposition and nutrient cycling, typically associated with later successional stages (Peay et al., 2016). However, the large proportion of unassigned fungi also underscores the limitations of current fungal functional classification systems (Nilsson et al., 2020), potentially obscuring a portion of the ecological signal. 
+
+
+</br>
+
+
+### Bacterial and fungal interactions 
+
+This study illustrates that bacterial and fungal communities are affected by different drivers. Diversity within bacterial communities is largely driven by establishment methods while fungal diversity is significantly affected by soil pH and age. However, drivers for the differences in community composition (beta) between sites were broadly similar for bacterial and fungal communities, with establishment, pH, age and to a more limited extent, management the most important factors. A look at differentially abundant taxa between the two kingdoms shows taxonomical composition patterns. This includes preferences for GH and SM sites, that tend to have more diverse plant communities, by copiotrophic bacteria such as Proteobacteria and  fungi Gibellulopsis. At a pathway and guild level core metabolic pathways for bacteria and core decomposition functions from saptrophs also seem to dominate. Making comparisons between bacterial and fungal communities is however made difficult by the shortage of documentation associated with fungal taxonomy and function.  
+
+Both fungal and bacterial communities are important for multi-functionality in ecosystems, supporting functional diversity as well as functional redundancy, where an ecosystem contains multiple species that provide the same function. Functional redundancy acts as a ‘future proofing’ for ecosystems, as it protects against the loss of taxa and ensures functioning is maintained (Wagg et al, 2019). Relationships between fungi and bacteria can be complementary or supportive (Wagg et al, 2019; Kohlmeier et al, 2005). 
+
+In this study, the most significant taxa correlations were between saprotrophic or parasitic/pathogenic fungi and heterotrophic or organotrophic bacteria. The dominance of these groups is often found in grasslands (Labouyrie et al, 2023). For functional correlations, most of the significant relationships were between animal pathogens and saprotrops and microbial metabolic pathways associated with the breakdown of sugars and other macromolecules. 
+
+Placing specific correlations in the context of existing literature proved challenging, chiefly due to the limited nature of many studies. Although there are multiple studies considering the effects of fungal-bacterial interactions on ecosystem function, literature is still sparse with those studies that are available treating bacterial and fungal diversity separately (Labouyrie et al, 2023; Lepinay et al, 2024), drawing general conclusions (Gao et al, 2021; de Menezes et al., 2015), or investigating interactions in non-grassland ecosystems (Gomez-Brandon et al, 2020).  
+ 
+
+#### Taxa correlations
+
+In this study, there was some evidence for fungal-bacterial interactions at a taxa level. For instance, Bradyrhizobiaceae, an oligotrophic family of nitrogen-fixing, phosphate-mobilising bacteria was correlated with the abundance of saprotrophic yeasts (genus: Saitozyma) from the Trimorphomycetaceae family, and genus Keithomyces, an insect parasite from the pathogenic fungal family Clavicipitaceae. The relative abundance of saprotrophic fungi, including yeasts, responds positively to increased bio-available nitrogen (Gomez-Brandon et al, 2020; Simonin et al, 2017) as do fungal pathogens (Geng et al, 2023) so it is possible the increased prescence of these fungi on Bradyrhizobiaceae-containing sites could be related to increased nitrogen and phosphorous availability. However, soil nitrogen levels at these sites would need to be assessed to confirm this. An alternative explanation is that pH levels were a driving factor as all three taxa appeared on the sites with the lowest pH values (6.6-6.7). Bradyrhizobiaceae in particular favours acidic soils (Sawada et al, 2023). 
+
+Many of the taxa correlations appeared to be driven by site preferences. For example, Rhodospirillaceae, a family of photoheterotrophic bacteria appeared to be correlated with Dermaloma, as both taxa were most abundant on one site, Knepp Pond Field. Rhodospirillaceae prefers anoxic conditions while saprotroph Dermaloma, prefers unimproved grassland (O’Reilly and Parker, n.d.). It is possible therefore the positive correlation is related to the NR site providing the most favourable conditions for both taxa to thrive but for different reasons. 
+
+#### Functional correlations
+
+The main functional correlations were related to nutrient cycling, with fungi and bacteria carrying out complementary processes or recycling different macromolecules.  
+
+Six of the significant pathways involved dung saprotrophs, associated with genera from the Chaetomiaceae family, mainly Thermothielavioides. Thermothielavioides produces α-ʟ-arabinofuranosidase, an enzyme that breaks down plant polysaccharides to release ʟ-arabinose (Camargo et al, 2020) and the bacterial ʟ-arabinose degradation pathway. Other sugar degradation pathways significantly positively correlated with Thermothielavioides were the glucose and glucose-1-phosphate degradation pathway (Caspi et al, 2020), and sucrose degradation IV (sucrose phosphorylase), associated with the bacterial order Actinomycetales (Caspi et al, 2020). Pathways involving the breakdown of tryptophan and the degradation of proprionate (2-methylcitrate cycle II), a by-product of fermentation found in ruminants (Caspi et al, 2020), were also positively associated with these fungal taxa. These correlations could suggest fungi and bacteria can take on complementary functions by breaking down different plant polysaccharides, different macromolecules or bacteria degrading the byproducts of fungal processes. Support for complementarity between the kingdoms has been found by Wagg et al (2019) in experimental grassland systems with these complementary functions providing different limiting nutrients to plants and increasing plant productivity. 
+
+The purine nucleobases degradation I (anaerobic) pathway was associated with the saprotrophic and ectomycorrhizal guilds related to Pezizaceae, a fungal family that includes genera found in dung, rotting wood or litter. The purine degradation pathway releases carbon and nitrogen in oxygen poor environments (Caspi et al, 2020), so this may be an example of bacteria taking advantage of the accessibility of macronutrients released by fungal nutrient cycling. 
+
+Most of the correlations were associated with sites that use NR as an establishment method. Fungal-bacterial associations have been shown to increase in complexity along successional stages in grasslands (Gao et al., 2021) so this is a potential avenue for research.
+
 
 </br>
 
 ## Limitations
 
+Carrying out pairwise comparisons between fungi and bacteria resulted in thousands of correlations. Although correlations were filtered for abundance it may have resulted in potentially filtering out meaningful correlations while including correlations which, upon analysis, could not be clearly understood, even when taking the current literature into account. Additionally, some of the FUNGuild guild assignments included multiple, non-specific guilds for the same assignment, making it confusing for analysis. Methods other than pairwise correlations such as generalised linear models (Wagg et al, 2019) could be investigated. 
 
-Correlation analyses were limited by the complexity and abundance of fungal-bacterial interactions. Filtering was required to manage the volume of pairwise comparisons, which may have excluded meaningful associations. The ambiguity of FUNGuild annotations also constrained ecological interpretation. Alternative modelling approaches like GLMs may yield more robust insights into cross-kingdom interactions.
-Additionally, the large proportion of unassigned fungi also underscores the limitations of current fungal functional classification systems (Nilsson et al., 2020), potentially obscuring a portion of the ecological signal.
+This study also considered each factor in isolation, potentially missing the effects of interactions between establishment method and age. For future studies, more advanced statistical methods could be used to take age into account when assessing the effects of establishment method. 
 
 
 
