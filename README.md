@@ -12,6 +12,8 @@ The repository includes:
 - R-markdown code to create an interactive report to display outputs from the project
 - R scripts for analysis of bacterial and fungal correlations
 
+Full results are available at: https://kerrycranfield.github.io/dig-deeper-project/Final_report.html
+
 ## Scripts description: ITS
 
 1. F01_itsxpress.sh – Trimming and Quality Control
